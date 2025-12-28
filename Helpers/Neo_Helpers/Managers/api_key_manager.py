@@ -139,6 +139,10 @@ async def gemini_api_call_with_rotation(prompt_content, generation_config, **kwa
                     await asyncio.sleep(180)
                 # After rotating (or waiting), continue the loop to retry the request
                 continue
+            elif "404" in str(e) and "not found" in str(e).lower():
+                print(f"    [Gemini Error] Model not found: {e}. Please check the model name in api_key_manager.py.")
+                # Break loop to avoid infinite 404s
+                raise e
             else:
                 # It's a different, non-quota error, so we re-raise it to be handled by the caller.
                 # This breaks the infinite loop.

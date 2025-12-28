@@ -30,7 +30,8 @@ async def process_match_task(match_data: dict, browser: Browser):
         user_agent=(
             "Mozilla/5.0 (Linux; Android 10; SM-G973F) AppleWebKit/537.36 (KHTML, like Gecko) "
             "Chrome/91.0.4472.124 Mobile Safari/537.36"
-        )
+        ),
+        timezone_id="Africa/Lagos"
     )
     page = await context.new_page()
     match_label = f"{match_data.get('home_team', 'unknown')}_vs_{match_data.get('away_team', 'unknown')}"
@@ -48,7 +49,7 @@ async def process_match_task(match_data: dict, browser: Browser):
 
         # --- H2H Tab & Expansion ---
         await analyze_page_and_update_selectors(page, "match_page")
-        h2h_tab_selector = await SelectorManager.get_selector_auto(page, "match_page", "nav_tab_h2h")
+        h2h_tab_selector = SelectorManager.get_selector("match_page", "h2h_tab")
 
         h2h_data = {}
         if h2h_tab_selector and await page.locator(h2h_tab_selector).is_visible(timeout=WAIT_FOR_LOAD_STATE_TIMEOUT):
@@ -59,25 +60,27 @@ async def process_match_task(match_data: dict, browser: Browser):
                 await fs_universal_popup_dismissal(page, "h2h_tab")
                 await asyncio.sleep(3.0)  # Shorter wait time
 
-                # More robust H2H expansion with better error handling
-                h2h_show_more_home_sel = await SelectorManager.get_selector_auto(page, "h2h_tab", "h2h_show_more_home")
-                h2h_show_more_away_sel = await SelectorManager.get_selector_auto(page, "h2h_tab", "h2h_show_more_away")
-                h2h_show_more_mutual_sel = await SelectorManager.get_selector_auto(page, "h2h_tab", "h2h_show_more_mutual")
-
-                show_more_selectors = [h2h_show_more_home_sel, h2h_show_more_away_sel, h2h_show_more_mutual_sel]
-                show_more_selectors = [s for s in show_more_selectors if s]  # Filter out None values
-
-                if show_more_selectors:
-                    print("    [H2H Expansion] Expanding available match history...")
-                    for selector in show_more_selectors:
+                 # More robust H2H expansion with better error handling
+                show_more_selector = "button:has-text('Show more matches'), a:has-text('Show more matches')"
+                try:
+                    # Wait shorter time and handle case where buttons don't exist
+                    await page.wait_for_selector(show_more_selector, timeout=WAIT_FOR_LOAD_STATE_TIMEOUT)
+                    show_more_buttons = page.locator(show_more_selector).first  # Try first one
+                    if await show_more_buttons.count() > 0:
+                        print("    [H2H Expansion] Expanding available match history...")
                         try:
-                            if await page.locator(selector).count() > 0:
-                                await page.locator(selector).click(timeout=WAIT_FOR_LOAD_STATE_TIMEOUT)
-                                await asyncio.sleep(2.0)
+                            await show_more_buttons.click(timeout=WAIT_FOR_LOAD_STATE_TIMEOUT)
+                            await asyncio.sleep(5.0)
+                            # Check if clicking reveals more buttons
+                            second_button = page.locator(show_more_selector).nth(1)
+                            if await second_button.count() > 0:
+                                await second_button.click(timeout=WAIT_FOR_LOAD_STATE_TIMEOUT)
+                                await asyncio.sleep(1.0)
                         except Exception:
-                            print(f"    [H2H Expansion] Failed to click selector: {selector}")
-                else:
+                            print("    [H2H Expansion] Some expansion buttons failed, but continuing...")
+                except Exception:
                     print("    [H2H Expansion] No expansion buttons found or failed to load.")
+
 
                 await asyncio.sleep(3.0)  # Shorter wait time
                 await analyze_page_and_update_selectors(page, "h2h_tab")
@@ -100,7 +103,7 @@ async def process_match_task(match_data: dict, browser: Browser):
             print(f"      [Warning] H2H tab inaccessible for {match_label}")
 
         # --- Standings Tab ---
-        standings_tab_selector = await SelectorManager.get_selector_auto(page, "match_page", "nav_tab_standings")
+        standings_tab_selector = SelectorManager.get_selector("match_page", "standings_tab")
         standings_data = []
         standings_league = "Unknown"
         if standings_tab_selector and await page.locator(standings_tab_selector).is_visible(timeout=WAIT_FOR_LOAD_STATE_TIMEOUT):
@@ -279,10 +282,11 @@ async def run_flashscore_analysis(browser: Browser):
         user_agent=(
             "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
             "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
-        )
+        ),
+        timezone_id="Africa/Lagos"
     )
     page = await context.new_page()
-    processor = BatchProcessor(max_concurrent=4)
+    processor = BatchProcessor(max_concurrent=1)
     total_cycle_predictions = 0
 
     # --- Navigation & Calibration ---

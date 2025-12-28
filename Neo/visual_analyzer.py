@@ -852,6 +852,7 @@ class VisualAnalyzer:
         - **PRIORITY**: ID > Single class > Simple attribute > 2-word combo
         - **FORBIDDEN**: Chains >2 levels, long selectors, complex nesting
         - **RULE**: If simple works, STOP - don't make it complex
+        - **NO HARDCODED DATA**: NEVER use specific team names, dates, times, or scores in selectors (e.g., no :contains("Chelsea")). Use structural selectors (:nth-child, :nth-of-type) or generic classes.
 
         VALID: "#btn", ".schedule", "a[href*='login']", "button.save"
         INVALID: "div.container section.matches a.button", "div.home-section-container.is-upcoming-matches a.view-more-button"
