@@ -2431,7 +2431,6 @@
         "standings_tab_top_scorers_button": "a[data-analytics-alias=\"stats-detail_top-scorers\"]"
     },
     "h2h_tab2": {
-        
         "h2h_section_home_last_5": "div.h2h__section:nth-of-type(1)",
         "h2h_section_away_last_5": "div.h2h__section:nth-of-type(2)",
         "h2h_section_mutual": "div.h2h__section:nth-of-type(3)",
@@ -6010,7 +6009,7 @@
         "league_wrapper_collapsed": "div.league-wrapper.collapsed",
         "match_card": "section.match-card-section.match-card",
         "match_card_link": "section.match-card-section.match-card .card-link",
-        "match_url": "section.match-card-section.match-card .card-link",
+        "match_url": "section.match-card-section.match-card a.card-link",
         "match_region_league_name": "section.match-card-section.match-card .header .league-link",
         "odds_val_1": ".match-card .outcome-row > div:nth-child(1) span",
         "odds_val_x": ".match-card .outcome-row > div:nth-child(2) span",
@@ -6040,6 +6039,23 @@
         "league_list_item_toggle_icon": "div.league-title-wrapper span.icon-triangle.collapsed",
         "sticky_table_header_1": "section.sticky-market-title-bar .right-box h5:nth-child(1)",
         "sticky_table_header_x": "section.sticky-market-title-bar .right-box h5:nth-child(2)",
-        "sticky_table_header_2": "section.sticky-market-title-bar .right-box h5:nth-child(3)"
+        "sticky_table_header_2": "section.sticky-market-title-bar .right-box h5:nth-child(3)",
+        "full_schedule_button": "span[data-cms-key='full_schedule']",
+        "filter_dropdown_today": "div.m-choose-time",
+        "dropdown_time_items": "div.m-dropdown-item",
+        "sort_dropdown": "div.m-choose-sort",
+        "match_card_header": "section.match-card-section.match-card div.header",
+        "search_icon": ".search-icon",
+        "search_input": "input.searchMode",
+        "slip_drawer_container": "div[data-op='betslip-container']",
+        "slip_trigger_button": "div[data-op='betslip-multi-min-count']",
+        "slip_tab_multiple": "div.m-betslip-tab-item:has-text('Multiple')",
+        "stake_input": ".m-betslip-stake-input",
+        "place_bet_button": "div[data-op='place-bet']",
+        "confirm_bet_button": "button:has-text('Confirm')",
+        "booking_code_text": ".bet-code",
+        "betslip_count_badge": "div.open-bet-icon + div.circle",
+        "betslip_clear_all": ".m-icon-delete",
+        "outcome_row_container": "div.m-table-row"
     }
 }

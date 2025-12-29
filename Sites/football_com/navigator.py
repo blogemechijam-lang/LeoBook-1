@@ -144,64 +144,48 @@ async def extract_balance(page: Page) -> float:
 
 
 async def navigate_to_schedule(page: Page):
-    """Navigate to the full schedule page using robust hardcoded selectors."""
-
-    # Priority-based selector fallback system (most specific to most general)
-    selectors = [
-        "a[href*='/ng/m/sport/football/schedule']",  # Exact Football.com schedule URL
-        "a[href*='schedule']",                       # Any link containing "schedule"
-        "text='Full Schedule'",                      # Text-based fallback
-        "text='Schedule'",                          # Shorter text fallback
-        "[data-op*='schedule']",                    # Data attribute fallback
-    ]
-
-    for selector in selectors:
+    """Navigate to the full schedule page using dynamic selectors."""
+    
+    # Try dynamic selector first
+    schedule_sel = get_selector("fb_main_page", "full_schedule_button")
+    
+    if schedule_sel:
         try:
-            print(f"  [Navigation] Trying selector: {selector}")
-            if await page.locator(selector).count() > 0:
-                await page.locator(selector).first.click(timeout=5000)
-                print("  [Navigation] Button clicked successfully.")
+            print(f"  [Navigation] Trying dynamic selector: {schedule_sel}")
+            if await page.locator(schedule_sel).count() > 0:
+                await page.locator(schedule_sel).first.click(timeout=5000)
                 await page.wait_for_load_state('domcontentloaded', timeout=WAIT_FOR_LOAD_STATE_TIMEOUT)
-                print("  [Navigation] Schedule page loaded.")
+                print("  [Navigation] Schedule page loaded via dynamic selector.")
                 return
             else:
-                print(f"  [Navigation] Selector not found: {selector}")
+                 print(f"  [Navigation] Dynamic selector not found on page: {schedule_sel}")
         except Exception as e:
-            print(f"  [Navigation] Selector failed: {selector} - {e}")
-            continue
+            print(f"  [Navigation] Dynamic selector failed: {e}")
 
-    # Final fallback: direct URL navigation
-    print("  [Navigation] All selectors failed. Using direct URL navigation.")
-    await page.goto("https://www.football.com/ng/m/sport/football/schedule", wait_until='domcontentloaded', timeout=30000)
+    # Fallback: direct URL navigation
+    print("  [Navigation] Dynamic selector failed. Using direct URL navigation.")
+    await page.goto("https://www.football.com/ng/m/sport/football/", wait_until='domcontentloaded', timeout=30000)
     print("  [Navigation] Schedule page loaded via direct URL.")
 
 async def select_target_date(page: Page, target_date: str) -> bool:
-    """Select the target date in the schedule and validate using robust hardcoded selectors."""
+    """Select the target date in the schedule and validate using dynamic and robust selectors."""
 
     print(f"  [Navigation] Selecting date: {target_date}")
 
-    # Priority-based selector system for date dropdown
-    date_selectors = [
-        "div.m-choose-time",           # Football.com time selector
-        "[data-op*='time']",          # Data attribute fallback
-        ".time-selector",             # Class-based fallback
-        "select[name*='time']",       # Select element fallback
-    ]
-
-    # Find and click the date dropdown
+    # Dynamic Selector First
+    dropdown_sel = get_selector("fb_schedule_page", "filter_dropdown_today")
     dropdown_found = False
-    for selector in date_selectors:
+    
+    if dropdown_sel:
         try:
-            if await page.locator(selector).count() > 0:
-                await page.locator(selector).first.click()
-                print(f"  [Filter] Clicked date dropdown with selector: {selector}")
+            if await page.locator(dropdown_sel).count() > 0:
+                await page.locator(dropdown_sel).first.click()
+                print(f"  [Filter] Clicked date dropdown with selector: {dropdown_sel}")
                 dropdown_found = True
                 await asyncio.sleep(1)
-                break
         except Exception as e:
-            print(f"  [Filter] Dropdown selector failed: {selector} - {e}")
-            continue
-
+            print(f"  [Filter] Dropdown selector failed: {dropdown_sel} - {e}")
+            
     if not dropdown_found:
         print("  [Filter] Could not find date dropdown")
         return False
@@ -219,14 +203,21 @@ async def select_target_date(page: Page, target_date: str) -> bool:
 
     # Try to find and click the target day
     day_found = False
+    item_selector = get_selector("fb_schedule_page", "dropdown_time_items")
+    
     for day in possible_days:
         try:
-            day_selector = f"text='{day}'"
+            # Try specific dynamic item selector if available + text filter
+            if item_selector:
+                 day_selector = f"{item_selector}:has-text('{day}')"
+            else:
+                 day_selector = f"text='{day}'"
+                 
             if await page.locator(day_selector).count() > 0:
                 await page.locator(day_selector).first.click()
                 print(f"  [Filter] Successfully selected: {day}")
                 day_found = True
-                break
+                #break
         except Exception as e:
             print(f"  [Filter] Failed to select {day}: {e}")
             continue
@@ -238,30 +229,23 @@ async def select_target_date(page: Page, target_date: str) -> bool:
     await page.wait_for_load_state('networkidle', timeout=WAIT_FOR_LOAD_STATE_TIMEOUT)
     await asyncio.sleep(2)
 
-    # Sort by League (optional - may not always be available)
+    # Sort by League 
     try:
-        league_sort_selectors = [
-            "div.m-choose-sort",                    # Football.com sort dropdown
-            "[data-op*='sort']",                   # Data attribute fallback
-            "text='League'",                       # Direct text match
-        ]
-
-        for sort_sel in league_sort_selectors:
+        sort_sel = get_selector("fb_schedule_page", "sort_dropdown")
+        if sort_sel:
             try:
                 if await page.locator(sort_sel).count() > 0:
                     await page.locator(sort_sel).first.click()
                     await asyncio.sleep(1)
 
-                    # Try to select "League" from dropdown options
+                    # Try to select "League" from dropdown options (Content filter)
                     league_option = "text='League'"
                     if await page.locator(league_option).count() > 0:
-                        await page.locator(league_option).first.click()
+                        await page.locator(league_option).second.click()
                         print("  [Filter] Successfully sorted by League")
                         await asyncio.sleep(2)
-                    break
             except Exception as e:
                 print(f"  [Filter] Sort selector failed: {sort_sel} - {e}")
-                continue
 
     except Exception as e:
         print(f"  [Filter] League sorting failed (non-critical): {e}")

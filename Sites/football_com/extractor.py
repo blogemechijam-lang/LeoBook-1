@@ -9,6 +9,7 @@ from typing import List, Dict
 from playwright.async_api import Page
 
 from Neo.selector_manager import SelectorManager
+from Neo.intelligence import get_selector
 from Helpers.constants import WAIT_FOR_LOAD_STATE_TIMEOUT
 
 
@@ -19,43 +20,24 @@ async def extract_league_matches(page: Page, target_date: str) -> List[Dict]:
     print("  [Harvest] Starting match extraction...")
     all_matches = []
 
-    # Priority-based selector system for Football.com matches
-    selector_sets = [
-        # Primary selectors (Football.com specific)
-        {
-            "league_header": "section.match-card-section.match-card div.header",
-            "match_rows": "section.match-card-section.match-card",
-            "match_url": "section.match-card-section.match-card a.card-link"
-        },
-        # Secondary selectors (generic football site patterns)
-        {
-            "league_header": ".league-header, [class*='league'] h4, [class*='league'] h3",
-            "match_rows": ".match-card, .match-row, [class*='match']",
-            "match_url": ".match-card a, .match-row a, [class*='match'] a"
-        },
-        # Tertiary selectors (very generic)
-        {
-            "league_header": "h4, h3, .header",
-            "match_rows": ".card, .row, [class*='item']",
-            "match_url": "a[href*='match'], a[href*='game']"
-        }
-    ]
+    # Dynamic selectors from knowledge base
+    # User Requirement: No hardcoded selectors.
+    
+    league_header_sel = get_selector("fb_schedule_page", "match_card_header")
+    match_rows_sel = get_selector("fb_schedule_page", "match_rows")
+    match_url_sel = get_selector("fb_schedule_page", "match_url")
+    
+    if not league_header_sel or not match_rows_sel or not match_url_sel:
+        print("  [Harvest] Critical selectors missing in knowledge.json")
+        return all_matches
 
-    # Try each selector set in priority order
-    working_selectors = None
-    for i, selector_set in enumerate(selector_sets):
-        try:
-            # Test if selectors work on the page
-            league_count = await page.locator(selector_set["league_header"]).count()
-            match_count = await page.locator(selector_set["match_rows"]).count()
+    working_selectors = {
+        "league_header": league_header_sel,
+        "match_rows": match_rows_sel,
+        "match_url": match_url_sel
+    }
 
-            if league_count > 0 and match_count > 0:
-                working_selectors = selector_set
-                print(f"  [Harvest] Using selector set {i+1}: Found {league_count} leagues, {match_count} matches")
-                break
-        except Exception as e:
-            print(f"  [Harvest] Selector set {i+1} failed: {e}")
-            continue
+    print(f"  [Harvest] Using dynamic selectors: {working_selectors}")
 
     if not working_selectors:
         print("  [Harvest] No working selectors found")

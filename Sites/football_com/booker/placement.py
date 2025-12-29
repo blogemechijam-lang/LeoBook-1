@@ -12,7 +12,7 @@ from Helpers.Site_Helpers.site_helpers import get_main_frame
 from Helpers.DB_Helpers.db_helpers import update_prediction_status
 from Helpers.utils import log_error_state
 from Neo.selector_manager import SelectorManager
-from Neo.intelligence import fb_universal_popup_dismissal as neo_popup_dismissal
+from Neo.intelligence import get_selector, fb_universal_popup_dismissal as neo_popup_dismissal
 
 from .ui import robust_click, handle_page_overlays, dismiss_overlays
 from .mapping import find_market_and_outcome
@@ -69,69 +69,53 @@ async def place_bets_for_matches(page: Page, matched_urls: Dict[str, str], day_p
 
             print(f"    [Betting] Looking for market '{m_name}' with outcome '{o_name}'")
 
-            # Find and click search icon using priority-based selectors
-            search_selectors = [
-                ".search-icon",                      # Football.com search icon
-                "[class*='search'] svg",           # Icon in search container
-                "svg[viewBox*='24']",              # Common search icon viewBox
-                "[data-op*='search']",             # Data attribute
-                "button:has(svg)",                 # Button containing SVG
-            ]
-
+            # Find and click search icon using dynamic selector
+            search_sel = get_selector("fb_match_page", "search_icon")
             search_clicked = False
-            for search_sel in search_selectors:
+            
+            if search_sel:
                 try:
                     if await frame.locator(search_sel).count() > 0:
                         await frame.locator(search_sel).first.click()
                         print(f"    [Betting] Clicked search with selector: {search_sel}")
                         search_clicked = True
                         await asyncio.sleep(1)
-                        break
                 except Exception as e:
                     print(f"    [Betting] Search selector failed: {search_sel} - {e}")
-                    continue
+            else:
+                 print("    [Betting] Search selector missing in knowledge.json")
 
             if not search_clicked:
                 print("    [Betting] Could not find search icon")
                 continue
 
-            # Find and fill search input using priority-based selectors
-            input_selectors = [
-                "input.searchMode",                # Football.com search input
-                ".searchMode input",              # Input in search mode
-                "input[type='text']",             # Generic text input
-                "input[placeholder*='search']",   # Placeholder-based
-                "input.full-size",                # Football.com specific class
-            ]
-
+            # Find and fill search input using dynamic selector
+            input_sel = get_selector("fb_match_page", "search_input")
             input_found = False
-            for input_sel in input_selectors:
+            
+            if input_sel:
                 try:
                     if await frame.locator(input_sel).count() > 0:
                         await frame.locator(input_sel).first.fill(m_name)
                         print(f"    [Betting] Filled search input with selector: {input_sel}")
                         input_found = True
                         await asyncio.sleep(2)
-                        break
                 except Exception as e:
                     print(f"    [Betting] Input selector failed: {input_sel} - {e}")
-                    continue
+            else:
+                print("    [Betting] Input selector missing in knowledge.json")
 
             if not input_found:
                 print("    [Betting] Could not find search input")
                 continue
 
-            # Select Outcome using priority-based selectors
-            outcome_selectors = [
-                f"div.m-table-row > div:has-text('{o_name}')",  # Football.com specific
-                f"[class*='outcome']:has-text('{o_name}')",     # Generic outcome with text
-                f"div:has-text('{o_name}')",                    # Any div with the outcome text
-                f"button:has-text('{o_name}')",                 # Button with outcome text
-                f"span:has-text('{o_name}')",                   # Span with outcome text
-            ]
-
+            # Select Outcome using dynamic selector
+            row_container = get_selector("fb_match_page", "outcome_row_container")
             bet_selected = False
-            for outcome_sel in outcome_selectors:
+            
+            if row_container:
+                # Construct specific selector
+                outcome_sel = f"{row_container} > div:has-text('{o_name}')"
                 try:
                     if await frame.locator(outcome_sel).count() > 0:
                         count_before = await get_bet_slip_count(page)
@@ -142,10 +126,10 @@ async def place_bets_for_matches(page: Page, matched_urls: Dict[str, str], day_p
                                 update_prediction_status(match_id, target_date, 'booked')
                                 print(f"    [Success] Added bet for {pred['home_team']} vs {pred['away_team']}")
                                 bet_selected = True
-                                break
                 except Exception as e:
                     print(f"    [Betting] Outcome selector failed: {outcome_sel} - {e}")
-                    continue
+            else:
+                 print("    [Betting] Outcome row container missing in knowledge.json")
 
             if bet_selected:
                 continue
@@ -182,34 +166,33 @@ async def finalize_accumulator(page: Page, target_date: str) -> bool:
         await asyncio.sleep(1)
         await page.keyboard.press("End")
         
-        is_open_selectors = ["div[data-op='betslip-container']", ".bottom-panel-drawer", "div.m-betslip-place-bet"]
-        is_open = any([await page.locator(s).first.is_visible(timeout=500) for s in is_open_selectors])
+        # Check if slip is open
+        drawer_sel = get_selector("fb_match_page", "slip_drawer_container")
+        is_open = False
+        if drawer_sel:
+             is_open = await page.locator(drawer_sel).first.is_visible(timeout=500)
 
         if not is_open:
-            triggers = ["div[data-op='betslip-multi-min-count']", ".open-bet-icon", "text='Betslip'"]
-            for t in triggers:
-                if await robust_click(page.locator(t).first, page):
+            trigger_sel = get_selector("fb_match_page", "slip_trigger_button")
+            if trigger_sel:
+                if await robust_click(page.locator(trigger_sel).first, page):
                     await asyncio.sleep(3)
-                    break
+            else:
+                print("    [Betting] Slip trigger selector missing")
 
         # Ensure 'Multiple' tab is selected for accumulators
-        multi_tab = "div.m-betslip-tab-item:has-text('Multiple'), .m-betslip-tabs > div:nth-child(2)"
-        if await page.locator(multi_tab).count() > 0:
-            if await page.locator(multi_tab).is_visible(timeout=2000):
-                await page.locator(multi_tab).click()
+        multi_sel = get_selector("fb_match_page", "slip_tab_multiple")
+        
+        if multi_sel and await page.locator(multi_sel).count() > 0:
+            if await page.locator(multi_sel).is_visible(timeout=2000):
+                await page.locator(multi_sel).click()
                 await asyncio.sleep(1)
 
-        # Enter Stake using priority-based selectors
-        stake_selectors = [
-            "input[type='number']",               # Standard number input
-            ".m-betslip-stake-input",            # Football.com stake input
-            "[placeholder*='stake']",            # Placeholder-based
-            "[class*='stake'] input",            # Class-based
-            ".stake-input",                      # Generic stake class
-        ]
-
+        # Enter Stake
+        stake_sel = get_selector("fb_match_page", "stake_input")
         stake_entered = False
-        for stake_sel in stake_selectors:
+        
+        if stake_sel:
             try:
                 if await page.locator(stake_sel).count() > 0:
                     input_field = page.locator(stake_sel).first
@@ -219,49 +202,33 @@ async def finalize_accumulator(page: Page, target_date: str) -> bool:
                     print(f"    [Betting] Entered stake with selector: {stake_sel}")
                     stake_entered = True
                     await asyncio.sleep(1)
-                    break
             except Exception as e:
                 print(f"    [Betting] Stake selector failed: {stake_sel} - {e}")
-                continue
 
         if not stake_entered:
             print("    [Warning] Could not enter stake. Attempting to place anyway.")
 
-        # Place bet using priority-based selectors
-        place_selectors = [
-            "div[data-op='place-bet']",           # Football.com place bet
-            ".m-place-bet-btn",                  # Football.com button class
-            "button:has-text('Place')",          # Text-based
-            "[class*='place'] button",           # Class-based
-            ".place-bet",                        # Generic class
-        ]
-
+        # Place bet
+        place_sel = get_selector("fb_match_page", "place_bet_button")
         bet_placed = False
-        for place_sel in place_selectors:
+        
+        if place_sel:
             try:
                 if await robust_click(page.locator(place_sel).first, page):
                     print(f"    [Betting] Clicked place bet with selector: {place_sel}")
                     bet_placed = True
                     await asyncio.sleep(2)
-                    break
             except Exception as e:
                 print(f"    [Betting] Place bet selector failed: {place_sel} - {e}")
-                continue
 
         if not bet_placed:
             print("    [Betting] Could not place bet")
             return False
 
-        # Confirm bet using priority-based selectors
-        confirm_selectors = [
-            "button:has-text('Confirm')",         # Text-based
-            ".m-confirm-btn",                    # Football.com confirm class
-            "[data-op='confirm']",               # Data attribute
-            ".confirm-button",                   # Generic class
-            ".btn-confirm",                      # Alternative class
-        ]
-
-        for confirm_sel in confirm_selectors:
+        # Confirm bet
+        confirm_sel = get_selector("fb_match_page", "confirm_bet_button")
+        
+        if confirm_sel:
             try:
                 if await page.locator(confirm_sel).count() > 0:
                     await robust_click(page.locator(confirm_sel).first, page)
@@ -276,8 +243,7 @@ async def finalize_accumulator(page: Page, target_date: str) -> bool:
                     print(f"    [Success] Placed for {target_date}")
                     return True
             except Exception as e:
-                print(f"    [Betting] Confirm selector failed: {confirm_sel} - {e}")
-                continue
+                 print(f"    [Betting] Confirm selector failed: {confirm_sel} - {e}")
 
         print("    [Betting] Could not confirm bet")
         return False
@@ -286,16 +252,10 @@ async def finalize_accumulator(page: Page, target_date: str) -> bool:
     return False
 
 async def extract_booking_details(page: Page) -> str:
-    """Extract booking code using priority-based selectors."""
-    code_selectors = [
-        ".bet-code",                          # Football.com bet code class
-        "[class*='code']",                    # Generic code class
-        "[data-op*='code']",                  # Data attribute
-        "span:not(.divider)",                 # Football.com specific format
-        ".booking-code",                      # Alternative class
-    ]
-
-    for code_sel in code_selectors:
+    """Extract booking code using dynamic selector."""
+    code_sel = get_selector("fb_match_page", "booking_code_text")
+    
+    if code_sel:
         try:
             if await page.locator(code_sel).count() > 0:
                 code = await page.locator(code_sel).first.inner_text()
@@ -304,8 +264,7 @@ async def extract_booking_details(page: Page) -> str:
                     return code.strip()
         except Exception as e:
             print(f"    [Booking] Code selector failed: {code_sel} - {e}")
-            continue
-
+            
     print("    [Booking] Could not extract booking code")
     return "N/A"
 
