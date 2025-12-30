@@ -13,7 +13,14 @@ from datetime import datetime, timedelta
 from playwright.async_api import Page
 
 from pathlib import Path
+from pathlib import Path
 from Helpers.DB_Helpers.db_helpers import PREDICTIONS_CSV, update_prediction_status
+try:
+    from Helpers.AI.llm_matcher import SemanticMatcher
+    HAS_LLM = True
+except ImportError:
+    HAS_LLM = False
+    print("  [Matcher] Warning: LLM dependencies not found. Falling back to simple fuzzy matching.")
 
 
 async def filter_pending_predictions() -> List[Dict]:
@@ -101,6 +108,15 @@ async def match_predictions_with_site(day_predictions: List[Dict], site_matches:
     if not day_predictions or not site_matches:
         return {}
 
+    # Initialize LLM Matcher if available
+    llm_matcher = None
+    if HAS_LLM:
+        try:
+            llm_matcher = SemanticMatcher()
+            print("  [Matcher] LLM Semantic Matcher initialized.")
+        except Exception as e:
+            print(f"  [Matcher] Failed to init LLM: {e}")
+
     mapping = {}
     used_site_matches = set()
 
@@ -143,6 +159,21 @@ async def match_predictions_with_site(day_predictions: List[Dict], site_matches:
             # Base team + league score (lower weight to prioritize datetime)
             team_score = (home_sim + away_sim) / 2
             base_score = team_score * 0.6 + league_sim * 0.4  # 40% teams/league
+
+            # LLM Semantic Check for medium-confidence matches
+            llm_boost = 0.0
+            if HAS_LLM and llm_matcher and 0.45 <= team_score <= 0.85:
+                 # Check if we already have a very high score match, skip costly LLM if so?
+                 # Actually, we want to find the true match.
+                 if best_score < 0.9: # Only ask if we don't have a definitive match yet
+                     print(f"    [LLM Check] Asking AI: Is '{pred_home}' == '{site_home}'?")
+                     if llm_matcher.is_match(pred_home, site_home, league=pred_league):
+                         print("      -> AI says YES!")
+                         # Boost confidence significantly
+                         base_score = 0.95 
+                         llm_boost = 0.5 # Marker
+                     else:
+                         print("      -> AI says NO.")
 
             # Datetime matching priority
             time_bonus = 0.0
