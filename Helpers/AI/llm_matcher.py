@@ -1,12 +1,16 @@
-import ollama
+import requests
+import json
 
 class SemanticMatcher:
-    def __init__(self, model='qwen3-vl:2b'):
+    def __init__(self, model='qwen3-vl:2b-custom'):
+        # The model name doesn't strictly matter for the raw server as it only serves one model,
+        # but we keep it for compatibility with the signature.
         self.model = model
+        self.api_url = "http://127.0.0.1:8080/v1/chat/completions"
 
     def is_match(self, team1, team2, league=None):
         """
-        Determines if two team names refer to the same entity.
+        Determines if two team names refer to the same entity using the local llama-server.
         """
         context = ""
         if league:
@@ -18,11 +22,22 @@ class SemanticMatcher:
             "Answer with exactly one word: 'Yes' or 'No'."
         )
         
+        payload = {
+            "model": self.model, # Passed but ignored by single-model server
+            "messages": [
+                {'role': 'user', 'content': prompt}
+            ],
+            "temperature": 0.0,
+            "max_tokens": 10
+        }
+
         try:
-            response = ollama.chat(model=self.model, messages=[
-                {'role': 'user', 'content': prompt},
-            ])
-            ans = response['message']['content'].strip().lower()
+            response = requests.post(self.api_url, json=payload, timeout=30)
+            response.raise_for_status()
+            
+            data = response.json()
+            # Handle standard OpenAI-compatible response structure
+            ans = data['choices'][0]['message']['content'].strip().lower()
             return 'yes' in ans
             
         except Exception as e:

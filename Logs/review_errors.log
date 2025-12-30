@@ -2693,3 +2693,63 @@ Call log:
 Call log:
   - waiting for locator("div.detailScore__wrapper > span:nth-child(3)").first
 
+2025-12-30T17:22:51.636949 [MEDIUM] score_extraction_error: Failed to extract score: Locator.inner_text: Timeout 30000ms exceeded.
+Call log:
+  - waiting for locator("div.detailScore__wrapper > span:nth-child(3)").first
+
+2025-12-30T17:23:45.849898 [MEDIUM] score_extraction_error: Failed to extract score: Locator.inner_text: Timeout 30000ms exceeded.
+Call log:
+  - waiting for locator("div.detailScore__wrapper > span:nth-child(3)").first
+
+2025-12-30T17:23:51.320775 [MEDIUM] score_extraction_error: Failed to extract score: Locator.inner_text: Timeout 30000ms exceeded.
+Call log:
+  - waiting for locator("div.detailScore__wrapper > span:nth-child(1)").first
+
+2025-12-30T17:23:56.197377 [MEDIUM] score_extraction_error: Failed to extract score: Locator.inner_text: Timeout 30000ms exceeded.
+Call log:
+  - waiting for locator("div.detailScore__wrapper > span:nth-child(3)").first
+
+2025-12-30T17:24:26.266809 [MEDIUM] score_extraction_error: Failed to extract score: Locator.inner_text: Timeout 30000ms exceeded.
+Call log:
+  - waiting for locator("div.detailScore__wrapper > span:nth-child(3)").first
+
+2025-12-30T17:24:29.745703 [MEDIUM] review_task_error: Review failed for MiQbIqn1: Page.goto: Timeout 180000ms exceeded.
+Call log:
+  - navigating to "https://www.flashscore.com/match/football/wellington-phoenix-YTnQRHr5/western-sydney-wanderers-OQSp9Rrp/?mid=MiQbIqn1", waiting until "domcontentloaded"
+
+2025-12-30T17:25:34.705625 [MEDIUM] score_extraction_error: Failed to extract score: Locator.inner_text: Timeout 30000ms exceeded.
+Call log:
+  - waiting for locator("div.detailScore__wrapper > span:nth-child(3)").first
+
+2025-12-30T17:25:54.190049 [MEDIUM] score_extraction_error: Failed to extract score: Locator.inner_text: Timeout 30000ms exceeded.
+Call log:
+  - waiting for locator("div.detailScore__wrapper > span:nth-child(3)").first
+
+2025-12-30T17:25:54.272384 [MEDIUM] score_extraction_error: Failed to extract score: Locator.inner_text: Timeout 30000ms exceeded.
+Call log:
+  - waiting for locator("div.detailScore__wrapper > span:nth-child(3)").first
+
+2025-12-30T17:26:06.350298 [MEDIUM] score_extraction_error: Failed to extract score: Locator.inner_text: Timeout 30000ms exceeded.
+Call log:
+  - waiting for locator("div.detailScore__wrapper > span:nth-child(3)").first
+
+2025-12-30T17:27:16.255400 [MEDIUM] score_extraction_error: Failed to extract score: Locator.inner_text: Timeout 30000ms exceeded.
+Call log:
+  - waiting for locator("div.detailScore__wrapper > span:nth-child(3)").first
+
+2025-12-30T17:27:30.102495 [MEDIUM] score_extraction_error: Failed to extract score: Locator.inner_text: Timeout 30000ms exceeded.
+Call log:
+  - waiting for locator("div.detailScore__wrapper > span:nth-child(3)").first
+
+2025-12-30T17:27:39.250153 [MEDIUM] score_extraction_error: Failed to extract score: Locator.inner_text: Timeout 30000ms exceeded.
+Call log:
+  - waiting for locator("div.detailScore__wrapper > span:nth-child(3)").first
+
+2025-12-30T17:40:30.598781 [MEDIUM] review_task_error: Review failed for 8EqLWWSI: Page.goto: net::ERR_CONNECTION_CLOSED at https://www.flashscore.com/match/football/al-arabi-saudi-arabia-8f20POYF/al-wehda-fqHipWm7/?mid=8EqLWWSI
+Call log:
+  - navigating to "https://www.flashscore.com/match/football/al-arabi-saudi-arabia-8f20POYF/al-wehda-fqHipWm7/?mid=8EqLWWSI", waiting until "domcontentloaded"
+
+2025-12-30T17:40:30.906362 [MEDIUM] review_task_error: Review failed for tt9elHXQ: Page.goto: net::ERR_CONNECTION_CLOSED at https://www.flashscore.com/match/football/rio-branco-vn-G879mo6t/tombense-bo9r6pAI/?mid=tt9elHXQ
+Call log:
+  - navigating to "https://www.flashscore.com/match/football/rio-branco-vn-G879mo6t/tombense-bo9r6pAI/?mid=tt9elHXQ", waiting until "domcontentloaded"
+
