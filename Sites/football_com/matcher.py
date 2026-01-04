@@ -167,9 +167,9 @@ async def match_predictions_with_site(day_predictions: List[Dict], site_matches:
             a = m.get('away', '') or m.get('away_team', '')
             h = h.strip() if h else ''
             a = a.strip() if a else ''
-        if len(h) < 2 or len(a) < 2:
-            continue
-        valid_site_matches.append(m)
+            if len(h) < 2 or len(a) < 2:
+                continue
+            valid_site_matches.append(m)
     
     if len(valid_site_matches) < len(site_matches):
         print(f"  [Matcher] Filtered out {len(site_matches) - len(valid_site_matches)} invalid site matches (empty names).")
@@ -204,7 +204,6 @@ async def match_predictions_with_site(day_predictions: List[Dict], site_matches:
             site_away = site_match.get('away', '') or site_match.get('away_team', '')
             site_home = site_home.strip()
             site_away = site_away.strip()
-            site_away = site_match.get('away', '').strip()
             site_date = site_match.get('date', '').strip()
             site_time = site_match.get('time', '').strip()
 
