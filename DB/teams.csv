@@ -1,12 +1,12 @@
 team_id,team_name,region_league,team_url
 UwcWaARL,Wefaq Ajdabiya,LIBYA - PREMIER LEAGUE - ROUND 4,https://www.flashscore.com/team/wefaq-ajdabiya/UwcWaARL/
 O86tie4p,Darnes,LIBYA - PREMIER LEAGUE - ROUND 4,https://www.flashscore.com/team/darnes/O86tie4p/
-Sv4ZfUyS,Sanga Balende,DR CONGO - LIGUE 1 - ROUND 6,https://www.flashscore.com/team/sanga-balende/Sv4ZfUyS/
-d0ovafZr,Don Bosco,DR CONGO - LIGUE 1 - ROUND 15,https://www.flashscore.com/team/don-bosco/d0ovafZr/
-rgPE61eo,Don Bosco,DR CONGO - LIGUE 1 - ROUND 15,https://www.flashscore.com/team/don-bosco/rgPE61eo/
-YFwNANXN,Sanga Balende,Unknown,https://www.flashscore.com/team/tshinkunku/YFwNANXN/
-bRDQ07GG,Saint-Luc,Unknown,https://www.flashscore.com/team/saint-luc/bRDQ07GG/
-IVLgRZlm,Al-Hilal Omdurman,RWANDA - PREMIER LEAGUE,https://www.flashscore.com/team/al-hilal-omdurman/IVLgRZlm/
+Sv4ZfUyS,Sanga Balende,DR CONGO - LIGUE 1 - ROUND 13,https://www.flashscore.com/team/sanga-balende/Sv4ZfUyS/
+d0ovafZr,Sanga Balende,DR CONGO - LIGUE 1 - ROUND 13,https://www.flashscore.com/team/sanga-balende/d0ovafZr/
+rgPE61eo,Don Bosco,DR CONGO - LIGUE 1 - ROUND 13,https://www.flashscore.com/team/don-bosco/rgPE61eo/
+YFwNANXN,Tshinkunku,DR CONGO - LIGUE 1 - ROUND 13,https://www.flashscore.com/team/tshinkunku/YFwNANXN/
+bRDQ07GG,Blessing,DR CONGO - LIGUE 1 - ROUND 7,https://www.flashscore.com/team/blessing/bRDQ07GG/
+IVLgRZlm,St Eloi Lupopo,DR CONGO - LIGUE 1 - ROUND 13,https://www.flashscore.com/team/st-eloi-lupopo/IVLgRZlm/
 vFEtMx6M,Ethiopia Nigd Bank,Unknown,https://www.flashscore.com/team/ethiopia-nigd-bank/vFEtMx6M/
 27bLOvM3,Welayta Dicha,Unknown,https://www.flashscore.com/team/ethiopian-insurance/27bLOvM3/
 MLk7IOLT,Al Najaf,IRAQ - STARS LEAGUE - ROUND 10,https://www.flashscore.com/team/al-najaf/MLk7IOLT/
@@ -272,7 +272,7 @@ QgdbKpiH,Al Najaf,IRAQ - STARS LEAGUE - ROUND 10,https://www.flashscore.com/team
 84r5OlNu,Al Ahli SC,SAUDI ARABIA - SAUDI PROFESSIONAL LEAGUE - ROUND 14,https://www.flashscore.com/team/al-ahli-sc/84r5OlNu/
 KQ0ty6yb,Al Naft,IRAQ - STARS LEAGUE - ROUND 9,https://www.flashscore.com/team/al-naft/KQ0ty6yb/
 S6IZ7lYf,Al Akhdar,LIBYA - PREMIER LEAGUE - ROUND 4,https://www.flashscore.com/team/al-akhdar/S6IZ7lYf/
-GIbqT9BI,Muzinga,BURUNDI - PRIMUS LEAGUE - ROUND 16,https://www.flashscore.com/team/muzinga/GIbqT9BI/
+GIbqT9BI,Le Messager Ngozi,BURUNDI - PRIMUS LEAGUE - ROUND 16,https://www.flashscore.com/team/le-messager-ngozi/GIbqT9BI/
 Iw5jr76r,Asswehly,LIBYA - PREMIER LEAGUE - ROUND 4,https://www.flashscore.com/team/asswehly/Iw5jr76r/
 ruPS27js,Al Tahaddi,LIBYA - PREMIER LEAGUE - ROUND 4,https://www.flashscore.com/team/al-tahaddi/ruPS27js/
 rDwl5y9p,Al Tahaddi,LIBYA - PREMIER LEAGUE - ROUND 4,https://www.flashscore.com/team/al-tahaddi/rDwl5y9p/
@@ -431,7 +431,7 @@ KtEMhbTp,Nof Hagalil,ISRAEL - LEUMIT LEAGUE - ROUND 17,https://www.flashscore.co
 2wR15I0F,Kelantan The Real Warriors,MALAYSIA - SUPER LEAGUE - ROUND 15,https://www.flashscore.com/team/kelantan-the-real-warriors/2wR15I0F/
 EqLgadT1,Kuching City FC,MALAYSIA - SUPER LEAGUE - ROUND 15,https://www.flashscore.com/team/kuching-city-fc/EqLgadT1/
 lvWVs1Kj,Sohar,Unknown,https://www.flashscore.com/team/al-nasr/lvWVs1Kj/
-EFY2qsJc,Al Nasr,Unknown,https://www.flashscore.com/team/sohar/EFY2qsJc/
+EFY2qsJc,Al Nahda,OMAN - SULTAN CUP - QUARTER-FINALS,https://www.flashscore.com/team/al-nahda/EFY2qsJc/
 UanWW9fq,Al Khaleej,SAUDI ARABIA - SAUDI PROFESSIONAL LEAGUE - ROUND 14,https://www.flashscore.com/team/al-khaleej/UanWW9fq/
 0QD6GL0s,Al Okhdood,SAUDI ARABIA - SAUDI PROFESSIONAL LEAGUE - ROUND 14,https://www.flashscore.com/team/al-okhdood/0QD6GL0s/
 jTUBmrZ7,Operario PR U20,BRAZIL - COPINHA - ROUND 3,https://www.flashscore.com/team/operario-pr-u20/jTUBmrZ7/
@@ -448,8 +448,8 @@ UX1exRBg,Al Ain,BAHRAIN - PREMIER LEAGUE - ROUND 11,https://www.flashscore.com/t
 YqFkJ2t6,Al Wahda,Unknown,https://www.flashscore.com/team/al-sharjah/YqFkJ2t6/
 40ZYZrBI,Al Ain,UNITED ARAB EMIRATES - UAE LEAGUE - ROUND 12,https://www.flashscore.com/team/al-ain/40ZYZrBI/
 8riCzYNT,Bani Yas,UNITED ARAB EMIRATES - UAE LEAGUE - ROUND 9,https://www.flashscore.com/team/bani-yas/8riCzYNT/
-xx8n54PO,Al Seeb,OMAN - PROFESSIONAL LEAGUE - ROUND 9,https://www.flashscore.com/team/al-seeb/xx8n54PO/
-tMWj6OR3,Saham,OMAN - PROFESSIONAL LEAGUE - ROUND 9,https://www.flashscore.com/team/saham/tMWj6OR3/
+xx8n54PO,Sur Club,OMAN - SULTAN CUP - QUARTER-FINALS,https://www.flashscore.com/team/sur-club/xx8n54PO/
+tMWj6OR3,Saham,OMAN - SULTAN CUP - QUARTER-FINALS,https://www.flashscore.com/team/saham/tMWj6OR3/
 Wfaskwf0,Kabylie,EGYPT - LEAGUE CUP - ROUND 6,https://www.flashscore.com/team/kabylie/Wfaskwf0/
 tnY2Lfcp,MC Alger,ALGERIA - LIGUE 1 - ROUND 15,https://www.flashscore.com/team/mc-alger/tnY2Lfcp/
 jL9qWdNF,Urana,Unknown,https://www.flashscore.com/team/as-zam/jL9qWdNF/
@@ -471,7 +471,7 @@ CS0fFFd8,Vitoria Guimaraes,PORTUGAL - LEAGUE CUP - SEMI-FINALS,https://www.flash
 tljXuHBC,Sporting CP,PORTUGAL - LEAGUE CUP - SEMI-FINALS,https://www.flashscore.com/team/sporting-cp/tljXuHBC/
 C2xKyq0a,Vilavelhense U20,BRAZIL - COPINHA - ROUND 3,https://www.flashscore.com/team/vilavelhense-u20/C2xKyq0a/
 dnPuQaIE,Mirassol U20,BRAZIL - COPINHA - ROUND 3,https://www.flashscore.com/team/mirassol-u20/dnPuQaIE/
-OEsEpExD,Eibar,Unknown,https://www.flashscore.com/team/eibar/OEsEpExD/
+OEsEpExD,Eibar,SPAIN - LALIGA2 - ROUND 21,https://www.flashscore.com/team/eibar/OEsEpExD/
 48Z7G1Sf,Almeria,Unknown,https://www.flashscore.com/team/mirandes/48Z7G1Sf/
 IBmris38,Sochaux,Unknown,https://www.flashscore.com/team/lens/IBmris38/
 MLmY2yB1,Toulouse,Unknown,https://www.flashscore.com/team/toulouse/MLmY2yB1/
@@ -604,19 +604,19 @@ EPlozI1G,Welwalo Adigrat,ETHIOPIA - PREMIER LEAGUE - ROUND 14,https://www.flashs
 fsfAHubD,Troyes,Unknown,https://www.flashscore.com/team/troyes/fsfAHubD/
 YDrUEgY3,Penang,MALAYSIA - SUPER LEAGUE - ROUND 15,https://www.flashscore.com/team/penang/YDrUEgY3/
 25SbDxKo,Melaka FC,MALAYSIA - SUPER LEAGUE - ROUND 15,https://www.flashscore.com/team/melaka-fc/25SbDxKo/
-Wj5d6e4h,Zabbar,MALTA - PREMIER LEAGUE - FIRST STAGE - PLAY OUT - ROUND 16,https://www.flashscore.com/team/zabbar/Wj5d6e4h/
+Wj5d6e4h,Tarxien,MALTA - PREMIER LEAGUE - FIRST STAGE - PLAY OUT - ROUND 16,https://www.flashscore.com/team/tarxien/Wj5d6e4h/
 MVsXEDdf,Victoria Wanderers,MALTA - PREMIER LEAGUE - FIRST STAGE - TOP 6 - ROUND 15,https://www.flashscore.com/team/victoria-wanderers/MVsXEDdf/
-0EeKzT9a,Hamrun,Unknown,https://www.flashscore.com/team/hamrun/0EeKzT9a/
+0EeKzT9a,Naxxar,MALTA - PREMIER LEAGUE - FIRST STAGE - PLAY OUT - ROUND 16,https://www.flashscore.com/team/naxxar/0EeKzT9a/
 QDIE6A4K,Victoria Hotspurs,MALTA - PREMIER LEAGUE - FIRST STAGE - TOP 6 - ROUND 16,https://www.flashscore.com/team/victoria-hotspurs/QDIE6A4K/
 8OBSMGLH,Pembroke,MALTA - PREMIER LEAGUE - FIRST STAGE - TOP 6 - ROUND 16,https://www.flashscore.com/team/pembroke/8OBSMGLH/
 WMTGoox8,Valletta,MALTA - PREMIER LEAGUE - FIRST STAGE - PLAY OUT - ROUND 16,https://www.flashscore.com/team/valletta/WMTGoox8/
 O6FowKBc,Cultural Leonesa,Unknown,https://www.flashscore.com/team/leonesa/O6FowKBc/
-UJOGLItN,Albacete,Unknown,https://www.flashscore.com/team/real-sociedad/UJOGLItN/
+UJOGLItN,Real Sociedad B,SPAIN - LALIGA2 - ROUND 21,https://www.flashscore.com/team/real-sociedad-b/UJOGLItN/
 OIDqIbjd,Neom SC,Unknown,https://www.flashscore.com/team/al-fateh/OIDqIbjd/
-0ranWp9D,Algeciras,SPAIN - PRIMERA RFEF - GROUP 2 - ROUND 19,https://www.flashscore.com/team/algeciras/0ranWp9D/
+0ranWp9D,Alcorcon,SPAIN - PRIMERA RFEF - GROUP 2 - ROUND 19,https://www.flashscore.com/team/alcorcon/0ranWp9D/
 IJyXDZ6C,Teruel,SPAIN - PRIMERA RFEF - GROUP 2 - ROUND 19,https://www.flashscore.com/team/teruel/IJyXDZ6C/
-pjsQ54Cc,Dhofar,OMAN - PROFESSIONAL LEAGUE - ROUND 9,https://www.flashscore.com/team/dhofar/pjsQ54Cc/
-nPxbG6zt,Bahla,OMAN - PROFESSIONAL LEAGUE - ROUND 9,https://www.flashscore.com/team/bahla/nPxbG6zt/
+pjsQ54Cc,Dhofar,OMAN - SULTAN CUP - QUARTER-FINALS,https://www.flashscore.com/team/dhofar/pjsQ54Cc/
+nPxbG6zt,Oman Club,OMAN - SULTAN CUP - QUARTER-FINALS,https://www.flashscore.com/team/oman-club/nPxbG6zt/
 C0yUqo8c,Cittadella,Unknown,https://www.flashscore.com/team/cittadella/C0yUqo8c/
 f1BIaCoh,Arzignano,Unknown,https://www.flashscore.com/team/virtus-verona/f1BIaCoh/
 MwxjuB2g,Giana Erminio,Unknown,https://www.flashscore.com/team/giana-erminio/MwxjuB2g/
@@ -737,32 +737,32 @@ MusLmn5f,Annan,Unknown,https://www.flashscore.com/team/annan/MusLmn5f/
 EkbhGY5S,Stirling,Unknown,https://www.flashscore.com/team/stirling/EkbhGY5S/
 nFG30cQH,Edinburgh City,Unknown,https://www.flashscore.com/team/edinburgh-city/nFG30cQH/
 vudJXTkl,Stranraer,Unknown,https://www.flashscore.com/team/stranraer/vudJXTkl/
-beO74ziJ,Atl. Madrid B,SPAIN - PRIMERA RFEF - GROUP 2 - ROUND 19,https://www.flashscore.com/team/atl.-madrid-b/beO74ziJ/
+beO74ziJ,Antequera,SPAIN - PRIMERA RFEF - GROUP 2 - ROUND 19,https://www.flashscore.com/team/antequera/beO74ziJ/
 t8OpHDUh,Tarazona,SPAIN - PRIMERA RFEF - GROUP 2 - ROUND 19,https://www.flashscore.com/team/tarazona/t8OpHDUh/
-WSv960Hk,Teruel,SPAIN - PRIMERA RFEF - GROUP 2 - ROUND 19,https://www.flashscore.com/team/teruel/WSv960Hk/
+WSv960Hk,Atl. Madrid B,SPAIN - PRIMERA RFEF - GROUP 2 - ROUND 19,https://www.flashscore.com/team/atl.-madrid-b/WSv960Hk/
 AB8XRSBQ,Algeciras,SPAIN - PRIMERA RFEF - GROUP 2 - ROUND 19,https://www.flashscore.com/team/algeciras/AB8XRSBQ/
 IP5zl0cJ,Ourense CF,SPAIN - PRIMERA RFEF - GROUP 1 - ROUND 19,https://www.flashscore.com/team/ourense-cf/IP5zl0cJ/
 ETdxjU8a,Osasuna,SPAIN - LALIGA - ROUND 19,https://www.flashscore.com/team/osasuna/ETdxjU8a/
-hKIRewt8,Floriana,MALTA - PREMIER LEAGUE - FIRST STAGE - PLAY OUT - ROUND 16,https://www.flashscore.com/team/floriana/hKIRewt8/
-6LJg5A2T,Marsaxlokk,MALTA - PREMIER LEAGUE - FIRST STAGE - PLAY OUT - ROUND 16,https://www.flashscore.com/team/marsaxlokk/6LJg5A2T/
-nF2Vy2D0,Mirandes,Unknown,https://www.flashscore.com/team/almeria/nF2Vy2D0/
-EXuxl1xP,Castellon,Unknown,https://www.flashscore.com/team/granada-cf/EXuxl1xP/
+hKIRewt8,Mosta,MALTA - PREMIER LEAGUE - FIRST STAGE - PLAY OUT - ROUND 16,https://www.flashscore.com/team/mosta/hKIRewt8/
+6LJg5A2T,Tarxien,MALTA - PREMIER LEAGUE - FIRST STAGE - PLAY OUT - ROUND 16,https://www.flashscore.com/team/tarxien/6LJg5A2T/
+nF2Vy2D0,Leganes,SPAIN - LALIGA2 - ROUND 21,https://www.flashscore.com/team/leganes/nF2Vy2D0/
+EXuxl1xP,Valladolid,SPAIN - LALIGA2 - ROUND 21,https://www.flashscore.com/team/valladolid/EXuxl1xP/
 QyHHzdwl,Granada CF,Unknown,https://www.flashscore.com/team/castellon/QyHHzdwl/
-UytPaaEP,Zaragoza,SPAIN - LALIGA2 - ROUND 21,https://www.flashscore.com/team/zaragoza/UytPaaEP/
-fL7ONd6B,Hibernians,MALTA - PREMIER LEAGUE - FIRST STAGE - PLAY OUT - ROUND 15,https://www.flashscore.com/team/hibernians/fL7ONd6B/
-hWUCnRM1,Hibernians,MALTA - PREMIER LEAGUE - FIRST STAGE - PLAY OUT - ROUND 16,https://www.flashscore.com/team/hibernians/hWUCnRM1/
-pMtbSRu6,Tarxien,MALTA - PREMIER LEAGUE - FIRST STAGE - PLAY OUT - ROUND 15,https://www.flashscore.com/team/tarxien/pMtbSRu6/
-I5Y7y9fg,Tarxien,MALTA - PREMIER LEAGUE - FIRST STAGE - PLAY OUT - ROUND 16,https://www.flashscore.com/team/tarxien/I5Y7y9fg/
+UytPaaEP,Huesca,SPAIN - LALIGA2 - ROUND 21,https://www.flashscore.com/team/huesca/UytPaaEP/
+fL7ONd6B,Hibernians,MALTA - PREMIER LEAGUE - FIRST STAGE - PLAY OUT - ROUND 16,https://www.flashscore.com/team/hibernians/fL7ONd6B/
+hWUCnRM1,Tarxien,MALTA - PREMIER LEAGUE - FIRST STAGE - PLAY OUT - ROUND 16,https://www.flashscore.com/team/tarxien/hWUCnRM1/
+pMtbSRu6,Tarxien,MALTA - PREMIER LEAGUE - FIRST STAGE - PLAY OUT - ROUND 16,https://www.flashscore.com/team/tarxien/pMtbSRu6/
+I5Y7y9fg,Naxxar,MALTA - PREMIER LEAGUE - FIRST STAGE - PLAY OUT - ROUND 16,https://www.flashscore.com/team/naxxar/I5Y7y9fg/
 fJqfm7CG,Portimonense,PORTUGAL - LIGA PORTUGAL 2 - ROUND 16,https://www.flashscore.com/team/portimonense/fJqfm7CG/
 nFFgCnVo,Tondela,Unknown,https://www.flashscore.com/team/tondela/nFFgCnVo/
 tpBOiyM5,Osasuna B,SPAIN - PRIMERA RFEF - GROUP 1 - ROUND 19,https://www.flashscore.com/team/osasuna-b/tpBOiyM5/
 zcgwCMgS,Merida AD,SPAIN - PRIMERA RFEF - GROUP 1 - ROUND 19,https://www.flashscore.com/team/merida-ad/zcgwCMgS/
-UTX26rhg,Antequera,SPAIN - PRIMERA RFEF - GROUP 2 - ROUND 19,https://www.flashscore.com/team/antequera/UTX26rhg/
-MTXvQWhD,Algeciras,SPAIN - PRIMERA RFEF - GROUP 2 - ROUND 19,https://www.flashscore.com/team/algeciras/MTXvQWhD/
-zySRrs5p,Al Nahda,Unknown,https://www.flashscore.com/team/al-nahda/zySRrs5p/
-fRoavPcE,Sur Club,Unknown,https://www.flashscore.com/team/sur-club/fRoavPcE/
+UTX26rhg,Atl. Madrid B,SPAIN - PRIMERA RFEF - GROUP 2 - ROUND 19,https://www.flashscore.com/team/atl.-madrid-b/UTX26rhg/
+MTXvQWhD,Teruel,SPAIN - PRIMERA RFEF - GROUP 2 - ROUND 19,https://www.flashscore.com/team/teruel/MTXvQWhD/
+zySRrs5p,Al Nahda,OMAN - SULTAN CUP - QUARTER-FINALS,https://www.flashscore.com/team/al-nahda/zySRrs5p/
+fRoavPcE,Sur Club,OMAN - SULTAN CUP - QUARTER-FINALS,https://www.flashscore.com/team/sur-club/fRoavPcE/
 hOIsJLJr,Senegal,AFRICA - AFRICA CUP OF NATIONS - PLAY OFFS - 1/8-FINALS,https://www.flashscore.com/team/senegal/hOIsJLJr/
-2akflumR,Lyon,Unknown,https://www.flashscore.com/team/lyon/2akflumR/
+2akflumR,G.A. Eagles,NETHERLANDS - EREDIVISIE - ROUND 18,https://www.flashscore.com/team/g.a.-eagles/2akflumR/
 2PIvr8o4,Orleans,Unknown,https://www.flashscore.com/team/monaco/2PIvr8o4/
 CGTL4Tuk,Bandeirante U20,BRAZIL - COPINHA - ROUND 3,https://www.flashscore.com/team/bandeirante-u20/CGTL4Tuk/
 xnc1HSLk,Aguia De Maraba U20,BRAZIL - COPINHA - ROUND 3,https://www.flashscore.com/team/aguia-de-maraba-u20/xnc1HSLk/
@@ -825,29 +825,29 @@ lUatW5jE,Mallorca,SPAIN - LALIGA - ROUND 19,https://www.flashscore.com/team/mall
 Gr9tN9OA,Caldas,Unknown,https://www.flashscore.com/team/caldas-sc/Gr9tN9OA/
 IPOO94UA,Mafra,Unknown,https://www.flashscore.com/team/mafra/IPOO94UA/
 WjJkJilj,Al Taawon,SAUDI ARABIA - SAUDI PROFESSIONAL LEAGUE - ROUND 14,https://www.flashscore.com/team/al-taawon/WjJkJilj/
-nVpEwOrl,Racing Santander,Unknown,https://www.flashscore.com/team/racing-santander/nVpEwOrl/
-zkpajjvm,Valladolid,Unknown,https://www.flashscore.com/team/valladolid/zkpajjvm/
+nVpEwOrl,Valladolid,SPAIN - LALIGA2 - ROUND 21,https://www.flashscore.com/team/valladolid/nVpEwOrl/
+zkpajjvm,Leganes,SPAIN - LALIGA2 - ROUND 21,https://www.flashscore.com/team/leganes/zkpajjvm/
 vZKd15Gk,Corinthians U20,BRAZIL - COPINHA - ROUND 3,https://www.flashscore.com/team/corinthians-u20/vZKd15Gk/
 IH1MEr4p,Trindade U20,BRAZIL - COPINHA - ROUND 2,https://www.flashscore.com/team/trindade-u20/IH1MEr4p/
 fBqFQex0,Osasuna B,SPAIN - PRIMERA RFEF - GROUP 1 - ROUND 19,https://www.flashscore.com/team/osasuna-b/fBqFQex0/
 fmE1l44l,Unionistas,SPAIN - PRIMERA RFEF - GROUP 1 - ROUND 19,https://www.flashscore.com/team/unionistas/fmE1l44l/
 M9KnSe0f,Ourense CF,SPAIN - PRIMERA RFEF - GROUP 1 - ROUND 19,https://www.flashscore.com/team/ourense-cf/M9KnSe0f/
 dKc4L5vq,Real Aviles,SPAIN - PRIMERA RFEF - GROUP 1 - ROUND 19,https://www.flashscore.com/team/real-aviles/dKc4L5vq/
-lSHMFchs,Alcorcon,SPAIN - PRIMERA RFEF - GROUP 2 - ROUND 19,https://www.flashscore.com/team/alcorcon/lSHMFchs/
+lSHMFchs,Algeciras,SPAIN - PRIMERA RFEF - GROUP 2 - ROUND 19,https://www.flashscore.com/team/algeciras/lSHMFchs/
 dY03Jvn2,Sevilla FC B,SPAIN - PRIMERA RFEF - GROUP 2 - ROUND 19,https://www.flashscore.com/team/sevilla-fc-b/dY03Jvn2/
 YagoQJpq,Nice,Unknown,https://www.flashscore.com/team/nice/YagoQJpq/
 69ZXff9E,Team Indonesia,Unknown,https://www.flashscore.com/team/team-mexico/69ZXff9E/
 EZxtgYwR,Team India,Unknown,https://www.flashscore.com/team/team-saudi-arabia/EZxtgYwR/
 fVHSnLKa,FC Renaissance,DR CONGO - LIGUE 1 - ROUND 10,https://www.flashscore.com/team/fc-renaissance/fVHSnLKa/
 j5mZpKKH,Maniema,DR CONGO - LIGUE 1 - ROUND 10,https://www.flashscore.com/team/maniema/j5mZpKKH/
-WAHVfceE,Gzira,MALTA - PREMIER LEAGUE - FIRST STAGE - PLAY OUT - ROUND 16,https://www.flashscore.com/team/gzira/WAHVfceE/
+WAHVfceE,Naxxar,MALTA - PREMIER LEAGUE - FIRST STAGE - PLAY OUT - ROUND 16,https://www.flashscore.com/team/naxxar/WAHVfceE/
 KnBhE6kN,Swieqi,MALTA - PREMIER LEAGUE - FIRST STAGE - TOP 6 - ROUND 16,https://www.flashscore.com/team/swieqi/KnBhE6kN/
 vNKKFgsl,Gzira,MALTA - PREMIER LEAGUE - FIRST STAGE - PLAY OUT - ROUND 16,https://www.flashscore.com/team/gzira/vNKKFgsl/
 KzII5UJQ,Gzira,MALTA - PREMIER LEAGUE - FIRST STAGE - PLAY OUT - ROUND 16,https://www.flashscore.com/team/gzira/KzII5UJQ/
-zBkyuyRI,Bayer Leverkusen,GERMANY - BUNDESLIGA - ROUND 16,https://www.flashscore.com/team/bayer-leverkusen/zBkyuyRI/
+zBkyuyRI,Benfica,NETHERLANDS - EREDIVISIE - ROUND 18,https://www.flashscore.com/team/benfica/zBkyuyRI/
 htoKuYZl,Estoril,PORTUGAL - LIGA 3 - ROUND 16,https://www.flashscore.com/team/estoril/htoKuYZl/
 dpUer7ht,Caldas,PORTUGAL - LIGA 3 - ROUND 16,https://www.flashscore.com/team/caldas/dpUer7ht/
-hrYABE5k,Braga,PORTUGAL - LEAGUE CUP - SEMI-FINALS,https://www.flashscore.com/team/braga/hrYABE5k/
+hrYABE5k,Valladolid,SPAIN - LALIGA2 - ROUND 21,https://www.flashscore.com/team/valladolid/hrYABE5k/
 hrjONbUc,Chapecoense-SC U20,BRAZIL - COPINHA - ROUND 3,https://www.flashscore.com/team/chapecoense-sc-u20/hrjONbUc/
 AZvumxAU,Volta Redonda U20,BRAZIL - COPINHA - ROUND 3,https://www.flashscore.com/team/volta-redonda-u20/AZvumxAU/
 WYrAhEKP,QFC U20,BRAZIL - COPINHA - ROUND 3,https://www.flashscore.com/team/qfc-u20/WYrAhEKP/
@@ -888,10 +888,10 @@ Oj1YI0dc,Team Japan,Unknown,https://www.flashscore.com/team/team-japan/Oj1YI0dc/
 b51ED5KH,Team USA,Unknown,https://www.flashscore.com/team/team-usa/b51ED5KH/
 EHWE5bel,Cuiaba U20,BRAZIL - COPINHA - ROUND 3,https://www.flashscore.com/team/cuiaba-u20/EHWE5bel/
 tnHLCYuq,XV de Jau U20,BRAZIL - COPINHA - ROUND 3,https://www.flashscore.com/team/xv-de-jau-u20/tnHLCYuq/
-vTxTEFi6,Burgos CF,Unknown,https://www.flashscore.com/team/burgos-cf/vTxTEFi6/
-CWuejruc,Cordoba,SPAIN - LALIGA2 - ROUND 21,https://www.flashscore.com/team/cordoba/CWuejruc/
+vTxTEFi6,Leganes,SPAIN - LALIGA2 - ROUND 21,https://www.flashscore.com/team/leganes/vTxTEFi6/
+CWuejruc,Leganes,SPAIN - LALIGA2 - ROUND 21,https://www.flashscore.com/team/leganes/CWuejruc/
 EgDgrOO2,Hercules,SPAIN - PRIMERA RFEF - GROUP 2 - ROUND 19,https://www.flashscore.com/team/hercules/EgDgrOO2/
-lnS2YNhJ,Sabadell,SPAIN - PRIMERA RFEF - GROUP 2 - ROUND 19,https://www.flashscore.com/team/sabadell/lnS2YNhJ/
+lnS2YNhJ,Atl. Madrid B,SPAIN - PRIMERA RFEF - GROUP 2 - ROUND 19,https://www.flashscore.com/team/atl.-madrid-b/lnS2YNhJ/
 pfDZL71o,Lille,Unknown,https://www.flashscore.com/team/lille/pfDZL71o/
 d2nnj1IE,Rennes,Unknown,https://www.flashscore.com/team/rennes/d2nnj1IE/
 n5iFLIaP,Carajas U20,BRAZIL - COPINHA - ROUND 3,https://www.flashscore.com/team/carajas-u20/n5iFLIaP/
@@ -949,7 +949,7 @@ zo4S3YNH,Cagliari U20,ITALY - PRIMAVERA 1 - ROUND 19,https://www.flashscore.com/
 boEfbzat,Cagliari U20,ITALY - PRIMAVERA 1 - ROUND 19,https://www.flashscore.com/team/cagliari-u20/boEfbzat/
 S8MBgwuo,Aston Villa,ENGLAND - FA CUP - 1/32-FINALS,https://www.flashscore.com/team/aston-villa/S8MBgwuo/
 YXDi6MHo,Young Boys,ENGLAND - FA CUP - 1/32-FINALS,https://www.flashscore.com/team/young-boys/YXDi6MHo/
-p6QXMgOj,Utrecht,NETHERLANDS - EREDIVISIE - ROUND 18,https://www.flashscore.com/team/utrecht/p6QXMgOj/
+p6QXMgOj,Ajax,NETHERLANDS - EREDIVISIE - ROUND 18,https://www.flashscore.com/team/ajax/p6QXMgOj/
 tYNTdpar,Nottingham,ENGLAND - PREMIER LEAGUE - ROUND 21,https://www.flashscore.com/team/nottingham/tYNTdpar/
 OQpzcCnS,Doxa,CYPRUS - DIVISION 2 - ROUND 15,https://www.flashscore.com/team/doxa/OQpzcCnS/
 rgI3oA08,Ethnikos Latsion,CYPRUS - DIVISION 2 - ROUND 15,https://www.flashscore.com/team/ethnikos-latsion/rgI3oA08/
@@ -1057,7 +1057,7 @@ IHTx6E4O,Kirivong Sok Sen Chey,CAMBODIA - CPL - ROUND 16,https://www.flashscore.
 MuJGOXzi,Boeung Ket,CAMBODIA - CPL - ROUND 16,https://www.flashscore.com/team/boeung-ket/MuJGOXzi/
 pEK6LYCR,Tiffy Army,CAMBODIA - CPL - ROUND 16,https://www.flashscore.com/team/tiffy-army/pEK6LYCR/
 6m8PWkft,Tusker,KENYA - PREMIER LEAGUE - ROUND 16,https://www.flashscore.com/team/tusker/6m8PWkft/
-YXH9gwV9,Mara Sugar,KENYA - PREMIER LEAGUE - ROUND 16,https://www.flashscore.com/team/mara-sugar/YXH9gwV9/
+YXH9gwV9,Gor Mahia,KENYA - PREMIER LEAGUE - ROUND 16,https://www.flashscore.com/team/gor-mahia/YXH9gwV9/
 hxT1f5xa,Felgueiras,PORTUGAL - LIGA PORTUGAL 2 - ROUND 16,https://www.flashscore.com/team/felgueiras/hxT1f5xa/
 lGALDDtR,Penafiel,PORTUGAL - LIGA PORTUGAL 2 - ROUND 17,https://www.flashscore.com/team/penafiel/lGALDDtR/
 GrRgeTHo,Felgueiras,PORTUGAL - LIGA PORTUGAL 2 - ROUND 16,https://www.flashscore.com/team/felgueiras/GrRgeTHo/
@@ -1074,7 +1074,7 @@ W0xBI7Xo,CF Talavera,SPAIN - PRIMERA RFEF - GROUP 1 - ROUND 19,https://www.flash
 WhhSCpFP,Guadalajara,SPAIN - PRIMERA RFEF - GROUP 1 - ROUND 19,https://www.flashscore.com/team/guadalajara/WhhSCpFP/
 lWjqRFF0,Arenteiro,SPAIN - PRIMERA RFEF - GROUP 1 - ROUND 19,https://www.flashscore.com/team/arenteiro/lWjqRFF0/
 fyNss8GQ,Real Madrid B,SPAIN - PRIMERA RFEF - GROUP 1 - ROUND 19,https://www.flashscore.com/team/real-madrid-b/fyNss8GQ/
-8WUSyF3F,Algeciras,SPAIN - PRIMERA RFEF - GROUP 2 - ROUND 19,https://www.flashscore.com/team/algeciras/8WUSyF3F/
+8WUSyF3F,Eldense,SPAIN - PRIMERA RFEF - GROUP 2 - ROUND 19,https://www.flashscore.com/team/eldense/8WUSyF3F/
 rNW6jqw0,Algeciras,SPAIN - PRIMERA RFEF - GROUP 2 - ROUND 19,https://www.flashscore.com/team/algeciras/rNW6jqw0/
 r3QHlQs7,Chonburi,THAILAND - THAI LEAGUE 1 - ROUND 16,https://www.flashscore.com/team/chonburi/r3QHlQs7/
 UcjkBSc4,Nakhon Ratchasima FC,THAILAND - THAI LEAGUE 1 - ROUND 16,https://www.flashscore.com/team/nakhon-ratchasima-fc/UcjkBSc4/
@@ -1088,41 +1088,41 @@ fiyEz00m,Independente AP U20,Unknown,https://www.flashscore.com/team/independent
 O8prtMxQ,Real Soccer U20,Unknown,https://www.flashscore.com/team/real-soccer/O8prtMxQ/
 dpud9xRC,Estrela De Marco U20,Unknown,https://www.flashscore.com/team/estrela-de-marco/dpud9xRC/
 W82OaQl9,Bali United,INDONESIA - SUPER LEAGUE - ROUND 17,https://www.flashscore.com/team/bali-united/W82OaQl9/
-OfdPtDuK,Kakamega Homeboyz,KENYA - PREMIER LEAGUE - ROUND 16,https://www.flashscore.com/team/kakamega-homeboyz/OfdPtDuK/
-GWtFfl5B,Mara Sugar,KENYA - PREMIER LEAGUE - ROUND 16,https://www.flashscore.com/team/mara-sugar/GWtFfl5B/
+OfdPtDuK,Gor Mahia,KENYA - PREMIER LEAGUE - ROUND 16,https://www.flashscore.com/team/gor-mahia/OfdPtDuK/
+GWtFfl5B,Gor Mahia,KENYA - PREMIER LEAGUE - ROUND 16,https://www.flashscore.com/team/gor-mahia/GWtFfl5B/
 j5nyEXB0,Xewkija,MALTA - FA TROPHY - 1/16-FINALS,https://www.flashscore.com/team/xewkija/j5nyEXB0/
-MZkrZYmQ,Zabbar,MALTA - PREMIER LEAGUE - FIRST STAGE - PLAY OUT - ROUND 16,https://www.flashscore.com/team/zabbar/MZkrZYmQ/
+MZkrZYmQ,Tarxien,MALTA - PREMIER LEAGUE - FIRST STAGE - PLAY OUT - ROUND 16,https://www.flashscore.com/team/tarxien/MZkrZYmQ/
 8rPrIR1D,KKP (Fin),Unknown,https://www.flashscore.com/team/joku-paikallinen-joukkue/8rPrIR1D/
 xtWmMMjf,JPJ (Fin),Unknown,https://www.flashscore.com/team/kiimingin-kiekko-pojat/xtWmMMjf/
 G8FL0ShI,Espanyol,Unknown,https://www.flashscore.com/team/levante/G8FL0ShI/
 h8oAv4Ts,Valencia,SPAIN - LALIGA - ROUND 19,https://www.flashscore.com/team/valencia/h8oAv4Ts/
 2yAFxbj3,Fasil Kenema,Unknown,https://www.flashscore.com/team/ethiopia-bunna-ethiopian-coffee/2yAFxbj3/
 6eMph4DP,Fgura,MALTA - FA TROPHY - 1/16-FINALS,https://www.flashscore.com/team/fgura/6eMph4DP/
-SItGFa63,Naxxar,MALTA - PREMIER LEAGUE - FIRST STAGE - PLAY OUT - ROUND 16,https://www.flashscore.com/team/naxxar/SItGFa63/
+SItGFa63,Tarxien,MALTA - PREMIER LEAGUE - FIRST STAGE - PLAY OUT - ROUND 16,https://www.flashscore.com/team/tarxien/SItGFa63/
 S0heSKit,Mgarr,MALTA - FA TROPHY - 1/16-FINALS,https://www.flashscore.com/team/mgarr/S0heSKit/
 CCj1l92P,Gharghur,MALTA - FA TROPHY - 1/16-FINALS,https://www.flashscore.com/team/gharghur/CCj1l92P/
 OzpysOgq,Al-Merreikh,RWANDA - PREMIER LEAGUE,https://www.flashscore.com/team/al-merreikh/OzpysOgq/
 A7FS3VKA,Etincelles,RWANDA - PREMIER LEAGUE,https://www.flashscore.com/team/etincelles/A7FS3VKA/
 UXPL3a3r,Mukura Victory Sports,Unknown,https://www.flashscore.com/team/mukura-victory-sports/UXPL3a3r/
 viwgne3n,Al-Merreikh,RWANDA - PREMIER LEAGUE,https://www.flashscore.com/team/al-merreikh/viwgne3n/
-69w4Rb2d,Gijon,SPAIN - LALIGA - ROUND 19,https://www.flashscore.com/team/gijon/69w4Rb2d/
-25tIqYiJ,Ceuta,Unknown,https://www.flashscore.com/team/malaga/25tIqYiJ/
-zBE2YzXC,Mbale Heroes,Unknown,https://www.flashscore.com/team/blacks-power/zBE2YzXC/
-25tTRfd0,Kataka,Unknown,https://www.flashscore.com/team/kigezi-homeboyz/25tTRfd0/
-x8hvZQYH,Onduparaka,Unknown,https://www.flashscore.com/team/catda/x8hvZQYH/
+69w4Rb2d,Leganes,SPAIN - LALIGA2 - ROUND 21,https://www.flashscore.com/team/leganes/69w4Rb2d/
+25tIqYiJ,Valladolid,SPAIN - LALIGA2 - ROUND 21,https://www.flashscore.com/team/valladolid/25tIqYiJ/
+zBE2YzXC,Paidha Black Angels,UGANDA - BIG LEAGUE,https://www.flashscore.com/team/paidha-black-angels/zBE2YzXC/
+25tTRfd0,Kigezi HomeBoyz,UGANDA - BIG LEAGUE,https://www.flashscore.com/team/kigezi-homeboyz/25tTRfd0/
+x8hvZQYH,Young Elephant,UGANDA - BIG LEAGUE,https://www.flashscore.com/team/young-elephant/x8hvZQYH/
 8z6Mv6WD,Nebbi Central,UGANDA - BIG LEAGUE,https://www.flashscore.com/team/nebbi-central/8z6Mv6WD/
-zyAkQAzK,Bunyaruguru,Unknown,https://www.flashscore.com/team/bunyaruguru/zyAkQAzK/
+zyAkQAzK,Paidha Black Angels,UGANDA - BIG LEAGUE,https://www.flashscore.com/team/paidha-black-angels/zyAkQAzK/
 CSLmgrl2,Iganga United,UGANDA - BIG LEAGUE,https://www.flashscore.com/team/iganga-united/CSLmgrl2/
-nFbRqMVn,Kigezi HomeBoyz,Unknown,https://www.flashscore.com/team/kataka/nFbRqMVn/
-UuAzUDmI,Kaaro Karungi,Unknown,https://www.flashscore.com/team/kiyinda-boys/UuAzUDmI/
-SQMvloD2,Blacks Power,Unknown,https://www.flashscore.com/team/mbale-heroes/SQMvloD2/
-M7dUPYQC,Paidha Black Angels,Unknown,https://www.flashscore.com/team/young-elephant/M7dUPYQC/
-xScu4GoA,Bright Stars,Unknown,https://www.flashscore.com/team/bright-stars/xScu4GoA/
-tbGYCNF6,Ntugasaze,Unknown,https://www.flashscore.com/team/ntugasaze/tbGYCNF6/
-YgXse3a2,Catda,Unknown,https://www.flashscore.com/team/onduparaka/YgXse3a2/
-654c4y9e,Young Elephant,Unknown,https://www.flashscore.com/team/paidha-black-angels/654c4y9e/
-E1qGmxJJ,Kiyinda Boys,Unknown,https://www.flashscore.com/team/kaaro-karungi/E1qGmxJJ/
-nTeERdMj,Wakiso Giants,Unknown,https://www.flashscore.com/team/wakiso-giants/nTeERdMj/
+nFbRqMVn,Kataka,UGANDA - BIG LEAGUE,https://www.flashscore.com/team/kataka/nFbRqMVn/
+UuAzUDmI,Paidha Black Angels,UGANDA - BIG LEAGUE,https://www.flashscore.com/team/paidha-black-angels/UuAzUDmI/
+SQMvloD2,Mbale Heroes,UGANDA - BIG LEAGUE,https://www.flashscore.com/team/mbale-heroes/SQMvloD2/
+M7dUPYQC,Young Elephant,UGANDA - BIG LEAGUE,https://www.flashscore.com/team/young-elephant/M7dUPYQC/
+xScu4GoA,Bright Stars,UGANDA - BIG LEAGUE,https://www.flashscore.com/team/bright-stars/xScu4GoA/
+tbGYCNF6,Paidha Black Angels,UGANDA - BIG LEAGUE,https://www.flashscore.com/team/paidha-black-angels/tbGYCNF6/
+YgXse3a2,Young Elephant,UGANDA - BIG LEAGUE,https://www.flashscore.com/team/young-elephant/YgXse3a2/
+654c4y9e,Blacks Power,UGANDA - BIG LEAGUE,https://www.flashscore.com/team/blacks-power/654c4y9e/
+E1qGmxJJ,Paidha Black Angels,UGANDA - BIG LEAGUE,https://www.flashscore.com/team/paidha-black-angels/E1qGmxJJ/
+nTeERdMj,Paidha Black Angels,UGANDA - BIG LEAGUE,https://www.flashscore.com/team/paidha-black-angels/nTeERdMj/
 C2lt6Igm,Club Africain (Tun),Unknown,https://www.flashscore.com/team/club-africain/C2lt6Igm/
 l8FEjeUE,Hammam-Lif,WORLD - CLUB FRIENDLY,https://www.flashscore.com/team/hammam-lif/l8FEjeUE/
 Q14fiPNg,Pontevedra,SPAIN - PRIMERA RFEF - GROUP 1 - ROUND 19,https://www.flashscore.com/team/pontevedra/Q14fiPNg/
@@ -1236,10 +1236,10 @@ GhTladZT,ASC Kara,TOGO - CHAMPIONNAT NATIONAL - ROUND 9,https://www.flashscore.c
 MVs3a18Q,Semassi,TOGO - CHAMPIONNAT NATIONAL - ROUND 9,https://www.flashscore.com/team/semassi/MVs3a18Q/
 YZFeqj3D,Al Okhdood,SAUDI ARABIA - SAUDI PROFESSIONAL LEAGUE - ROUND 14,https://www.flashscore.com/team/al-okhdood/YZFeqj3D/
 vJbTeCGP,Betis,SPAIN - LALIGA - ROUND 19,https://www.flashscore.com/team/betis/vJbTeCGP/
-xpWAk3h6,Malaga,Unknown,https://www.flashscore.com/team/ad-ceuta/xpWAk3h6/
-O6ucWgAa,Andorra,Unknown,https://www.flashscore.com/team/fc-andorra/O6ucWgAa/
+xpWAk3h6,Ceuta,SPAIN - LALIGA2 - ROUND 21,https://www.flashscore.com/team/ceuta/xpWAk3h6/
+O6ucWgAa,Valladolid,SPAIN - LALIGA2 - ROUND 21,https://www.flashscore.com/team/valladolid/O6ucWgAa/
 MceEOzkT,Hohoe United,Unknown,https://www.flashscore.com/team/hearts-of-oak/MceEOzkT/
-htCyNMwL,Mosta,MALTA - PREMIER LEAGUE - FIRST STAGE - PLAY OUT - ROUND 16,https://www.flashscore.com/team/mosta/htCyNMwL/
+htCyNMwL,Tarxien,MALTA - PREMIER LEAGUE - FIRST STAGE - PLAY OUT - ROUND 16,https://www.flashscore.com/team/tarxien/htCyNMwL/
 f1WM5KGl,Mosta,MALTA - FA TROPHY - 1/16-FINALS,https://www.flashscore.com/team/mosta/f1WM5KGl/
 QFHt9Zgs,Casa Pia,PORTUGAL - LEAGUE CUP - SEMI-FINALS,https://www.flashscore.com/team/casa-pia/QFHt9Zgs/
 jPzXLi4l,Rio Ave,PORTUGAL - LEAGUE CUP - SEMI-FINALS,https://www.flashscore.com/team/rio-ave/jPzXLi4l/
@@ -1328,13 +1328,13 @@ zoiy9OqH,Paredes,Unknown,https://www.flashscore.com/team/paredes/zoiy9OqH/
 jaM2NNF9,Sanjoanense,Unknown,https://www.flashscore.com/team/sanjoanense/jaM2NNF9/
 l6Iu2w06,Al Fayha,Unknown,https://www.flashscore.com/team/al-riyadh/l6Iu2w06/
 xfAehSWL,Damac,SAUDI ARABIA - SAUDI PROFESSIONAL LEAGUE - ROUND 14,https://www.flashscore.com/team/damac/xfAehSWL/
-UirAofN6,Real Sociedad B,Unknown,https://www.flashscore.com/team/albacete/UirAofN6/
-Mi0rXQg7,Leganes,Unknown,https://www.flashscore.com/team/leganes/Mi0rXQg7/
-IyRQC2vM,Dep. La Coruna,Unknown,https://www.flashscore.com/team/las-palmas/IyRQC2vM/
-za7D2lO5,Zaragoza,Unknown,https://www.flashscore.com/team/zaragoza/za7D2lO5/
-GzVElN7C,UD Ibiza,SPAIN - PRIMERA RFEF - GROUP 2 - ROUND 19,https://www.flashscore.com/team/ud-ibiza/GzVElN7C/
-UkEeaAlL,Tarazona,SPAIN - PRIMERA RFEF - GROUP 2 - ROUND 19,https://www.flashscore.com/team/tarazona/UkEeaAlL/
-fw2i3K6O,Teruel,SPAIN - PRIMERA RFEF - GROUP 2 - ROUND 19,https://www.flashscore.com/team/teruel/fw2i3K6O/
+UirAofN6,Leganes,SPAIN - LALIGA2 - ROUND 21,https://www.flashscore.com/team/leganes/UirAofN6/
+Mi0rXQg7,Valladolid,SPAIN - LALIGA2 - ROUND 21,https://www.flashscore.com/team/valladolid/Mi0rXQg7/
+IyRQC2vM,Valladolid,SPAIN - LALIGA2 - ROUND 21,https://www.flashscore.com/team/valladolid/IyRQC2vM/
+za7D2lO5,Leganes,SPAIN - LALIGA2 - ROUND 21,https://www.flashscore.com/team/leganes/za7D2lO5/
+GzVElN7C,Betis B,SPAIN - PRIMERA RFEF - GROUP 2 - ROUND 19,https://www.flashscore.com/team/betis-b/GzVElN7C/
+UkEeaAlL,CE Europa,SPAIN - PRIMERA RFEF - GROUP 2 - ROUND 19,https://www.flashscore.com/team/ce-europa/UkEeaAlL/
+fw2i3K6O,Atl. Madrid B,SPAIN - PRIMERA RFEF - GROUP 2 - ROUND 19,https://www.flashscore.com/team/atl.-madrid-b/fw2i3K6O/
 YT0e2vMU,Villarreal B,SPAIN - PRIMERA RFEF - GROUP 2 - ROUND 19,https://www.flashscore.com/team/villarreal-b/YT0e2vMU/
 YmRwMMic,Team Italy,Unknown,https://www.flashscore.com/team/team-algeria/YmRwMMic/
 Ol0UzZHr,Team Poland,Unknown,https://www.flashscore.com/team/team-poland/Ol0UzZHr/
@@ -1371,9 +1371,9 @@ jNvak2f3,Real Sociedad,SPAIN - LALIGA - ROUND 19,https://www.flashscore.com/team
 p4l82KfJ,Team Spain,Unknown,https://www.flashscore.com/team/team-qatar/p4l82KfJ/
 YPZk1QE1,All Saints Utd.,ANTIGUA & BARBUDA - ABFA PREMIER LEAGUE - ROUND 10,https://www.flashscore.com/team/all-saints-utd./YPZk1QE1/
 42qJbj5G,Old Road,ANTIGUA & BARBUDA - ABFA PREMIER LEAGUE - ROUND 10,https://www.flashscore.com/team/old-road/42qJbj5G/
-hdWjLJUJ,Zaragoza,SPAIN - LALIGA2 - ROUND 21,https://www.flashscore.com/team/zaragoza/hdWjLJUJ/
+hdWjLJUJ,Cadiz CF,SPAIN - LALIGA2 - ROUND 21,https://www.flashscore.com/team/cadiz-cf/hdWjLJUJ/
 Q51ZzMS6,Dep. La Coruna,SPAIN - LALIGA - ROUND 19,https://www.flashscore.com/team/dep.-la-coruna/Q51ZzMS6/
-YqQG18wC,Murcia,SPAIN - PRIMERA RFEF - GROUP 2 - ROUND 19,https://www.flashscore.com/team/murcia/YqQG18wC/
+YqQG18wC,Antequera,SPAIN - PRIMERA RFEF - GROUP 2 - ROUND 19,https://www.flashscore.com/team/antequera/YqQG18wC/
 r1N5s49f,Sanluqueno,SPAIN - PRIMERA RFEF - GROUP 2 - ROUND 19,https://www.flashscore.com/team/sanluqueno/r1N5s49f/
 OlUJCOO5,Santos U20,Unknown,https://www.flashscore.com/team/sao-carlense/OlUJCOO5/
 h63g9LLG,Uniao Cacoalense U20,Unknown,https://www.flashscore.com/team/uniao-cacoalense/h63g9LLG/
@@ -1393,15 +1393,15 @@ AVsHc14R,Marathon,HONDURAS - LIGA NACIONAL - APERTURA - PLAY OFFS - FINAL,https:
 2eev0q52,Olimpia,HONDURAS - LIGA NACIONAL - APERTURA - PLAY OFFS - FINAL,https://www.flashscore.com/team/olimpia/2eev0q52/
 v561dFtk,Al-Najma,BAHRAIN - PREMIER LEAGUE - ROUND 10,https://www.flashscore.com/team/al-najma/v561dFtk/
 40LLENdG,Isa Town,BAHRAIN - PREMIER LEAGUE - ROUND 10,https://www.flashscore.com/team/isa-town/40LLENdG/
-SWo1QmYO,Al Rayyan,QATAR - EMIR CUP - 1/16-FINALS,https://www.flashscore.com/team/al-rayyan/SWo1QmYO/
+SWo1QmYO,Al Rayyan,OMAN - SULTAN CUP - QUARTER-FINALS,https://www.flashscore.com/team/al-rayyan/SWo1QmYO/
 MsVAD4Kb,Al-Shabab,OMAN - PROFESSIONAL LEAGUE - ROUND 9,https://www.flashscore.com/team/al-shabab/MsVAD4Kb/
-zPZbpN3i,Al-Rustaq,OMAN - PROFESSIONAL LEAGUE - ROUND 9,https://www.flashscore.com/team/al-rustaq/zPZbpN3i/
-Y7m8RLYG,Oman Club,OMAN - PROFESSIONAL LEAGUE - ROUND 9,https://www.flashscore.com/team/oman-club/Y7m8RLYG/
-bJtxRa3T,Al-Samail,OMAN - PROFESSIONAL LEAGUE - ROUND 9,https://www.flashscore.com/team/al-samail/bJtxRa3T/
+zPZbpN3i,Sur Club,OMAN - SULTAN CUP - QUARTER-FINALS,https://www.flashscore.com/team/sur-club/zPZbpN3i/
+Y7m8RLYG,Bahla,OMAN - SULTAN CUP - QUARTER-FINALS,https://www.flashscore.com/team/bahla/Y7m8RLYG/
+bJtxRa3T,Sur Club,OMAN - SULTAN CUP - QUARTER-FINALS,https://www.flashscore.com/team/sur-club/bJtxRa3T/
 2R7Wzcej,Dhofar,OMAN - PROFESSIONAL LEAGUE - ROUND 9,https://www.flashscore.com/team/dhofar/2R7Wzcej/
 raMyru3G,Al-Wahda,OMAN - PROFESSIONAL LEAGUE - ROUND 9,https://www.flashscore.com/team/al-wahda/raMyru3G/
 fXWnUNlb,Bahla,OMAN - PROFESSIONAL LEAGUE - ROUND 9,https://www.flashscore.com/team/bahla/fXWnUNlb/
-vZd1OY26,Bahla,OMAN - PROFESSIONAL LEAGUE - ROUND 9,https://www.flashscore.com/team/bahla/vZd1OY26/
+vZd1OY26,Ibri,OMAN - SULTAN CUP - QUARTER-FINALS,https://www.flashscore.com/team/ibri/vZd1OY26/
 KpOJIAAg,FC Cartagena SAD,SPAIN - PRIMERA RFEF - GROUP 2 - ROUND 18,https://www.flashscore.com/team/fc-cartagena-sad/KpOJIAAg/
 OdthnF7f,Alcione Milano,Unknown,https://www.flashscore.com/team/alcione-milano/OdthnF7f/
 nJ5YN3gH,Triestina,Unknown,https://www.flashscore.com/team/triestina/nJ5YN3gH/
@@ -1487,8 +1487,8 @@ EqpFnf0d,SC Vila Real,PORTUGAL - LIGA PORTUGAL - ROUND 17,https://www.flashscore
 4OH7ewrU,Langreo,SPAIN - PRIMERA RFEF - GROUP 1 - ROUND 18,https://www.flashscore.com/team/langreo/4OH7ewrU/
 rkPfzpO6,Sant Andreu,SPAIN - PRIMERA RFEF - GROUP 2 - ROUND 19,https://www.flashscore.com/team/sant-andreu/rkPfzpO6/
 WYZnRzI1,Al Bidda,QATAR - EMIR CUP - 1/16-FINALS,https://www.flashscore.com/team/al-bidda/WYZnRzI1/
-8zyiTs44,Al-Msnaa,OMAN - PROFESSIONAL LEAGUE - ROUND 9,https://www.flashscore.com/team/al-msnaa/8zyiTs44/
-8n6G0msi,Tadamone Hadramout,OMAN - PROFESSIONAL LEAGUE - ROUND 9,https://www.flashscore.com/team/tadamone-hadramout/8n6G0msi/
+8zyiTs44,Al-Msnaa,OMAN - SULTAN CUP - QUARTER-FINALS,https://www.flashscore.com/team/al-msnaa/8zyiTs44/
+8n6G0msi,Tadamone Hadramout,OMAN - SULTAN CUP - QUARTER-FINALS,https://www.flashscore.com/team/tadamone-hadramout/8n6G0msi/
 tKuIoRxU,Burkina Faso,AFRICA - AFRICA CUP OF NATIONS - PLAY OFFS - 1/8-FINALS,https://www.flashscore.com/team/burkina-faso/tKuIoRxU/
 phn9mm8H,D.R. Congo,Unknown,https://www.flashscore.com/team/d-r-congo/phn9mm8H/
 naNvXTwI,Botswana,AFRICA - AFRICA CUP OF NATIONS - PLAY OFFS - 1/8-FINALS,https://www.flashscore.com/team/botswana/naNvXTwI/
@@ -1501,10 +1501,10 @@ K8aAGt6r,Iraq,AFRICA - AFRICA CUP OF NATIONS - PLAY OFFS - 1/8-FINALS,https://ww
 jHmbM6XM,Sudan,AFRICA - AFRICA CUP OF NATIONS - PLAY OFFS - 1/8-FINALS,https://www.flashscore.com/team/sudan/jHmbM6XM/
 noYKsAu8,United Arab Emirates U23,ASIA - AFC ASIAN CUP U23 - ROUND 2,https://www.flashscore.com/team/united-arab-emirates-u23/noYKsAu8/
 EDZck0CK,Ivory Coast,AFRICA - AFRICA CUP OF NATIONS - PLAY OFFS - 1/8-FINALS,https://www.flashscore.com/team/ivory-coast/EDZck0CK/
-riaqqurF,Monaco,FRANCE - COUPE DE FRANCE - 1/16-FINALS,https://www.flashscore.com/team/monaco/riaqqurF/
+riaqqurF,Galatasaray,NETHERLANDS - EREDIVISIE - ROUND 18,https://www.flashscore.com/team/galatasaray/riaqqurF/
 S0WZMUNG,Bodo/Glimt,FRANCE - COUPE DE FRANCE - 1/16-FINALS,https://www.flashscore.com/team/bodo/glimt/S0WZMUNG/
 t4XSJNRh,Saint-Cyr Collonges,FRANCE - LIGUE 1 - ROUND 17,https://www.flashscore.com/team/saint-cyr-collonges/t4XSJNRh/
-hG8POBb8,Roda,NETHERLANDS - EERSTE DIVISIE - ROUND 22,https://www.flashscore.com/team/roda/hG8POBb8/
+hG8POBb8,G.A. Eagles,NETHERLANDS - EREDIVISIE - ROUND 18,https://www.flashscore.com/team/g.a.-eagles/hG8POBb8/
 tnJEvn3R,Comercial FC - Tiete U20,BRAZIL - COPINHA - ROUND 3,https://www.flashscore.com/team/comercial-fc---tiete-u20/tnJEvn3R/
 SQHlAzJO,Aguia De Maraba U20,BRAZIL - COPINHA - ROUND 3,https://www.flashscore.com/team/aguia-de-maraba-u20/SQHlAzJO/
 faofXqVH,Tuna Luso U20,BRAZIL - COPINHA - ROUND 2,https://www.flashscore.com/team/tuna-luso-u20/faofXqVH/
@@ -1607,7 +1607,7 @@ Stjmj4EU,New Jack,DR CONGO - LIGUE 1 - ROUND 10,https://www.flashscore.com/team/
 ll5VeAML,Aigles du Congo,DR CONGO - LIGUE 1 - ROUND 10,https://www.flashscore.com/team/aigles-du-congo/ll5VeAML/
 E5gUhvoN,Celeste,DR CONGO - LIGUE 1 - ROUND 10,https://www.flashscore.com/team/celeste/E5gUhvoN/
 rX4RfyVF,Santa Lucia,MALTA - FA TROPHY - 1/16-FINALS,https://www.flashscore.com/team/santa-lucia/rX4RfyVF/
-8UOvIwnb,Ajax,NETHERLANDS - EREDIVISIE - ROUND 18,https://www.flashscore.com/team/ajax/8UOvIwnb/
+8UOvIwnb,Telstar,NETHERLANDS - EREDIVISIE - ROUND 18,https://www.flashscore.com/team/telstar/8UOvIwnb/
 lOaIjNAm,Casa Pia,PORTUGAL - LIGA PORTUGAL - ROUND 17,https://www.flashscore.com/team/casa-pia/lOaIjNAm/
 z7XvPYLp,Concordia U20,BRAZIL - COPINHA - ROUND 3,https://www.flashscore.com/team/concordia-u20/z7XvPYLp/
 8KwyQWXP,Figueirense U20,BRAZIL - COPINHA - ROUND 3,https://www.flashscore.com/team/figueirense-u20/8KwyQWXP/
@@ -1773,18 +1773,18 @@ Ymtczixg,Kirivong Sok Sen Chey,CAMBODIA - CPL - ROUND 16,https://www.flashscore.
 0retwjin,Manila Digger,CAMBODIA - CPL - ROUND 16,https://www.flashscore.com/team/manila-digger/0retwjin/
 6qKtzBnM,Ezra,CAMBODIA - CPL - ROUND 16,https://www.flashscore.com/team/ezra/6qKtzBnM/
 6mrLtwEp,Svay Rieng,CAMBODIA - CPL - ROUND 16,https://www.flashscore.com/team/svay-rieng/6mrLtwEp/
-YJdDMY7P,Mara Sugar,KENYA - PREMIER LEAGUE - ROUND 16,https://www.flashscore.com/team/mara-sugar/YJdDMY7P/
-UBYgXJJb,APS Bomet,KENYA - PREMIER LEAGUE - ROUND 16,https://www.flashscore.com/team/aps-bomet/UBYgXJJb/
-0zjHr0CN,APS Bomet,KENYA - PREMIER LEAGUE - ROUND 16,https://www.flashscore.com/team/aps-bomet/0zjHr0CN/
-AX15Kdd9,Police FC,Unknown,https://www.flashscore.com/team/police-fc/AX15Kdd9/
+YJdDMY7P,KCB,KENYA - PREMIER LEAGUE - ROUND 16,https://www.flashscore.com/team/kcb/YJdDMY7P/
+UBYgXJJb,Shabana,KENYA - PREMIER LEAGUE - ROUND 16,https://www.flashscore.com/team/shabana/UBYgXJJb/
+0zjHr0CN,Shabana,KENYA - PREMIER LEAGUE - ROUND 16,https://www.flashscore.com/team/shabana/0zjHr0CN/
+AX15Kdd9,Gor Mahia,KENYA - PREMIER LEAGUE - ROUND 16,https://www.flashscore.com/team/gor-mahia/AX15Kdd9/
 xxIkEOUS,Muranga,KENYA - PREMIER LEAGUE - ROUND 16,https://www.flashscore.com/team/muranga/xxIkEOUS/
 KzxaGb9r,Ulinzi Stars,KENYA - PREMIER LEAGUE - ROUND 16,https://www.flashscore.com/team/ulinzi-stars/KzxaGb9r/
-EkWjHR8e,Mara Sugar,KENYA - PREMIER LEAGUE - ROUND 16,https://www.flashscore.com/team/mara-sugar/EkWjHR8e/
-lzS777jQ,Mara Sugar,KENYA - PREMIER LEAGUE - ROUND 16,https://www.flashscore.com/team/mara-sugar/lzS777jQ/
+EkWjHR8e,Kariobangi Sharks,KENYA - PREMIER LEAGUE - ROUND 16,https://www.flashscore.com/team/kariobangi-sharks/EkWjHR8e/
+lzS777jQ,Gor Mahia,KENYA - PREMIER LEAGUE - ROUND 16,https://www.flashscore.com/team/gor-mahia/lzS777jQ/
 b9c0Ziqo,Tusker,KENYA - PREMIER LEAGUE - ROUND 16,https://www.flashscore.com/team/tusker/b9c0Ziqo/
-WfxlGWpg,Mara Sugar,KENYA - PREMIER LEAGUE - ROUND 16,https://www.flashscore.com/team/mara-sugar/WfxlGWpg/
+WfxlGWpg,Posta Rangers,KENYA - PREMIER LEAGUE - ROUND 16,https://www.flashscore.com/team/posta-rangers/WfxlGWpg/
 2yuuwjkA,Nairobi United,KENYA - PREMIER LEAGUE - ROUND 2,https://www.flashscore.com/team/nairobi-united/2yuuwjkA/
-AuYxVndl,Mara Sugar,KENYA - PREMIER LEAGUE - ROUND 16,https://www.flashscore.com/team/mara-sugar/AuYxVndl/
+AuYxVndl,Bandari,KENYA - PREMIER LEAGUE - ROUND 16,https://www.flashscore.com/team/bandari/AuYxVndl/
 xU9afFkD,Mara Sugar,KENYA - PREMIER LEAGUE - ROUND 16,https://www.flashscore.com/team/mara-sugar/xU9afFkD/
 QyX50QIH,Etoile Sahel,KENYA - PREMIER LEAGUE - ROUND 2,https://www.flashscore.com/team/etoile-sahel/QyX50QIH/
 ELGqWEpd,Ath Bilbao B,SPAIN - PRIMERA RFEF - GROUP 1 - ROUND 19,https://www.flashscore.com/team/ath-bilbao-b/ELGqWEpd/
@@ -1807,11 +1807,11 @@ A144gewT,Gangwon,THAILAND - THAI LEAGUE 1 - ROUND 18,https://www.flashscore.com/
 pQqbqyUn,Kanchanaburi,THAILAND - THAI LEAGUE 1 - ROUND 16,https://www.flashscore.com/team/kanchanaburi/pQqbqyUn/
 ppiiJg9Q,Chonburi,THAILAND - THAI LEAGUE 1 - ROUND 16,https://www.flashscore.com/team/chonburi/ppiiJg9Q/
 EVEwgyOM,Buriram,THAILAND - THAI LEAGUE 1 - ROUND 18,https://www.flashscore.com/team/buriram/EVEwgyOM/
-Qgd3eSin,Qarabag,ITALY - SERIE A - ROUND 19,https://www.flashscore.com/team/qarabag/Qgd3eSin/
+Qgd3eSin,Ajax,NETHERLANDS - EREDIVISIE - ROUND 18,https://www.flashscore.com/team/ajax/Qgd3eSin/
 lYsHBgeo,Estrela De Marco U20,BRAZIL - COPINHA - ROUND 3,https://www.flashscore.com/team/estrela-de-marco-u20/lYsHBgeo/
 rcYHsxe9,Como U19,ITALY - COPPA ITALIA PRIMAVERA - 1/8-FINALS,https://www.flashscore.com/team/como-u19/rcYHsxe9/
-GU9jbyMo,APS Bomet,KENYA - PREMIER LEAGUE - ROUND 16,https://www.flashscore.com/team/aps-bomet/GU9jbyMo/
-KScUSuRF,Mara Sugar,KENYA - PREMIER LEAGUE - ROUND 16,https://www.flashscore.com/team/mara-sugar/KScUSuRF/
+GU9jbyMo,Shabana,KENYA - PREMIER LEAGUE - ROUND 16,https://www.flashscore.com/team/shabana/GU9jbyMo/
+KScUSuRF,Gor Mahia,KENYA - PREMIER LEAGUE - ROUND 16,https://www.flashscore.com/team/gor-mahia/KScUSuRF/
 OnKeiOGI,Tampines,SINGAPORE - PREMIER LEAGUE - ROUND 6,https://www.flashscore.com/team/tampines/OnKeiOGI/
 OKCqPPdQ,Cebu FC,MALAYSIA - SUPER LEAGUE - ROUND 15,https://www.flashscore.com/team/cebu-fc/OKCqPPdQ/
 O88o93rn,Shanghai Port,MALAYSIA - SUPER LEAGUE - ROUND 14,https://www.flashscore.com/team/shanghai-port/O88o93rn/
@@ -1839,16 +1839,16 @@ Ug6FEthC,Chebba,WORLD - CLUB FRIENDLY,https://www.flashscore.com/team/chebba/Ug6
 v3ZUa2na,OC Kerkennah,WORLD - CLUB FRIENDLY,https://www.flashscore.com/team/oc-kerkennah/v3ZUa2na/
 AqFWmrmE,CD Extremadura,SPAIN - LALIGA2 - ROUND 21,https://www.flashscore.com/team/cd-extremadura/AqFWmrmE/
 8GCCeX9f,Sevilla,SPAIN - LALIGA - ROUND 18,https://www.flashscore.com/team/sevilla/8GCCeX9f/
-6XXWPpSs,Sanga Balende,DR CONGO - LIGUE 1 - ROUND 6,https://www.flashscore.com/team/sanga-balende/6XXWPpSs/
-bi65l4LN,Tshikas,DR CONGO - LIGUE 1 - ROUND 15,https://www.flashscore.com/team/tshikas/bi65l4LN/
-x2ltaKrq,Lubumbashi Sport,Unknown,https://www.flashscore.com/team/lubumbashi-sport/x2ltaKrq/
-MPeIl2Lh,Malole,DR CONGO - LIGUE 1 - ROUND 15,https://www.flashscore.com/team/malole/MPeIl2Lh/
-vPRfquoq,Tshinkunku,Unknown,https://www.flashscore.com/team/sanga-balende/vPRfquoq/
-4fNDMVJo,Don Bosco,DR CONGO - LIGUE 1 - ROUND 15,https://www.flashscore.com/team/don-bosco/4fNDMVJo/
-rJfKh7qN,Mazembe,DR CONGO - LIGUE 1 - ROUND 15,https://www.flashscore.com/team/mazembe/rJfKh7qN/
-ObAh2h9o,Groupe Bazano,DR CONGO - LIGUE 1 - ROUND 15,https://www.flashscore.com/team/groupe-bazano/ObAh2h9o/
-jkaf0sAK,Tanganyika,DR CONGO - LIGUE 1 - ROUND 15,https://www.flashscore.com/team/tanganyika/jkaf0sAK/
-A7EU2hKp,Don Bosco,DR CONGO - LIGUE 1 - ROUND 15,https://www.flashscore.com/team/don-bosco/A7EU2hKp/
+6XXWPpSs,Sanga Balende,DR CONGO - LIGUE 1 - ROUND 13,https://www.flashscore.com/team/sanga-balende/6XXWPpSs/
+bi65l4LN,Tshinkunku,DR CONGO - LIGUE 1 - ROUND 13,https://www.flashscore.com/team/tshinkunku/bi65l4LN/
+x2ltaKrq,Lubumbashi Sport,DR CONGO - LIGUE 1 - ROUND 13,https://www.flashscore.com/team/lubumbashi-sport/x2ltaKrq/
+MPeIl2Lh,Sanga Balende,DR CONGO - LIGUE 1 - ROUND 13,https://www.flashscore.com/team/sanga-balende/MPeIl2Lh/
+vPRfquoq,Sanga Balende,DR CONGO - LIGUE 1 - ROUND 13,https://www.flashscore.com/team/sanga-balende/vPRfquoq/
+4fNDMVJo,Sanga Balende,DR CONGO - LIGUE 1 - ROUND 13,https://www.flashscore.com/team/sanga-balende/4fNDMVJo/
+rJfKh7qN,Tshinkunku,DR CONGO - LIGUE 1 - ROUND 13,https://www.flashscore.com/team/tshinkunku/rJfKh7qN/
+ObAh2h9o,Groupe Bazano,DR CONGO - LIGUE 1 - ROUND 13,https://www.flashscore.com/team/groupe-bazano/ObAh2h9o/
+jkaf0sAK,Tanganyika,DR CONGO - LIGUE 1 - ROUND 13,https://www.flashscore.com/team/tanganyika/jkaf0sAK/
+A7EU2hKp,Sanga Balende,DR CONGO - LIGUE 1 - ROUND 13,https://www.flashscore.com/team/sanga-balende/A7EU2hKp/
 AaR0Y3LG,Naft Al-Basra,IRAQ - STARS LEAGUE - ROUND 10,https://www.flashscore.com/team/naft-al-basra/AaR0Y3LG/
 OK628PQO,Qala Saints,MALTA - FA TROPHY - 1/16-FINALS,https://www.flashscore.com/team/qala-saints/OK628PQO/
 SWeEuJKT,Qala Saints,MALTA - FA TROPHY - 1/16-FINALS,https://www.flashscore.com/team/qala-saints/SWeEuJKT/
@@ -1889,9 +1889,9 @@ WG9pOTse,Heidenheim,Unknown,https://www.flashscore.com/team/1-fc-koln/WG9pOTse/
 pzHW4oaE,Mainz,Unknown,https://www.flashscore.com/team/union-berlin/pzHW4oaE/
 hQAtP9Sl,Werder Bremen,Unknown,https://www.flashscore.com/team/hoffenheim/hQAtP9Sl/
 fTVNku3I,B. Monchengladbach,Unknown,https://www.flashscore.com/team/augsburg/fTVNku3I/
-nJQmYp1B,Feyenoord,NETHERLANDS - EREDIVISIE - ROUND 18,https://www.flashscore.com/team/feyenoord/nJQmYp1B/
+nJQmYp1B,Stuttgart,NETHERLANDS - EREDIVISIE - ROUND 18,https://www.flashscore.com/team/stuttgart/nJQmYp1B/
 v9k3aY5F,Hamburger SV,Unknown,https://www.flashscore.com/team/hamburger/v9k3aY5F/
-KbS1suSm,St. Pauli,Unknown,https://www.flashscore.com/team/rb-leipzig/KbS1suSm/
+KbS1suSm,Dukla Prague,WORLD - CLUB FRIENDLY,https://www.flashscore.com/team/dukla-prague/KbS1suSm/
 nwkTahLL,Wolfsburg,Unknown,https://www.flashscore.com/team/wolfsburg/nwkTahLL/
 pCVkxE7k,USM Alger,ALGERIA - LIGUE 1 - ROUND 15,https://www.flashscore.com/team/usm-alger/pCVkxE7k/
 je0pik4r,Shkendija,CYPRUS - CYPRUS LEAGUE - ROUND 17,https://www.flashscore.com/team/shkendija/je0pik4r/
@@ -1974,7 +1974,7 @@ fZKFBvxG,Alaves,SPAIN - LALIGA - ROUND 19,https://www.flashscore.com/team/alaves
 YkBRymvt,Constancia,SPAIN - LALIGA - ROUND 19,https://www.flashscore.com/team/constancia/YkBRymvt/
 zsq3xkum,Balzan,MALTA - FA TROPHY - 1/16-FINALS,https://www.flashscore.com/team/balzan/zsq3xkum/
 6RDzPlQI,Birzebbuga,MALTA - FA TROPHY - 1/16-FINALS,https://www.flashscore.com/team/birzebbuga/6RDzPlQI/
-AizHP7s7,Azuaga,SPAIN - LALIGA2 - ROUND 20,https://www.flashscore.com/team/azuaga/AizHP7s7/
+AizHP7s7,Azuaga,SPAIN - LALIGA2 - ROUND 21,https://www.flashscore.com/team/azuaga/AizHP7s7/
 lrXWWhUu,Mutilvera,SPAIN - LALIGA2 - ROUND 21,https://www.flashscore.com/team/mutilvera/lrXWWhUu/
 IDGLjl6p,CE Europa,SPAIN - PRIMERA RFEF - GROUP 2 - ROUND 19,https://www.flashscore.com/team/ce-europa/IDGLjl6p/
 8nemvXht,Pyramids,EGYPT - LEAGUE CUP - ROUND 6,https://www.flashscore.com/team/pyramids/8nemvXht/
@@ -2016,7 +2016,7 @@ AgFukvsR,Americano RJ U20,BRAZIL - COPINHA - ROUND 3,https://www.flashscore.com/
 UyQmTLBs,Fontenay,FRANCE - SUPER CUP - FINAL,https://www.flashscore.com/team/fontenay/UyQmTLBs/
 QZmBlWt8,Paris FC,FRANCE - LIGUE 1 - ROUND 17,https://www.flashscore.com/team/paris-fc/QZmBlWt8/
 MkPmVv50,Venezia,Unknown,https://www.flashscore.com/team/venezia/MkPmVv50/
-Olvehxrl,Salzburg (Aut),Unknown,https://www.flashscore.com/team/salzburg/Olvehxrl/
+Olvehxrl,G.A. Eagles,NETHERLANDS - EREDIVISIE - ROUND 18,https://www.flashscore.com/team/g.a.-eagles/Olvehxrl/
 6RpzBH79,Real Sociedad,SPAIN - LALIGA - ROUND 18,https://www.flashscore.com/team/real-sociedad/6RpzBH79/
 nFcnrOw1,SCSA Eagles,ANTIGUA & BARBUDA - ABFA PREMIER LEAGUE - ROUND 10,https://www.flashscore.com/team/scsa-eagles/nFcnrOw1/
 G2F5XzYm,Murcia,SPAIN - PRIMERA RFEF - GROUP 2 - ROUND 18,https://www.flashscore.com/team/murcia/G2F5XzYm/
@@ -2087,7 +2087,7 @@ A9Z4YZ1F,Silver Stars,MYANMAR - NATIONAL LEAGUE - ROUND 11,https://www.flashscor
 0fQAxtPF,Yarmanya United,MYANMAR - NATIONAL LEAGUE - ROUND 11,https://www.flashscore.com/team/yarmanya-united/0fQAxtPF/
 WlA42WvP,Al Bashaer,LIBYA - PREMIER LEAGUE - ROUND 4,https://www.flashscore.com/team/al-bashaer/WlA42WvP/
 8UezaUtS,Asaria,LIBYA - PREMIER LEAGUE - ROUND 4,https://www.flashscore.com/team/asaria/8UezaUtS/
-8zjySeoN,Heerenveen,NETHERLANDS - EREDIVISIE - ROUND 18,https://www.flashscore.com/team/heerenveen/8zjySeoN/
+8zjySeoN,Feyenoord,NETHERLANDS - EREDIVISIE - ROUND 18,https://www.flashscore.com/team/feyenoord/8zjySeoN/
 KWRqBiAb,Luzern,WORLD - CLUB FRIENDLY,https://www.flashscore.com/team/luzern/KWRqBiAb/
 6oCa40nb,Luzern,WORLD - CLUB FRIENDLY,https://www.flashscore.com/team/luzern/6oCa40nb/
 bDKkAiK5,Abu Salim,LIBYA - PREMIER LEAGUE - ROUND 4,https://www.flashscore.com/team/abu-salim/bDKkAiK5/
@@ -2137,7 +2137,7 @@ GAtxDHF9,Antalyaspor,WORLD - CLUB FRIENDLY,https://www.flashscore.com/team/antal
 pSc6z7bf,Hamrun,MALTA - PREMIER LEAGUE - FIRST STAGE - TOP 6 - ROUND 16,https://www.flashscore.com/team/hamrun/pSc6z7bf/
 MsbmracL,Fenerbahce,WORLD - CLUB FRIENDLY,https://www.flashscore.com/team/fenerbahce/MsbmracL/
 GOPqBIRK,Sakaryaspor,TURKEY - 1. LIG - ROUND 20,https://www.flashscore.com/team/sakaryaspor/GOPqBIRK/
-hfvQIzKf,Kocaelispor,WORLD - CLUB FRIENDLY,https://www.flashscore.com/team/kocaelispor/hfvQIzKf/
+hfvQIzKf,Erzurumspor,TURKEY - 1. LIG - ROUND 20,https://www.flashscore.com/team/erzurumspor/hfvQIzKf/
 IcN8oPcJ,Kayserispor,WORLD - CLUB FRIENDLY,https://www.flashscore.com/team/kayserispor/IcN8oPcJ/
 IDmErJCR,Besiktas,TURKEY - SUPER CUP - SEMI-FINALS,https://www.flashscore.com/team/besiktas/IDmErJCR/
 0MJlDkrA,Goztepe (Tur),Unknown,https://www.flashscore.com/team/goztepe/0MJlDkrA/
@@ -2201,7 +2201,7 @@ neJtB1pJ,Buhimba,UGANDA - PREMIER LEAGUE - ROUND 12,https://www.flashscore.com/t
 hj8xMlGq,Maroons,UGANDA - PREMIER LEAGUE - ROUND 12,https://www.flashscore.com/team/maroons/hj8xMlGq/
 fwjo7kpb,Kampala City,UGANDA - PREMIER LEAGUE - ROUND 12,https://www.flashscore.com/team/kampala-city/fwjo7kpb/
 O6V1NhPB,Villa,UGANDA - PREMIER LEAGUE - ROUND 12,https://www.flashscore.com/team/villa/O6V1NhPB/
-EDjXSyWG,Venlo,NETHERLANDS - EERSTE DIVISIE - ROUND 22,https://www.flashscore.com/team/venlo/EDjXSyWG/
+EDjXSyWG,Sittard,NETHERLANDS - EREDIVISIE - ROUND 18,https://www.flashscore.com/team/sittard/EDjXSyWG/
 xW8i8U05,Umm-Salal,QATAR - EMIR CUP - 1/16-FINALS,https://www.flashscore.com/team/umm-salal/xW8i8U05/
 SYF3M1AS,Kyrgyzstan U23,ASIA - AFC ASIAN CUP U23 - ROUND 2,https://www.flashscore.com/team/kyrgyzstan-u23/SYF3M1AS/
 4xuOqBYn,Al Sailiya,Unknown,https://www.flashscore.com/team/al-sailiya/4xuOqBYn/
@@ -2255,21 +2255,21 @@ dM8vDNti,Express,UGANDA - PREMIER LEAGUE - ROUND 12,https://www.flashscore.com/t
 vXYNKJKR,Villa,UGANDA - PREMIER LEAGUE - ROUND 12,https://www.flashscore.com/team/villa/vXYNKJKR/
 6s1W4sXk,United FC,UNITED ARAB EMIRATES - UAE LEAGUE - ROUND 9,https://www.flashscore.com/team/united-fc/6s1W4sXk/
 UPwapTb8,Villa,UGANDA - PREMIER LEAGUE - ROUND 12,https://www.flashscore.com/team/villa/UPwapTb8/
-CM8ySpMH,Slavia Prague,WORLD - CLUB FRIENDLY,https://www.flashscore.com/team/slavia-prague/CM8ySpMH/
+CM8ySpMH,Dukla Prague,WORLD - CLUB FRIENDLY,https://www.flashscore.com/team/dukla-prague/CM8ySpMH/
 r9XWmtLq,Teplice,Unknown,https://www.flashscore.com/team/teplice/r9XWmtLq/
 MNEDyOlF,Slovacko,WORLD - CLUB FRIENDLY,https://www.flashscore.com/team/slovacko/MNEDyOlF/
 fuXqHnxa,Slavia Prague,WORLD - CLUB FRIENDLY,https://www.flashscore.com/team/slavia-prague/fuXqHnxa/
-2LA0e86b,Plzen,WORLD - CLUB FRIENDLY,https://www.flashscore.com/team/plzen/2LA0e86b/
-lI6ddlih,Slavia Prague,WORLD - CLUB FRIENDLY,https://www.flashscore.com/team/slavia-prague/lI6ddlih/
+2LA0e86b,Dukla Prague,WORLD - CLUB FRIENDLY,https://www.flashscore.com/team/dukla-prague/2LA0e86b/
+lI6ddlih,Dukla Prague,WORLD - CLUB FRIENDLY,https://www.flashscore.com/team/dukla-prague/lI6ddlih/
 C09N1Ikd,Zlin,Unknown,https://www.flashscore.com/team/zlin/C09N1Ikd/
 IkkZrteI,Basel,WORLD - CLUB FRIENDLY,https://www.flashscore.com/team/basel/IkkZrteI/
 r3jWUIiN,Basel,WORLD - CLUB FRIENDLY,https://www.flashscore.com/team/basel/r3jWUIiN/
 0nBNQR0n,Al Seeb,OMAN - PROFESSIONAL LEAGUE - ROUND 9,https://www.flashscore.com/team/al-seeb/0nBNQR0n/
-bB3JbZpA,Heerenveen,NETHERLANDS - EREDIVISIE - ROUND 18,https://www.flashscore.com/team/heerenveen/bB3JbZpA/
-KK4FaFV3,Heerenveen,NETHERLANDS - EREDIVISIE - ROUND 18,https://www.flashscore.com/team/heerenveen/KK4FaFV3/
-r1L5w2EB,Zwolle,NETHERLANDS - EREDIVISIE - ROUND 18,https://www.flashscore.com/team/zwolle/r1L5w2EB/
-2RxOow1i,Heerenveen,NETHERLANDS - EREDIVISIE - ROUND 18,https://www.flashscore.com/team/heerenveen/2RxOow1i/
-YH8HX5iP,Heerenveen,NETHERLANDS - EREDIVISIE - ROUND 18,https://www.flashscore.com/team/heerenveen/YH8HX5iP/
+bB3JbZpA,Heracles,NETHERLANDS - EREDIVISIE - ROUND 18,https://www.flashscore.com/team/heracles/bB3JbZpA/
+KK4FaFV3,Sparta Rotterdam,NETHERLANDS - EREDIVISIE - ROUND 18,https://www.flashscore.com/team/sparta-rotterdam/KK4FaFV3/
+r1L5w2EB,Sittard,NETHERLANDS - EREDIVISIE - ROUND 18,https://www.flashscore.com/team/sittard/r1L5w2EB/
+2RxOow1i,Sittard,NETHERLANDS - EREDIVISIE - ROUND 18,https://www.flashscore.com/team/sittard/2RxOow1i/
+YH8HX5iP,Ajax,NETHERLANDS - EREDIVISIE - ROUND 18,https://www.flashscore.com/team/ajax/YH8HX5iP/
 UNA6IKFC,Roda,NETHERLANDS - EERSTE DIVISIE - ROUND 22,https://www.flashscore.com/team/roda/UNA6IKFC/
 nLNrHc14,NAC Breda,NETHERLANDS - EREDIVISIE - ROUND 18,https://www.flashscore.com/team/nac-breda/nLNrHc14/
 0b0BUPhM,CSA U20,BRAZIL - COPINHA - ROUND 2,https://www.flashscore.com/team/csa-u20/0b0BUPhM/
@@ -2280,7 +2280,7 @@ zsktjfsD,Crvena zvezda,WORLD - CLUB FRIENDLY,https://www.flashscore.com/team/crv
 8pVJab5C,Vojvodina,WORLD - CLUB FRIENDLY,https://www.flashscore.com/team/vojvodina/8pVJab5C/
 tEBfcZh3,Cukaricki,WORLD - CLUB FRIENDLY,https://www.flashscore.com/team/cukaricki/tEBfcZh3/
 Imdxh57l,Crvena zvezda,WORLD - CLUB FRIENDLY,https://www.flashscore.com/team/crvena-zvezda/Imdxh57l/
-Gv2kjDpN,FCSB,NETHERLANDS - EREDIVISIE - ROUND 18,https://www.flashscore.com/team/fcsb/Gv2kjDpN/
+Gv2kjDpN,U. Cluj,WORLD - CLUB FRIENDLY,https://www.flashscore.com/team/u.-cluj/Gv2kjDpN/
 00NeCQbK,Crvena zvezda,WORLD - CLUB FRIENDLY,https://www.flashscore.com/team/crvena-zvezda/00NeCQbK/
 6Z6nNNBJ,Crvena zvezda,WORLD - CLUB FRIENDLY,https://www.flashscore.com/team/crvena-zvezda/6Z6nNNBJ/
 b7fHYa2g,Crvena zvezda,WORLD - CLUB FRIENDLY,https://www.flashscore.com/team/crvena-zvezda/b7fHYa2g/
@@ -2385,7 +2385,7 @@ WlHjRvDk,Ponte Preta,Unknown,https://www.flashscore.com/team/ponte-preta/WlHjRvD
 WMZyrhsE,Guarani,Unknown,https://www.flashscore.com/team/guarani/WMZyrhsE/
 IcsAE3i6,Camboriu,Unknown,https://www.flashscore.com/team/camboriu/IcsAE3i6/
 vRn3UqXP,Ostrava B (Cze),Unknown,https://www.flashscore.com/team/polonia-bytom/vRn3UqXP/
-drA4fSL4,Piast Gliwice (Pol),Unknown,https://www.flashscore.com/team/sigma-olomouc/drA4fSL4/
+drA4fSL4,Sigma Olomouc,WORLD - CLUB FRIENDLY,https://www.flashscore.com/team/sigma-olomouc/drA4fSL4/
 pjq9BL0p,Ancona,ITALY - COPPA ITALIA SERIE D - SEMI-FINALS,https://www.flashscore.com/team/ancona/pjq9BL0p/
 UsH271za,Francavilla,ITALY - COPPA ITALIA SERIE D - SEMI-FINALS,https://www.flashscore.com/team/francavilla/UsH271za/
 OdnLMaug,Club Milano,ITALY - COPPA ITALIA SERIE D - SEMI-FINALS,https://www.flashscore.com/team/club-milano/OdnLMaug/
@@ -2413,8 +2413,8 @@ thJIFAIJ,Enyimba,NIGERIA - NPFL - ROUND 20,https://www.flashscore.com/team/enyim
 nZg9p86q,Wikki Tourist,NIGERIA - NPFL - ROUND 20,https://www.flashscore.com/team/wikki-tourist/nZg9p86q/
 6um4wQbn,Metz W,FRANCE - COUPE DE FRANCE WOMEN - 1/16-FINALS,https://www.flashscore.com/team/metz-w/6um4wQbn/
 j5WywMkQ,Strasbourg W,FRANCE - COUPE DE FRANCE WOMEN - 1/16-FINALS,https://www.flashscore.com/team/strasbourg-w/j5WywMkQ/
-AVMiabqs,Strasbourg W,FRANCE - COUPE DE FRANCE WOMEN - 1/16-FINALS,https://www.flashscore.com/team/strasbourg-w/AVMiabqs/
-Ct88yAMf,Toulouse W,FRANCE - COUPE DE FRANCE WOMEN - 1/16-FINALS,https://www.flashscore.com/team/toulouse-w/Ct88yAMf/
+AVMiabqs,Dijon W,FRANCE - COUPE DE FRANCE WOMEN - 1/16-FINALS,https://www.flashscore.com/team/dijon-w/AVMiabqs/
+Ct88yAMf,Reims W,FRANCE - COUPE DE FRANCE WOMEN - 1/16-FINALS,https://www.flashscore.com/team/reims-w/Ct88yAMf/
 x8Kog2Fg,Casa,SENEGAL - LIGUE 1 - ROUND 10,https://www.flashscore.com/team/casa/x8Kog2Fg/
 OQ5eeez7,Linguere,SENEGAL - LIGUE 1 - ROUND 10,https://www.flashscore.com/team/linguere/OQ5eeez7/
 Odka8d9n,Jaraaf,SENEGAL - LIGUE 1 - ROUND 10,https://www.flashscore.com/team/jaraaf/Odka8d9n/
@@ -2454,9 +2454,9 @@ OpNH7Ouf,Lech Poznan,GERMANY - BUNDESLIGA - ROUND 16,https://www.flashscore.com/
 bHbMply6,Lincoln Red Imps,Unknown,https://www.flashscore.com/team/lincoln-red-imps/bHbMply6/
 4bp6yRjU,Liberec,WORLD - CLUB FRIENDLY,https://www.flashscore.com/team/liberec/4bp6yRjU/
 SpbURe4O,Sigma Olomouc,WORLD - CLUB FRIENDLY,https://www.flashscore.com/team/sigma-olomouc/SpbURe4O/
-tKH71vSe,Dukla Prague (Cze),Unknown,https://www.flashscore.com/team/dukla-prague/tKH71vSe/
-Ys4YYBPn,Sparta Prague,WORLD - CLUB FRIENDLY,https://www.flashscore.com/team/sparta-prague/Ys4YYBPn/
-0f7GpAMu,Hradec Kralove B,Unknown,https://www.flashscore.com/team/mlada-boleslav/0f7GpAMu/
+tKH71vSe,Dukla Prague,WORLD - CLUB FRIENDLY,https://www.flashscore.com/team/dukla-prague/tKH71vSe/
+Ys4YYBPn,Dukla Prague,WORLD - CLUB FRIENDLY,https://www.flashscore.com/team/dukla-prague/Ys4YYBPn/
+0f7GpAMu,Mlada Boleslav,WORLD - CLUB FRIENDLY,https://www.flashscore.com/team/mlada-boleslav/0f7GpAMu/
 vo6umLPj,Polonia Bytom,WORLD - CLUB FRIENDLY,https://www.flashscore.com/team/polonia-bytom/vo6umLPj/
 vgkEmn04,Avia Swidnik,WORLD - CLUB FRIENDLY,https://www.flashscore.com/team/avia-swidnik/vgkEmn04/
 ImAVQStr,Polonia Bytom,WORLD - CLUB FRIENDLY,https://www.flashscore.com/team/polonia-bytom/ImAVQStr/
@@ -2523,25 +2523,25 @@ rTwSrVmg,Al Khor,QATAR - EMIR CUP - 1/16-FINALS,https://www.flashscore.com/team/
 YFNrgfzg,Al Ahli Doha,QATAR - QSL - ROUND 12,https://www.flashscore.com/team/al-ahli-doha/YFNrgfzg/
 WMOGyuBc,PAE Chania,Unknown,https://www.flashscore.com/team/ilioupoli/WMOGyuBc/
 lxNXrLmA,Jaalan,OMAN - PROFESSIONAL LEAGUE - ROUND 9,https://www.flashscore.com/team/jaalan/lxNXrLmA/
-GfBsT1pF,Lorient W,Unknown,https://www.flashscore.com/team/le-mans/GfBsT1pF/
-bXWXmrzj,Saint-Malo W,Unknown,https://www.flashscore.com/team/saint-malo/bXWXmrzj/
-j7XTlOKq,Grenoble W,Unknown,https://www.flashscore.com/team/grenoble/j7XTlOKq/
-MXBwUsV8,Toulouse W,Unknown,https://www.flashscore.com/team/toulouse/MXBwUsV8/
-4IXiwNca,PSG W,Unknown,https://www.flashscore.com/team/lille/4IXiwNca/
+GfBsT1pF,Lille W,FRANCE - COUPE DE FRANCE WOMEN - 1/16-FINALS,https://www.flashscore.com/team/lille-w/GfBsT1pF/
+bXWXmrzj,Nice W,FRANCE - COUPE DE FRANCE WOMEN - 1/16-FINALS,https://www.flashscore.com/team/nice-w/bXWXmrzj/
+j7XTlOKq,Grenoble W,FRANCE - COUPE DE FRANCE WOMEN - 1/16-FINALS,https://www.flashscore.com/team/grenoble-w/j7XTlOKq/
+MXBwUsV8,Toulouse W,FRANCE - COUPE DE FRANCE WOMEN - 1/16-FINALS,https://www.flashscore.com/team/toulouse-w/MXBwUsV8/
+4IXiwNca,PSG W,FRANCE - COUPE DE FRANCE WOMEN - 1/16-FINALS,https://www.flashscore.com/team/psg-w/4IXiwNca/
 OG6v7KNe,Guingamp W,FRANCE - COUPE DE FRANCE WOMEN - 1/16-FINALS,https://www.flashscore.com/team/guingamp-w/OG6v7KNe/
-jHaCSuFR,Bergerac W,FRANCE - COUPE DE FRANCE WOMEN - 1/16-FINALS,https://www.flashscore.com/team/bergerac-w/jHaCSuFR/
-S8pP4fqS,Nantes W,FRANCE - COUPE DE FRANCE WOMEN - 1/16-FINALS,https://www.flashscore.com/team/nantes-w/S8pP4fqS/
-djTazozI,Strasbourg W,FRANCE - COUPE DE FRANCE WOMEN - 1/16-FINALS,https://www.flashscore.com/team/strasbourg-w/djTazozI/
-xlsUII4p,Strasbourg W,FRANCE - COUPE DE FRANCE WOMEN - 1/16-FINALS,https://www.flashscore.com/team/strasbourg-w/xlsUII4p/
+jHaCSuFR,Rodez AF W,FRANCE - COUPE DE FRANCE WOMEN - 1/16-FINALS,https://www.flashscore.com/team/rodez-af-w/jHaCSuFR/
+S8pP4fqS,Le Havre W,FRANCE - COUPE DE FRANCE WOMEN - 1/16-FINALS,https://www.flashscore.com/team/le-havre-w/S8pP4fqS/
+djTazozI,PSG W,FRANCE - COUPE DE FRANCE WOMEN - 1/16-FINALS,https://www.flashscore.com/team/psg-w/djTazozI/
+xlsUII4p,Lille W,FRANCE - COUPE DE FRANCE WOMEN - 1/16-FINALS,https://www.flashscore.com/team/lille-w/xlsUII4p/
 ro3DSjf2,Lyon W,FRANCE - COUPE DE FRANCE WOMEN - 1/16-FINALS,https://www.flashscore.com/team/lyon-w/ro3DSjf2/
-foAoSLaL,Strasbourg W,FRANCE - COUPE DE FRANCE WOMEN - 1/16-FINALS,https://www.flashscore.com/team/strasbourg-w/foAoSLaL/
+foAoSLaL,PSG W,FRANCE - COUPE DE FRANCE WOMEN - 1/16-FINALS,https://www.flashscore.com/team/psg-w/foAoSLaL/
 Sh7b02dc,Auxerre W,FRANCE - COUPE DE FRANCE WOMEN - 1/16-FINALS,https://www.flashscore.com/team/auxerre-w/Sh7b02dc/
 WIWDwWDe,Marseille W,FRANCE - COUPE DE FRANCE WOMEN - 1/16-FINALS,https://www.flashscore.com/team/marseille-w/WIWDwWDe/
-8U7ZUNF2,Strasbourg W,FRANCE - COUPE DE FRANCE WOMEN - 1/16-FINALS,https://www.flashscore.com/team/strasbourg-w/8U7ZUNF2/
-6yx58ded,Montpellier W,FRANCE - COUPE DE FRANCE WOMEN - 1/16-FINALS,https://www.flashscore.com/team/montpellier-w/6yx58ded/
-dn9QwgJ9,Nice W,Unknown,https://www.flashscore.com/team/nice/dn9QwgJ9/
-8GdYByFr,Lens W,Unknown,https://www.flashscore.com/team/lens/8GdYByFr/
-0AE7nlMc,Auxerre W,Unknown,https://www.flashscore.com/team/le-havre/0AE7nlMc/
+8U7ZUNF2,Lille W,FRANCE - COUPE DE FRANCE WOMEN - 1/16-FINALS,https://www.flashscore.com/team/lille-w/8U7ZUNF2/
+6yx58ded,PSG W,FRANCE - COUPE DE FRANCE WOMEN - 1/16-FINALS,https://www.flashscore.com/team/psg-w/6yx58ded/
+dn9QwgJ9,Nice W,FRANCE - COUPE DE FRANCE WOMEN - 1/16-FINALS,https://www.flashscore.com/team/nice-w/dn9QwgJ9/
+8GdYByFr,Lille W,FRANCE - COUPE DE FRANCE WOMEN - 1/16-FINALS,https://www.flashscore.com/team/lille-w/8GdYByFr/
+0AE7nlMc,PSG W,FRANCE - COUPE DE FRANCE WOMEN - 1/16-FINALS,https://www.flashscore.com/team/psg-w/0AE7nlMc/
 pxx2KNFh,Jaraaf,SENEGAL - LIGUE 1 - ROUND 10,https://www.flashscore.com/team/jaraaf/pxx2KNFh/
 0Q2MY5fp,Generation F.,SENEGAL - LIGUE 1 - ROUND 10,https://www.flashscore.com/team/generation-f./0Q2MY5fp/
 bmicmGA9,AJEL,SENEGAL - LIGUE 1 - ROUND 10,https://www.flashscore.com/team/ajel/bmicmGA9/
@@ -2693,12 +2693,12 @@ CjtOK2Br,Chrudim,Unknown,https://www.flashscore.com/team/liberec/CjtOK2Br/
 WYFXQ1KH,Crystal Palace,Unknown,https://www.flashscore.com/team/macclesfield/WYFXQ1KH/
 KKFM0QO8,Brighton U18,Unknown,https://www.flashscore.com/team/qpr/KKFM0QO8/
 8CKOoQdn,Leicester W,ENGLAND - WSL - ROUND 12,https://www.flashscore.com/team/leicester-w/8CKOoQdn/
-4EeCFcxJ,Manchester Utd W,ENGLAND - WSL - ROUND 12,https://www.flashscore.com/team/manchester-utd-w/4EeCFcxJ/
+4EeCFcxJ,Manchester Utd W,FRANCE - COUPE DE FRANCE WOMEN - 1/16-FINALS,https://www.flashscore.com/team/manchester-utd-w/4EeCFcxJ/
 Ori0c7SL,Chonburi,THAILAND - THAI LEAGUE 1 - ROUND 16,https://www.flashscore.com/team/chonburi/Ori0c7SL/
-MavEG09p,Rukinzo,BURUNDI - PRIMUS LEAGUE - ROUND 16,https://www.flashscore.com/team/rukinzo/MavEG09p/
-z90n4hUF,Kayanza,BURUNDI - PRIMUS LEAGUE - ROUND 16,https://www.flashscore.com/team/kayanza/z90n4hUF/
+MavEG09p,Garage Express,BURUNDI - PRIMUS LEAGUE - ROUND 16,https://www.flashscore.com/team/garage-express/MavEG09p/
+z90n4hUF,Le Messager Ngozi,BURUNDI - PRIMUS LEAGUE - ROUND 16,https://www.flashscore.com/team/le-messager-ngozi/z90n4hUF/
 8AShqI0G,Igdir FK,TURKEY - 1. LIG - ROUND 20,https://www.flashscore.com/team/igdir-fk/8AShqI0G/
-rPvKSntq,Erokspor,TURKEY - 1. LIG - ROUND 20,https://www.flashscore.com/team/erokspor/rPvKSntq/
+rPvKSntq,Erzurumspor,TURKEY - 1. LIG - ROUND 20,https://www.flashscore.com/team/erzurumspor/rPvKSntq/
 69Jb7MZL,Jippo (Fin),Unknown,https://www.flashscore.com/team/jippo/69Jb7MZL/
 tfdW35Jm,KuPS Akatemia (Fin),Unknown,https://www.flashscore.com/team/kups-akatemia/tfdW35Jm/
 MgxTd1Lp,Lotte (Ger),Unknown,https://www.flashscore.com/team/jeddeloh/MgxTd1Lp/
@@ -2709,13 +2709,13 @@ QoZYVU3E,FC Rapid Bucuresti (Rou),Unknown,https://www.flashscore.com/team/wisla-
 tAKN55MM,Montpellier W,Unknown,https://www.flashscore.com/team/sarcelles-a-a-s/tAKN55MM/
 SrUo84oA,ACV Assen,Unknown,https://www.flashscore.com/team/acv-assen/SrUo84oA/
 AolLPeRe,Spakenburg,Unknown,https://www.flashscore.com/team/spakenburg/AolLPeRe/
-UDZPfSMg,Excelsior Maassluis,Unknown,https://www.flashscore.com/team/excelsior-maassluis/UDZPfSMg/
+UDZPfSMg,Ajax,NETHERLANDS - EREDIVISIE - ROUND 18,https://www.flashscore.com/team/ajax/UDZPfSMg/
 4O55s8Hm,Rijnsburgse Boys,Unknown,https://www.flashscore.com/team/rijnsburgse-boys/4O55s8Hm/
 pfRZrvjK,GVVV,Unknown,https://www.flashscore.com/team/barendrecht/pfRZrvjK/
 OUs0KUs2,Barendrecht,Unknown,https://www.flashscore.com/team/gvvv/OUs0KUs2/
 8lGjdOzo,Hardenberg,Unknown,https://www.flashscore.com/team/hardenberg/8lGjdOzo/
 WvtVUUns,Jong Almere City,Unknown,https://www.flashscore.com/team/jong-almere-city/WvtVUUns/
-0SOZnGOf,Hoek,Unknown,https://www.flashscore.com/team/hsv-hoek/0SOZnGOf/
+0SOZnGOf,Hoek,NETHERLANDS - EREDIVISIE - ROUND 18,https://www.flashscore.com/team/hoek/0SOZnGOf/
 lrd9kyb8,Katwijk,Unknown,https://www.flashscore.com/team/katwijk/lrd9kyb8/
 rP3bJqEb,RKAV Volendam,Unknown,https://www.flashscore.com/team/de-treffers/rP3bJqEb/
 xdoZWnj7,De Treffers,Unknown,https://www.flashscore.com/team/rkav-volendam/xdoZWnj7/
@@ -2723,8 +2723,8 @@ KrQC53a9,Comber Rec,Unknown,https://www.flashscore.com/team/ballymacash/KrQC53a9
 MqxVkpdE,Ballymacash,Unknown,https://www.flashscore.com/team/comber-rec/MqxVkpdE/
 6sy43vmm,Knockbreda,Unknown,https://www.flashscore.com/team/knockbreda/6sy43vmm/
 neXg8wSk,Lisburn Distillery,Unknown,https://www.flashscore.com/team/lisburn-distillery/neXg8wSk/
-MNOXupIc,Inter Star,BURUNDI - PRIMUS LEAGUE - ROUND 16,https://www.flashscore.com/team/inter-star/MNOXupIc/
-6NO5yf9m,Rukinzo,BURUNDI - PRIMUS LEAGUE - ROUND 16,https://www.flashscore.com/team/rukinzo/6NO5yf9m/
+MNOXupIc,Ngozi City,BURUNDI - PRIMUS LEAGUE - ROUND 16,https://www.flashscore.com/team/ngozi-city/MNOXupIc/
+6NO5yf9m,Royal Vision,BURUNDI - PRIMUS LEAGUE - ROUND 16,https://www.flashscore.com/team/royal-vision/6NO5yf9m/
 6aYykcXn,Fylkir,Unknown,https://www.flashscore.com/team/kr-reykjavik/6aYykcXn/
 A332L1f5,Avellino,Unknown,https://www.flashscore.com/team/avellino/A332L1f5/
 nJbCGx2U,Sampdoria,Unknown,https://www.flashscore.com/team/sampdoria/nJbCGx2U/
@@ -2788,17 +2788,17 @@ prk24pPc,Lisburn Rangers,Unknown,https://www.flashscore.com/team/lisburn-rangers
 KMgyPPeE,Europa Point,Unknown,https://www.flashscore.com/team/europa-point/KMgyPPeE/
 2J6mntb0,Roda,NETHERLANDS - EERSTE DIVISIE - ROUND 22,https://www.flashscore.com/team/roda/2J6mntb0/
 lvM1vra5,Venlo,NETHERLANDS - EERSTE DIVISIE - ROUND 22,https://www.flashscore.com/team/venlo/lvM1vra5/
-ENJLvZ33,Marseille W,Unknown,https://www.flashscore.com/team/thonon-evian/ENJLvZ33/
+ENJLvZ33,Lille W,FRANCE - COUPE DE FRANCE WOMEN - 1/16-FINALS,https://www.flashscore.com/team/lille-w/ENJLvZ33/
 4xlfVfnP,Real Madrid W,SPAIN - LIGA F WOMEN - ROUND 15,https://www.flashscore.com/team/real-madrid-w/4xlfVfnP/
 rJdhcQiF,Sevilla FC W,SPAIN - LIGA F WOMEN - ROUND 15,https://www.flashscore.com/team/sevilla-fc-w/rJdhcQiF/
-8rZvLOl2,Igdir FK,TURKEY - 1. LIG - ROUND 20,https://www.flashscore.com/team/igdir-fk/8rZvLOl2/
+8rZvLOl2,Bandirmaspor,TURKEY - 1. LIG - ROUND 20,https://www.flashscore.com/team/bandirmaspor/8rZvLOl2/
 2Jzfymql,Hatayspor,TURKEY - 1. LIG - ROUND 20,https://www.flashscore.com/team/hatayspor/2Jzfymql/
 hKSfjtsQ,Juve Stabia,Unknown,https://www.flashscore.com/team/juve-stabia/hKSfjtsQ/
 WW0i6v4C,Pescara,Unknown,https://www.flashscore.com/team/pescara/WW0i6v4C/
 8vQkJRl6,Hauts Lyonnais,Unknown,https://www.flashscore.com/team/hauts-lyonnais/8vQkJRl6/
 K2p4psD6,Istres,Unknown,https://www.flashscore.com/team/istres/K2p4psD6/
 xnng4dGk,Le Puy-en-Velay,Unknown,https://www.flashscore.com/team/le-puy-en-velay/xnng4dGk/
-dhOKTHGA,Twente,NETHERLANDS - EREDIVISIE - ROUND 18,https://www.flashscore.com/team/twente/dhOKTHGA/
+dhOKTHGA,Telstar,NETHERLANDS - EREDIVISIE - ROUND 18,https://www.flashscore.com/team/telstar/dhOKTHGA/
 E7jH2KUa,Weston-super-Mare,Unknown,https://www.flashscore.com/team/weston-super-mare/E7jH2KUa/
 UFiZUJu0,Sao Bernardo,Unknown,https://www.flashscore.com/team/capivariano/UFiZUJu0/
 Wp4nyhLR,Capivariano,Unknown,https://www.flashscore.com/team/sao-bernardo/Wp4nyhLR/
@@ -2809,7 +2809,7 @@ QJrclWys,Magpies,Unknown,https://www.flashscore.com/team/glacis-united/QJrclWys/
 EVDrNIYl,Glacis United,Unknown,https://www.flashscore.com/team/magpies/EVDrNIYl/
 xddf1qfh,Cesena,Unknown,https://www.flashscore.com/team/cesena/xddf1qfh/
 0ESCnI1H,Empoli,Unknown,https://www.flashscore.com/team/empoli/0ESCnI1H/
-nNlLsRUr,PSV,Unknown,https://www.flashscore.com/team/excelsior/nNlLsRUr/
+nNlLsRUr,Excelsior,NETHERLANDS - EREDIVISIE - ROUND 18,https://www.flashscore.com/team/excelsior/nNlLsRUr/
 GS36K259,Juventude,BRAZIL - PAULISTA - ROUND 1,https://www.flashscore.com/team/juventude/GS36K259/
 Ekl6KsWC,Ypiranga FC,Unknown,https://www.flashscore.com/team/ypiranga-fc/Ekl6KsWC/
 bo9r6pAI,Uberlandia,Unknown,https://www.flashscore.com/team/tombense/bo9r6pAI/
@@ -2821,7 +2821,7 @@ p08uISiJ,Moca,Unknown,https://www.flashscore.com/team/salcedo/p08uISiJ/
 8r1FnMIj,Inter de Sainte-Anne,MARTINIQUE - TROPHEE GERARD JANVION - ROUND 13,https://www.flashscore.com/team/inter-de-sainte-anne/8r1FnMIj/
 MwQz79uA,Aiglon Lamentin,MARTINIQUE - TROPHEE GERARD JANVION - ROUND 13,https://www.flashscore.com/team/aiglon-lamentin/MwQz79uA/
 pYpU8SM1,Morne des Esses,MARTINIQUE - TROPHEE GERARD JANVION - ROUND 13,https://www.flashscore.com/team/morne-des-esses/pYpU8SM1/
-MBUGcjb9,Groningen,Unknown,https://www.flashscore.com/team/groningen/MBUGcjb9/
+MBUGcjb9,Groningen,NETHERLANDS - EREDIVISIE - ROUND 18,https://www.flashscore.com/team/groningen/MBUGcjb9/
 jPojkLXK,Lens,Unknown,https://www.flashscore.com/team/sochaux/jPojkLXK/
 0SwtclaU,Gremio,BRAZIL - GAUCHO - ROUND 1,https://www.flashscore.com/team/gremio/0SwtclaU/
 G8jhxPQj,Portuguesa,BRAZIL - PAULISTA - ROUND 1,https://www.flashscore.com/team/portuguesa/G8jhxPQj/
@@ -2877,16 +2877,16 @@ xWWzm0zj,Artis Brno,WORLD - CLUB FRIENDLY,https://www.flashscore.com/team/artis-
 0EDHzr4L,Opava,WORLD - CLUB FRIENDLY,https://www.flashscore.com/team/opava/0EDHzr4L/
 SIjaTt2K,Z. Moravce-Vrable,WORLD - CLUB FRIENDLY,https://www.flashscore.com/team/z.-moravce-vrable/SIjaTt2K/
 WpwUHfZ0,Boluspor,TURKEY - 1. LIG - ROUND 20,https://www.flashscore.com/team/boluspor/WpwUHfZ0/
-ENFkH8NH,Hatayspor,TURKEY - 1. LIG - ROUND 20,https://www.flashscore.com/team/hatayspor/ENFkH8NH/
-K0zmTxp3,Keciorengucu,TURKEY - 1. LIG - ROUND 20,https://www.flashscore.com/team/keciorengucu/K0zmTxp3/
+ENFkH8NH,Erzurumspor,TURKEY - 1. LIG - ROUND 20,https://www.flashscore.com/team/erzurumspor/ENFkH8NH/
+K0zmTxp3,Sivasspor,TURKEY - 1. LIG - ROUND 20,https://www.flashscore.com/team/sivasspor/K0zmTxp3/
 tOinx4lk,Kayserispor,WORLD - CLUB FRIENDLY,https://www.flashscore.com/team/kayserispor/tOinx4lk/
 fNtKGmxb,Sariyer,TURKEY - 1. LIG - ROUND 20,https://www.flashscore.com/team/sariyer/fNtKGmxb/
-QczF79F9,Igdir FK,TURKEY - 1. LIG - ROUND 20,https://www.flashscore.com/team/igdir-fk/QczF79F9/
+QczF79F9,Sivasspor,TURKEY - 1. LIG - ROUND 20,https://www.flashscore.com/team/sivasspor/QczF79F9/
 dQVdH97o,Igdir FK,TURKEY - 1. LIG - ROUND 20,https://www.flashscore.com/team/igdir-fk/dQVdH97o/
 Cv7CWW8n,Karagumruk,WORLD - CLUB FRIENDLY,https://www.flashscore.com/team/karagumruk/Cv7CWW8n/
-OvblvwLr,Sivasspor,TURKEY - 1. LIG - ROUND 20,https://www.flashscore.com/team/sivasspor/OvblvwLr/
-xQZ3CpVE,Igdir FK,TURKEY - 1. LIG - ROUND 20,https://www.flashscore.com/team/igdir-fk/xQZ3CpVE/
-tAyqUIUd,Sariyer,TURKEY - 1. LIG - ROUND 20,https://www.flashscore.com/team/sariyer/tAyqUIUd/
+OvblvwLr,Erzurumspor,TURKEY - 1. LIG - ROUND 20,https://www.flashscore.com/team/erzurumspor/OvblvwLr/
+xQZ3CpVE,Sivasspor,TURKEY - 1. LIG - ROUND 20,https://www.flashscore.com/team/sivasspor/xQZ3CpVE/
+tAyqUIUd,Erzurumspor,TURKEY - 1. LIG - ROUND 20,https://www.flashscore.com/team/erzurumspor/tAyqUIUd/
 K6kUepBs,Legia,GIBRALTAR - NATIONAL LEAGUE - ROUND 17,https://www.flashscore.com/team/legia/K6kUepBs/
 rNOIW3uC,Widzew Lodz,WORLD - CLUB FRIENDLY,https://www.flashscore.com/team/widzew-lodz/rNOIW3uC/
 K4AgRmS1,Wisla Plock,WORLD - CLUB FRIENDLY,https://www.flashscore.com/team/wisla-plock/K4AgRmS1/
@@ -2894,7 +2894,7 @@ pp78XcbA,Korona Kielce,WORLD - CLUB FRIENDLY,https://www.flashscore.com/team/kor
 feEez0Ei,Arka Gdynia,WORLD - CLUB FRIENDLY,https://www.flashscore.com/team/arka-gdynia/feEez0Ei/
 GGLmkiK8,Lechia Gdansk,WORLD - CLUB FRIENDLY,https://www.flashscore.com/team/lechia-gdansk/GGLmkiK8/
 bBbO3SSG,KA Akureyri,ICELAND - REYKJAVIK CUP - ROUND 1,https://www.flashscore.com/team/ka-akureyri/bBbO3SSG/
-vkjy3nF9,Arsenal W,ENGLAND - WSL - ROUND 12,https://www.flashscore.com/team/arsenal-w/vkjy3nF9/
+vkjy3nF9,PSG W,FRANCE - COUPE DE FRANCE WOMEN - 1/16-FINALS,https://www.flashscore.com/team/psg-w/vkjy3nF9/
 fcBoKD55,Costa Adeje Tenerife W,SPAIN - LIGA F WOMEN - ROUND 15,https://www.flashscore.com/team/costa-adeje-tenerife-w/fcBoKD55/
 8Wb4V5AR,Real Madrid W,SPAIN - LIGA F WOMEN - ROUND 15,https://www.flashscore.com/team/real-madrid-w/8Wb4V5AR/
 vNUKeXyQ,AS Roma W,Unknown,https://www.flashscore.com/team/juventus/vNUKeXyQ/
@@ -2943,7 +2943,7 @@ Ee2FRS8C,Crystal Palace U18,ENGLAND - FA YOUTH CUP - 1/16-FINALS,https://www.fla
 2q5RapvF,Brighton U18,ENGLAND - FA YOUTH CUP - 1/16-FINALS,https://www.flashscore.com/team/brighton-u18/2q5RapvF/
 tnO5eJp7,Brighton U18,ENGLAND - FA YOUTH CUP - 1/16-FINALS,https://www.flashscore.com/team/brighton-u18/tnO5eJp7/
 4W00G1qP,Leicester W,ENGLAND - WSL - ROUND 12,https://www.flashscore.com/team/leicester-w/4W00G1qP/
-I9I2jkpo,Leuven W,SPAIN - LIGA F WOMEN - ROUND 15,https://www.flashscore.com/team/leuven-w/I9I2jkpo/
+I9I2jkpo,PSG W,FRANCE - COUPE DE FRANCE WOMEN - 1/16-FINALS,https://www.flashscore.com/team/psg-w/I9I2jkpo/
 fkY89QtU,Leicester W,ENGLAND - WSL - ROUND 12,https://www.flashscore.com/team/leicester-w/fkY89QtU/
 Ye260xTF,Tottenham W,ENGLAND - WSL - ROUND 12,https://www.flashscore.com/team/tottenham-w/Ye260xTF/
 zJscgDii,Leicester W,ENGLAND - WSL - ROUND 12,https://www.flashscore.com/team/leicester-w/zJscgDii/
@@ -2957,18 +2957,18 @@ KxpSSJgi,Brighton W,ENGLAND - WSL - ROUND 12,https://www.flashscore.com/team/bri
 zNp5iTGD,Chiangrai Utd,THAILAND - THAI LEAGUE 1 - ROUND 16,https://www.flashscore.com/team/chiangrai-utd/zNp5iTGD/
 6azsvVYq,Chiangrai Utd,THAILAND - THAI LEAGUE 1 - ROUND 16,https://www.flashscore.com/team/chiangrai-utd/6azsvVYq/
 riGczJcS,Sing Pathumthani,THAILAND - THAI LEAGUE 1 - ROUND 16,https://www.flashscore.com/team/sing-pathumthani/riGczJcS/
-rJY1oieJ,Rukinzo,BURUNDI - PRIMUS LEAGUE - ROUND 16,https://www.flashscore.com/team/rukinzo/rJY1oieJ/
+rJY1oieJ,Green Farmers,BURUNDI - PRIMUS LEAGUE - ROUND 16,https://www.flashscore.com/team/green-farmers/rJY1oieJ/
 OYdr5YE9,Rukinzo,BURUNDI - PRIMUS LEAGUE - ROUND 16,https://www.flashscore.com/team/rukinzo/OYdr5YE9/
-McALrAUE,Musongati,BURUNDI - PRIMUS LEAGUE - ROUND 16,https://www.flashscore.com/team/musongati/McALrAUE/
+McALrAUE,Le Messager Ngozi,BURUNDI - PRIMUS LEAGUE - ROUND 16,https://www.flashscore.com/team/le-messager-ngozi/McALrAUE/
 IPa2sIp5,Rukinzo,BURUNDI - PRIMUS LEAGUE - ROUND 16,https://www.flashscore.com/team/rukinzo/IPa2sIp5/
 I38oQfPB,Le Messager Ngozi,BURUNDI - PRIMUS LEAGUE - ROUND 16,https://www.flashscore.com/team/le-messager-ngozi/I38oQfPB/
-YsdPWSAo,Vital'O,BURUNDI - PRIMUS LEAGUE - ROUND 16,https://www.flashscore.com/team/vital'o/YsdPWSAo/
+YsdPWSAo,Ngozi City,BURUNDI - PRIMUS LEAGUE - ROUND 16,https://www.flashscore.com/team/ngozi-city/YsdPWSAo/
 0l9PsUqL,Ngozi City,BURUNDI - PRIMUS LEAGUE - ROUND 16,https://www.flashscore.com/team/ngozi-city/0l9PsUqL/
-ATkWI8PI,Aigle Noir,BURUNDI - PRIMUS LEAGUE - ROUND 16,https://www.flashscore.com/team/aigle-noir/ATkWI8PI/
-tvvIEKkc,Umraniyespor,TURKEY - 1. LIG - ROUND 20,https://www.flashscore.com/team/umraniyespor/tvvIEKkc/
-pQPEA10Q,Igdir FK,TURKEY - 1. LIG - ROUND 20,https://www.flashscore.com/team/igdir-fk/pQPEA10Q/
+ATkWI8PI,Ngozi City,BURUNDI - PRIMUS LEAGUE - ROUND 16,https://www.flashscore.com/team/ngozi-city/ATkWI8PI/
+tvvIEKkc,Sivasspor,TURKEY - 1. LIG - ROUND 20,https://www.flashscore.com/team/sivasspor/tvvIEKkc/
+pQPEA10Q,Erzurumspor,TURKEY - 1. LIG - ROUND 20,https://www.flashscore.com/team/erzurumspor/pQPEA10Q/
 EHdgkFvm,Amedspor,TURKEY - 1. LIG - ROUND 20,https://www.flashscore.com/team/amedspor/EHdgkFvm/
-0vne21BK,Corum,TURKEY - 1. LIG - ROUND 20,https://www.flashscore.com/team/corum/0vne21BK/
+0vne21BK,Erzurumspor,TURKEY - 1. LIG - ROUND 20,https://www.flashscore.com/team/erzurumspor/0vne21BK/
 YLX9eCPS,Erokspor,TURKEY - 1. LIG - ROUND 20,https://www.flashscore.com/team/erokspor/YLX9eCPS/
 Kj4IX8v9,JaPS,WORLD - CLUB FRIENDLY,https://www.flashscore.com/team/japs/Kj4IX8v9/
 pv9Nf2KF,KaPa,WORLD - CLUB FRIENDLY,https://www.flashscore.com/team/kapa/pv9Nf2KF/
@@ -3004,14 +3004,14 @@ QulwZyP2,DVTK,WORLD - CLUB FRIENDLY,https://www.flashscore.com/team/dvtk/QulwZyP
 ppX6bEHk,MTK Budapest,WORLD - CLUB FRIENDLY,https://www.flashscore.com/team/mtk-budapest/ppX6bEHk/
 tlYOere0,Zaglebie,WORLD - CLUB FRIENDLY,https://www.flashscore.com/team/zaglebie/tlYOere0/
 0C6tPiIc,Zrinjski,WORLD - CLUB FRIENDLY,https://www.flashscore.com/team/zrinjski/0C6tPiIc/
-bsd9fGaK,Mainz,GERMANY - BUNDESLIGA - ROUND 16,https://www.flashscore.com/team/mainz/bsd9fGaK/
+bsd9fGaK,U. Cluj,WORLD - CLUB FRIENDLY,https://www.flashscore.com/team/u.-cluj/bsd9fGaK/
 KvXSf2A6,Wisla Plock,WORLD - CLUB FRIENDLY,https://www.flashscore.com/team/wisla-plock/KvXSf2A6/
 2LH3Ywq4,Gornik Zabrze,WORLD - CLUB FRIENDLY,https://www.flashscore.com/team/gornik-zabrze/2LH3Ywq4/
 IoLk2VlL,Motor Lublin,WORLD - CLUB FRIENDLY,https://www.flashscore.com/team/motor-lublin/IoLk2VlL/
 Um9YwPQ0,Wisla Plock,WORLD - CLUB FRIENDLY,https://www.flashscore.com/team/wisla-plock/Um9YwPQ0/
 zD5nYhAT,Radomiak Radom,WORLD - CLUB FRIENDLY,https://www.flashscore.com/team/radomiak-radom/zD5nYhAT/
 YNkK4khO,Wisla Plock,WORLD - CLUB FRIENDLY,https://www.flashscore.com/team/wisla-plock/YNkK4khO/
-2H5uhNyO,FC Rapid Bucuresti,WORLD - CLUB FRIENDLY,https://www.flashscore.com/team/fc-rapid-bucuresti/2H5uhNyO/
+2H5uhNyO,Otelul,WORLD - CLUB FRIENDLY,https://www.flashscore.com/team/otelul/2H5uhNyO/
 GjY1JjUS,FC Botosani,WORLD - CLUB FRIENDLY,https://www.flashscore.com/team/fc-botosani/GjY1JjUS/
 65I2MLv6,FC Rapid Bucuresti,WORLD - CLUB FRIENDLY,https://www.flashscore.com/team/fc-rapid-bucuresti/65I2MLv6/
 A5gTQ7pG,FC Rapid Bucuresti,WORLD - CLUB FRIENDLY,https://www.flashscore.com/team/fc-rapid-bucuresti/A5gTQ7pG/
@@ -3019,11 +3019,11 @@ A5gTQ7pG,FC Rapid Bucuresti,WORLD - CLUB FRIENDLY,https://www.flashscore.com/tea
 pO9aXHLu,CSC Dumbravita,WORLD - CLUB FRIENDLY,https://www.flashscore.com/team/csc-dumbravita/pO9aXHLu/
 6XmrBYL3,Unirea Slobozia,WORLD - CLUB FRIENDLY,https://www.flashscore.com/team/unirea-slobozia/6XmrBYL3/
 bDDM0rYc,VV DOVO,NETHERLANDS - TWEEDE DIVISIE - ROUND 18,https://www.flashscore.com/team/vv-dovo/bDDM0rYc/
-nRluRF0T,Nijmegen,NETHERLANDS - EREDIVISIE - ROUND 18,https://www.flashscore.com/team/nijmegen/nRluRF0T/
+nRluRF0T,Ajax,NETHERLANDS - EREDIVISIE - ROUND 18,https://www.flashscore.com/team/ajax/nRluRF0T/
 naL1J006,De Graafschap,NETHERLANDS - EERSTE DIVISIE - ROUND 22,https://www.flashscore.com/team/de-graafschap/naL1J006/
 OWVTtSoL,De Treffers,NETHERLANDS - TWEEDE DIVISIE - ROUND 18,https://www.flashscore.com/team/de-treffers/OWVTtSoL/
 40amSqFn,Oss,NETHERLANDS - EERSTE DIVISIE - ROUND 22,https://www.flashscore.com/team/oss/40amSqFn/
-Aw0qTPat,Feyenoord,NETHERLANDS - EREDIVISIE - ROUND 18,https://www.flashscore.com/team/feyenoord/Aw0qTPat/
+Aw0qTPat,Ajax,NETHERLANDS - EREDIVISIE - ROUND 18,https://www.flashscore.com/team/ajax/Aw0qTPat/
 YJaj0Opm,Eindhoven FC,NETHERLANDS - EERSTE DIVISIE - ROUND 22,https://www.flashscore.com/team/eindhoven-fc/YJaj0Opm/
 4IzxgrNP,Den Bosch,NETHERLANDS - EERSTE DIVISIE - ROUND 22,https://www.flashscore.com/team/den-bosch/4IzxgrNP/
 xdFA0eGc,Vitesse,NETHERLANDS - EERSTE DIVISIE - ROUND 22,https://www.flashscore.com/team/vitesse/xdFA0eGc/
@@ -3046,10 +3046,10 @@ YagHqcXI,Fivemiletown,NORTHERN IRELAND - IRISH CUP - 1/16-FINALS,https://www.fla
 Mg7OJIbn,Larne Technical Old Boys,NORTHERN IRELAND - IRISH CUP - 1/16-FINALS,https://www.flashscore.com/team/larne-technical-old-boys/Mg7OJIbn/
 fmpoDPnk,Strabane Athletic,NORTHERN IRELAND - IRISH CUP - 1/16-FINALS,https://www.flashscore.com/team/strabane-athletic/fmpoDPnk/
 tA7w6Ea3,Bumamuru,BURUNDI - PRIMUS LEAGUE - ROUND 16,https://www.flashscore.com/team/bumamuru/tA7w6Ea3/
-dKoR74om,Muzinga,BURUNDI - PRIMUS LEAGUE - ROUND 16,https://www.flashscore.com/team/muzinga/dKoR74om/
-UgQBRKqh,Dynamik,BURUNDI - PRIMUS LEAGUE - ROUND 16,https://www.flashscore.com/team/dynamik/UgQBRKqh/
+dKoR74om,Le Messager Ngozi,BURUNDI - PRIMUS LEAGUE - ROUND 16,https://www.flashscore.com/team/le-messager-ngozi/dKoR74om/
+UgQBRKqh,Le Messager Ngozi,BURUNDI - PRIMUS LEAGUE - ROUND 16,https://www.flashscore.com/team/le-messager-ngozi/UgQBRKqh/
 YmTPNf6D,Paris FC W,FRANCE - COUPE DE FRANCE WOMEN - 1/16-FINALS,https://www.flashscore.com/team/paris-fc-w/YmTPNf6D/
-8ho9ywWE,SL Benfica W,SPAIN - LIGA F WOMEN - ROUND 15,https://www.flashscore.com/team/sl-benfica-w/8ho9ywWE/
+8ho9ywWE,PSG W,FRANCE - COUPE DE FRANCE WOMEN - 1/16-FINALS,https://www.flashscore.com/team/psg-w/8ho9ywWE/
 zgqsIZWO,Akranes,ICELAND - REYKJAVIK CUP - ROUND 1,https://www.flashscore.com/team/akranes/zgqsIZWO/
 n38Nktmn,Palermo,Unknown,https://www.flashscore.com/team/palermo/n38Nktmn/
 2gUwEtrE,Modena,Unknown,https://www.flashscore.com/team/padova/2gUwEtrE/
@@ -3228,7 +3228,7 @@ Gh9HoULa,Magpies,GIBRALTAR - NATIONAL LEAGUE - ROUND 17,https://www.flashscore.c
 GncWwxTm,Jong Ajax,NETHERLANDS - EERSTE DIVISIE - ROUND 22,https://www.flashscore.com/team/jong-ajax/GncWwxTm/
 Stafar0g,FC Emmen,NETHERLANDS - EERSTE DIVISIE - ROUND 22,https://www.flashscore.com/team/fc-emmen/Stafar0g/
 QRyYgO7J,Waalwijk,NETHERLANDS - EERSTE DIVISIE - ROUND 22,https://www.flashscore.com/team/waalwijk/QRyYgO7J/
-6FRTNZ8p,Venlo,NETHERLANDS - EERSTE DIVISIE - ROUND 22,https://www.flashscore.com/team/venlo/6FRTNZ8p/
+6FRTNZ8p,G.A. Eagles,NETHERLANDS - EREDIVISIE - ROUND 18,https://www.flashscore.com/team/g.a.-eagles/6FRTNZ8p/
 lKIgIV5b,Jong AZ,NETHERLANDS - EERSTE DIVISIE - ROUND 22,https://www.flashscore.com/team/jong-az/lKIgIV5b/
 fT0n14Vt,Venlo,NETHERLANDS - EERSTE DIVISIE - ROUND 22,https://www.flashscore.com/team/venlo/fT0n14Vt/
 zuvSQxYh,Real Oviedo W,SPAIN - LIGA F WOMEN - ROUND 15,https://www.flashscore.com/team/real-oviedo-w/zuvSQxYh/
@@ -3270,12 +3270,12 @@ SWqdMeSE,Primavera,BRAZIL - PAULISTA - ROUND 1,https://www.flashscore.com/team/p
 dEAmTapo,Sao Jose EC,BRAZIL - PAULISTA - ROUND 1,https://www.flashscore.com/team/sao-jose-ec/dEAmTapo/
 b5EIzft1,Capivariano,BRAZIL - PAULISTA - ROUND 1,https://www.flashscore.com/team/capivariano/b5EIzft1/
 f9eL3q5q,Bergerac W,FRANCE - COUPE DE FRANCE WOMEN - 1/16-FINALS,https://www.flashscore.com/team/bergerac-w/f9eL3q5q/
-GvpTVAy9,Bergerac W,FRANCE - COUPE DE FRANCE WOMEN - 1/16-FINALS,https://www.flashscore.com/team/bergerac-w/GvpTVAy9/
-ANAJVDr5,Bergerac W,FRANCE - COUPE DE FRANCE WOMEN - 1/16-FINALS,https://www.flashscore.com/team/bergerac-w/ANAJVDr5/
+GvpTVAy9,Lorient W,FRANCE - COUPE DE FRANCE WOMEN - 1/16-FINALS,https://www.flashscore.com/team/lorient-w/GvpTVAy9/
+ANAJVDr5,Issy W,FRANCE - COUPE DE FRANCE WOMEN - 1/16-FINALS,https://www.flashscore.com/team/issy-w/ANAJVDr5/
 hGBFtGq2,Orleans W,FRANCE - COUPE DE FRANCE WOMEN - 1/16-FINALS,https://www.flashscore.com/team/orleans-w/hGBFtGq2/
-xGo3D9V2,Bergerac W,FRANCE - COUPE DE FRANCE WOMEN - 1/16-FINALS,https://www.flashscore.com/team/bergerac-w/xGo3D9V2/
-drAnOaNr,La Roche W,Unknown,https://www.flashscore.com/team/la-roche/drAnOaNr/
-nX9IIisp,Montauban W,FRANCE - COUPE DE FRANCE WOMEN - 1/16-FINALS,https://www.flashscore.com/team/montauban-w/nX9IIisp/
+xGo3D9V2,Lorient W,FRANCE - COUPE DE FRANCE WOMEN - 1/16-FINALS,https://www.flashscore.com/team/lorient-w/xGo3D9V2/
+drAnOaNr,La Roche W,FRANCE - COUPE DE FRANCE WOMEN - 1/16-FINALS,https://www.flashscore.com/team/la-roche-w/drAnOaNr/
+nX9IIisp,Albi-Marssac W,FRANCE - COUPE DE FRANCE WOMEN - 1/16-FINALS,https://www.flashscore.com/team/albi-marssac-w/nX9IIisp/
 bqBPMVgI,Alaves W,SPAIN - LIGA F WOMEN - ROUND 15,https://www.flashscore.com/team/alaves-w/bqBPMVgI/
 pvHwtOUr,Huelva W,SPAIN - LIGA F WOMEN - ROUND 15,https://www.flashscore.com/team/huelva-w/pvHwtOUr/
 QBGfQbSe,Corinthians,BRAZIL - GAUCHO - ROUND 1,https://www.flashscore.com/team/corinthians/QBGfQbSe/
@@ -3342,12 +3342,12 @@ f3e09r3B,Portugal U17,WORLD - FRIENDLY INTERNATIONAL,https://www.flashscore.com/
 AFBITJMF,Turkey U19,WORLD - FRIENDLY INTERNATIONAL,https://www.flashscore.com/team/turkey-u19/AFBITJMF/
 xME6lK1f,Uzbekistan U18,WORLD - FRIENDLY INTERNATIONAL,https://www.flashscore.com/team/uzbekistan-u18/xME6lK1f/
 I7yMTPH6,Esperance Pernoise W,Unknown,https://www.flashscore.com/team/esperance-pernoise/I7yMTPH6/
-4zFVySJr,Aberdeen W,Unknown,https://www.flashscore.com/team/aberdeen/4zFVySJr/
-W8lDIuA1,Montrose W,Unknown,https://www.flashscore.com/team/montrose/W8lDIuA1/
-Us6gkXaT,U. Cluj (Rou),Unknown,https://www.flashscore.com/team/universitatea-cluj/Us6gkXaT/
-hxq0v6qt,Albi-Marssac W,Unknown,https://www.flashscore.com/team/albi-marssac/hxq0v6qt/
-zqnHohzB,Caen W,Unknown,https://www.flashscore.com/team/caen/zqnHohzB/
-Eamk5dDJ,Le Mans W,Unknown,https://www.flashscore.com/team/lorient/Eamk5dDJ/
+4zFVySJr,Montrose W,SCOTLAND - SCOTTISH CUP WOMEN - 1/8-FINALS,https://www.flashscore.com/team/montrose-w/4zFVySJr/
+W8lDIuA1,Aberdeen W,SCOTLAND - SCOTTISH CUP WOMEN - 1/8-FINALS,https://www.flashscore.com/team/aberdeen-w/W8lDIuA1/
+Us6gkXaT,U. Cluj,WORLD - CLUB FRIENDLY,https://www.flashscore.com/team/u.-cluj/Us6gkXaT/
+hxq0v6qt,Albi-Marssac W,FRANCE - COUPE DE FRANCE WOMEN - 1/16-FINALS,https://www.flashscore.com/team/albi-marssac-w/hxq0v6qt/
+zqnHohzB,La Roche W,FRANCE - COUPE DE FRANCE WOMEN - 1/16-FINALS,https://www.flashscore.com/team/la-roche-w/zqnHohzB/
+Eamk5dDJ,Le Mans W,FRANCE - COUPE DE FRANCE WOMEN - 1/16-FINALS,https://www.flashscore.com/team/le-mans-w/Eamk5dDJ/
 pfeIzYUj,Molsheim Ernolsheim W,Unknown,https://www.flashscore.com/team/molsheim-ernolsheim/pfeIzYUj/
 h61mWCzO,Fleury 91 W,Unknown,https://www.flashscore.com/team/rennes/h61mWCzO/
 QsMzyHP7,Roubaix W,Unknown,https://www.flashscore.com/team/roubaix/QsMzyHP7/
@@ -3375,20 +3375,20 @@ IBgAF51T,Armadale W,Unknown,https://www.flashscore.com/team/armadale-thistle-fc/
 jLOl2wLr,Stenhousemuir W,Unknown,https://www.flashscore.com/team/stenhousemuir/jLOl2wLr/
 hYgOzrfU,Dundee Utd W,Unknown,https://www.flashscore.com/team/bonnyrigg-rose/hYgOzrfU/
 4O6Vu23b,Bonnyrigg Rose W,Unknown,https://www.flashscore.com/team/dundee-utd/4O6Vu23b/
-xSvVX9W9,Glasgow City W,Unknown,https://www.flashscore.com/team/glasgow-city/xSvVX9W9/
+xSvVX9W9,Montrose W,SCOTLAND - SCOTTISH CUP WOMEN - 1/8-FINALS,https://www.flashscore.com/team/montrose-w/xSvVX9W9/
 Y9aM4rEK,Queen's Park W,Unknown,https://www.flashscore.com/team/queen-s-park/Y9aM4rEK/
-tC0mX4G6,Hibernian W,Unknown,https://www.flashscore.com/team/celtic/tC0mX4G6/
-rsn2kwrL,Celtic W,Unknown,https://www.flashscore.com/team/hibernian/rsn2kwrL/
+tC0mX4G6,Montrose W,SCOTLAND - SCOTTISH CUP WOMEN - 1/8-FINALS,https://www.flashscore.com/team/montrose-w/tC0mX4G6/
+rsn2kwrL,Montrose W,SCOTLAND - SCOTTISH CUP WOMEN - 1/8-FINALS,https://www.flashscore.com/team/montrose-w/rsn2kwrL/
 Qm85xg6U,Partick Thistle W,Unknown,https://www.flashscore.com/team/boroughmuir/Qm85xg6U/
-CzV1wJtM,Boroughmuir W,Unknown,https://www.flashscore.com/team/partick/CzV1wJtM/
-Kb9LqyRT,Stirling University W,Unknown,https://www.flashscore.com/team/hearts/Kb9LqyRT/
+CzV1wJtM,Montrose W,SCOTLAND - SCOTTISH CUP WOMEN - 1/8-FINALS,https://www.flashscore.com/team/montrose-w/CzV1wJtM/
+Kb9LqyRT,Hearts W,SCOTLAND - SCOTTISH CUP WOMEN - 1/8-FINALS,https://www.flashscore.com/team/hearts-w/Kb9LqyRT/
 r1UY7VtB,Hearts W,Unknown,https://www.flashscore.com/team/stirling-university/r1UY7VtB/
 lnUvapDA,Al-Ittihad,Unknown,https://www.flashscore.com/team/al-ittifaq/lnUvapDA/
 67dib4SG,Al-Ittifaq,Unknown,https://www.flashscore.com/team/al-ittihad/67dib4SG/
 fPUz0Qc4,Umm Al Hassam,Unknown,https://www.flashscore.com/team/al-hala/fPUz0Qc4/
 KQxJ7Enr,Al-Hala,Unknown,https://www.flashscore.com/team/umm-al-hassam/KQxJ7Enr/
-WbdSoWro,Rangers W,Unknown,https://www.flashscore.com/team/kilmarnock/WbdSoWro/
-SAiodgGe,Kilmarnock W,Unknown,https://www.flashscore.com/team/rangers/SAiodgGe/
+WbdSoWro,Kilmarnock W,SCOTLAND - SCOTTISH CUP WOMEN - 1/8-FINALS,https://www.flashscore.com/team/kilmarnock-w/WbdSoWro/
+SAiodgGe,Rangers W,SCOTLAND - SCOTTISH CUP WOMEN - 1/8-FINALS,https://www.flashscore.com/team/rangers-w/SAiodgGe/
 WrVFftBA,Chantilly,Unknown,https://www.flashscore.com/team/chantilly/WrVFftBA/
 SrN51gGs,Bagatelle SSC,Unknown,https://www.flashscore.com/team/bagatelle-ssc/SrN51gGs/
 CMcDTUJe,Botafogo SP,Unknown,https://www.flashscore.com/team/velo-clube/CMcDTUJe/
@@ -3458,7 +3458,7 @@ Ox862BG8,Roi Et,THAILAND - THAI LEAGUE 1 - ROUND 16,https://www.flashscore.com/t
 pjN37gZe,Udon United,THAILAND - THAI LEAGUE 1 - ROUND 16,https://www.flashscore.com/team/udon-united/pjN37gZe/
 lAgLCkT3,Venlo,NETHERLANDS - EERSTE DIVISIE - ROUND 22,https://www.flashscore.com/team/venlo/lAgLCkT3/
 pvqdLASe,Capelle,NETHERLANDS - EERSTE DIVISIE - ROUND 22,https://www.flashscore.com/team/capelle/pvqdLASe/
-IsK0b0aI,Almere City,NETHERLANDS - EERSTE DIVISIE - ROUND 22,https://www.flashscore.com/team/almere-city/IsK0b0aI/
+IsK0b0aI,Sittard,NETHERLANDS - EREDIVISIE - ROUND 18,https://www.flashscore.com/team/sittard/IsK0b0aI/
 6u3qag0G,Willem II,NETHERLANDS - EERSTE DIVISIE - ROUND 22,https://www.flashscore.com/team/willem-ii/6u3qag0G/
 4n6UcCIe,Lopburi City,THAILAND - THAI LEAGUE 1 - ROUND 16,https://www.flashscore.com/team/lopburi-city/4n6UcCIe/
 fgVmmMns,Pattani,THAILAND - THAI LEAGUE 1 - ROUND 16,https://www.flashscore.com/team/pattani/fgVmmMns/
@@ -3476,3 +3476,21 @@ faGwkPy9,Nottingham W,ENGLAND - WSL - ROUND 12,https://www.flashscore.com/team/n
 W8DdAWDD,Phitsanulok,THAILAND - THAI LEAGUE 1 - ROUND 16,https://www.flashscore.com/team/phitsanulok/W8DdAWDD/
 zLQAGOBK,Gamba Osaka,THAILAND - THAI LEAGUE 1 - ROUND 16,https://www.flashscore.com/team/gamba-osaka/zLQAGOBK/
 86Jvz7T8,Nigde Bld.,WORLD - CLUB FRIENDLY,https://www.flashscore.com/team/nigde-bld./86Jvz7T8/
+IiASecag,Montrose W,SCOTLAND - SCOTTISH CUP WOMEN - 1/8-FINALS,https://www.flashscore.com/team/montrose-w/IiASecag/
+bk6V7D54,Motherwell W,SCOTLAND - SCOTTISH CUP WOMEN - 1/8-FINALS,https://www.flashscore.com/team/motherwell-w/bk6V7D54/
+S4sqv7ep,Kepez Bld.,TURKEY - 1. LIG - ROUND 20,https://www.flashscore.com/team/kepez-bld./S4sqv7ep/
+zND9ljwn,Erzurumspor,TURKEY - 1. LIG - ROUND 20,https://www.flashscore.com/team/erzurumspor/zND9ljwn/
+CrJbN1Pa,U. Cluj,WORLD - CLUB FRIENDLY,https://www.flashscore.com/team/u.-cluj/CrJbN1Pa/
+dhnNlCE9,Petrolul,WORLD - CLUB FRIENDLY,https://www.flashscore.com/team/petrolul/dhnNlCE9/
+pUUuFXvI,U. Cluj,WORLD - CLUB FRIENDLY,https://www.flashscore.com/team/u.-cluj/pUUuFXvI/
+IDsPIcMA,Sepsi Sf. Gheorghe,WORLD - CLUB FRIENDLY,https://www.flashscore.com/team/sepsi-sf.-gheorghe/IDsPIcMA/
+QDiPqBNj,UTA Arad,WORLD - CLUB FRIENDLY,https://www.flashscore.com/team/uta-arad/QDiPqBNj/
+0zf4F2nD,U. Cluj,WORLD - CLUB FRIENDLY,https://www.flashscore.com/team/u.-cluj/0zf4F2nD/
+QaAe21P0,Metalul Buzau,WORLD - CLUB FRIENDLY,https://www.flashscore.com/team/metalul-buzau/QaAe21P0/
+WELaqb5Q,Gemert,NETHERLANDS - EREDIVISIE - ROUND 18,https://www.flashscore.com/team/gemert/WELaqb5Q/
+h8htURCA,Lisse,NETHERLANDS - EREDIVISIE - ROUND 18,https://www.flashscore.com/team/lisse/h8htURCA/
+CO0GywP7,Rouen W,FRANCE - COUPE DE FRANCE WOMEN - 1/16-FINALS,https://www.flashscore.com/team/rouen-w/CO0GywP7/
+tjm4qNol,Arras W,FRANCE - COUPE DE FRANCE WOMEN - 1/16-FINALS,https://www.flashscore.com/team/arras-w/tjm4qNol/
+I7yMpCkH,Boulogne W,FRANCE - COUPE DE FRANCE WOMEN - 1/16-FINALS,https://www.flashscore.com/team/boulogne-w/I7yMpCkH/
+xdX9vCbk,La Roche W,FRANCE - COUPE DE FRANCE WOMEN - 1/16-FINALS,https://www.flashscore.com/team/la-roche-w/xdX9vCbk/
+ngomh86d,La Roche W,FRANCE - COUPE DE FRANCE WOMEN - 1/16-FINALS,https://www.flashscore.com/team/la-roche-w/ngomh86d/
