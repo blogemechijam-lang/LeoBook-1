@@ -52,39 +52,87 @@ def is_server_running(base_url="http://127.0.0.1:8080"):
     return False
 
 def start_ai_server():
-    """Attempt to auto-start the local AI server."""
+    """Attempt to auto-start the local AI server with automatic setup if needed."""
     global server_process
-    
+
     if is_server_running():
         print("    [System] AI Server is already running. Attaching to existing instance.")
         return
 
     print("    [System] AI Server not detected. Attempting to auto-start...")
     mind_dir = Path("Mind")
-    
-    # Check if files exist
+
+    # Check if Mind directory exists
     if not mind_dir.exists():
         print(f"    [Error] 'Mind' directory not found at {mind_dir.absolute()}")
         return
 
+    # Check for required files and auto-setup if needed
+    setup_needed = False
+    if os.name == 'nt':  # Windows
+        executable = mind_dir / "llama-server.exe"
+        script = mind_dir / "run_split_model.bat"
+        setup_script = mind_dir / "setup_windows_env.ps1"
+    else:  # Linux/Mac/Codespaces
+        executable = mind_dir / "llama-server"
+        script = mind_dir / "run_split_model.sh"
+        # Use Codespaces-specific script if in Codespaces, otherwise use Linux script
+        if os.environ.get('CODESPACES') == 'true':
+            setup_script = mind_dir / "setup_codespaces_env.sh"
+        else:
+            setup_script = mind_dir / "setup_linux_env.sh"
+
+    # Check if executable exists
+    if not executable.exists():
+        print(f"    [Warning] AI executable not found: {executable}")
+        setup_needed = True
+    else:
+        # Check if executable can run (test library dependencies)
+        try:
+            if os.name == 'nt':
+                # On Windows, just check if file exists (library check is harder)
+                pass
+            else:
+                # On Linux, test with ldd to check for missing libraries
+                result = subprocess.run(["ldd", str(executable)], capture_output=True, text=True, cwd=str(mind_dir))
+                if "not found" in result.stdout or "not found" in result.stderr:
+                    print("    [Warning] Missing shared libraries detected. Auto-setup required.")
+                    setup_needed = True
+        except:
+            print("    [Warning] Could not verify executable dependencies. Auto-setup recommended.")
+            setup_needed = True
+
+    # Auto-setup if needed
+    if setup_needed and setup_script.exists():
+        print(f"    [System] Running auto-setup: {setup_script}")
+        try:
+            if os.name == 'nt':
+                subprocess.run(["powershell", "-ExecutionPolicy", "Bypass", "-File", str(setup_script)], cwd=str(mind_dir), check=True)
+            else:
+                os.chmod(setup_script, 0o755)
+                subprocess.run([str(setup_script)], cwd=str(mind_dir), check=True)
+            print("    [System] Auto-setup completed successfully.")
+        except Exception as e:
+            print(f"    [Error] Auto-setup failed: {e}")
+            print("    [Info] Please run setup manually or check the Mind folder setup.")
+            return
+    elif setup_needed:
+        print(f"    [Error] Setup required but setup script not found: {setup_script}")
+        print("    [Info] Please ensure AI dependencies are properly installed.")
+        return
+
+    # Check if startup script exists
+    if not script.exists():
+        print(f"    [Error] Startup script missing: {script}")
+        return
+
     try:
         if os.name == 'nt': # Windows
-            script = mind_dir / "run_split_model.bat"
-            if not script.exists():
-                print(f"    [Error] Startup script missing: {script}")
-                return
-                
             print(f"    [System] Launching {script.name} in new console...")
             # CREATE_NEW_CONSOLE is 0x10. Only works on Windows.
             server_process = subprocess.Popen([str(script.absolute())], cwd=str(mind_dir.absolute()), creationflags=subprocess.CREATE_NEW_CONSOLE)
-            
+
         else: # Linux/Mac/Codespaces
-            script = mind_dir / "run_split_model.sh"
-            if not script.exists():
-                print(f"    [Error] Startup script missing: {script}")
-                print("    [Info] For Linux, ensure 'run_split_model.sh' and 'llama-server' binary exist in 'Mind/'")
-                return
-            
             print(f"    [System] Launching {script.name}...")
             # Make sure it's executable
             os.chmod(script, 0o755)
@@ -100,7 +148,7 @@ def start_ai_server():
             time.sleep(1)
             if i % 5 == 0: print(".", end="", flush=True)
         print("\n    [Warning] Server start timed out. Proceeding anyway (Manual check recommended).")
-        
+
     except Exception as e:
         print(f"    [Error] Failed to start AI server: {e}")
 
