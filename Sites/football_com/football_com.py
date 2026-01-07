@@ -5,6 +5,8 @@ Coordinates all sub-modules to execute the complete booking workflow.
 
 import asyncio
 import os
+import subprocess
+import sys
 from datetime import datetime as dt, timedelta
 from pathlib import Path
 from typing import List, Dict, Optional
@@ -27,6 +29,112 @@ from Helpers.DB_Helpers.db_helpers import (
 )
 from Helpers.utils import log_error_state
 from Helpers.monitor import PageMonitor
+
+
+async def cleanup_chrome_processes():
+    """Automatically terminate conflicting Chrome processes before launch."""
+    try:
+        if sys.platform == "win32":
+            # Windows: Use taskkill
+            result = subprocess.run(
+                ["taskkill", "/F", "/IM", "chrome.exe", "/T"],
+                capture_output=True,
+                text=True,
+                timeout=10
+            )
+            if result.returncode == 0:
+                print("  [Cleanup] Terminated existing Chrome processes.")
+            else:
+                print("  [Cleanup] No Chrome processes found or cleanup not needed.")
+        else:
+            # Unix-like systems
+            result = subprocess.run(
+                ["pkill", "-f", "chrome"],
+                capture_output=True,
+                text=True,
+                timeout=10
+            )
+            if result.returncode == 0:
+                print("  [Cleanup] Terminated existing Chrome processes.")
+            else:
+                print("  [Cleanup] No Chrome processes found or cleanup not needed.")
+    except Exception as e:
+        print(f"  [Cleanup] Warning: Could not cleanup Chrome processes: {e}")
+
+
+async def launch_browser_with_retry(playwright: Playwright, user_data_dir: Path, max_retries: int = 3):
+    """Launch browser with retry logic and exponential backoff."""
+    base_timeout = 30000  # 30 seconds
+    backoff_multiplier = 1.5
+
+    for attempt in range(max_retries):
+        timeout = int(base_timeout * (backoff_multiplier ** attempt))
+        print(f"  [Launch] Attempt {attempt + 1}/{max_retries} with {timeout}ms timeout...")
+
+        try:
+            # Enhanced Chrome arguments for better performance
+            chrome_args = [
+                "--disable-dev-shm-usage",
+                "--no-sandbox",
+                "--disable-gpu",
+                "--disable-extensions",
+                "--disable-blink-features=AutomationControlled",
+                "--disable-background-timer-throttling",
+                "--disable-renderer-backgrounding",
+                "--disable-backgrounding-occluded-windows",
+                "--memory-pressure-off",
+                "--max_old_space_size=4096",
+                "--disable-features=VizDisplayCompositor",
+                "--disable-web-security",
+                "--disable-features=TranslateUI",
+                "--disable-ipc-flooding-protection",
+                "--disable-hang-monitor",
+                "--disable-prompt-on-repost",
+                "--force-color-profile=srgb",
+                "--metrics-recording-only",
+                "--no-first-run",
+                "--enable-automation",
+                "--disable-infobars",
+                "--disable-search-engine-choice-screen",
+                "--disable-sync",
+                "--no-service-autorun"
+            ]
+
+            context = await playwright.chromium.launch_persistent_context(
+                user_data_dir=str(user_data_dir),
+                headless=False,
+                args=chrome_args,
+                viewport={'width': 375, 'height': 612},
+                user_agent="Mozilla/5.0 (iPhone; CPU iPhone OS 14_7_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.1.2 Mobile/15E148 Safari/604.1",
+                timeout=timeout
+            )
+
+            print(f"  [Launch] Browser launched successfully on attempt {attempt + 1}!")
+            return context
+
+        except Exception as e:
+            print(f"  [Launch] Attempt {attempt + 1} failed: {e}")
+
+            if attempt < max_retries - 1:
+                # Cleanup before next attempt
+                await cleanup_chrome_processes()
+
+                # Remove lock files
+                lock_file = user_data_dir / "SingletonLock"
+                if lock_file.exists():
+                    try:
+                        lock_file.unlink()
+                        print(f"  [Launch] Removed SingletonLock before retry.")
+                    except Exception as lock_e:
+                        print(f"  [Launch] Could not remove lock file: {lock_e}")
+
+                # Wait before retry with exponential backoff
+                wait_time = 2 ** attempt  # 1s, 2s, 4s
+                print(f"  [Launch] Waiting {wait_time}s before next attempt...")
+                await asyncio.sleep(wait_time)
+            else:
+                print(f"  [Launch] All {max_retries} attempts failed.")
+                raise e
 
 
 async def run_football_com_booking(playwright: Playwright):
@@ -67,48 +175,27 @@ async def run_football_com_booking(playwright: Playwright):
     user_data_dir.mkdir(parents=True, exist_ok=True)
     
     print(f"  [System] Launching Persistent Context for Football.com... (Data Dir: {user_data_dir})")
-    
-    # Pre-emptive lock cleanup
+
+    # Initial cleanup
+    await cleanup_chrome_processes()
+
+    # Remove any existing lock files
     lock_file = user_data_dir / "SingletonLock"
     if lock_file.exists():
-         print("  [System] Found existing SingletonLock. Removing it before launch...")
-         try:
-             lock_file.unlink()
-         except Exception as e:
-             print(f"  [Warning] Could not remove SingletonLock: {e}")
+        try:
+            lock_file.unlink()
+            print("  [System] Removed existing SingletonLock.")
+        except Exception as e:
+            print(f"  [Warning] Could not remove SingletonLock: {e}")
 
     context = None
     page = None
-    
-    try:
-        context = await playwright.chromium.launch_persistent_context(
-            user_data_dir=str(user_data_dir),
-            headless=True,
-            args=[
-                "--disable-dev-shm-usage", 
-                "--no-sandbox", 
-                "--disable-gpu",
-                "--disable-extensions",
-                "--disable-blink-features=AutomationControlled" 
-            ],
-            viewport={'width': 375, 'height': 612}, # Taller viewport for modern mobile
-            user_agent="Mozilla/5.0 (iPhone; CPU iPhone OS 14_7_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.1.2 Mobile/15E148 Safari/604.1",
-            timeout=120000 # Further increased timeout
-        )
-    except Exception as launch_e:
-        print(f"  [CRITICAL ERROR] Failed to launch browser: {launch_e}")
-        
-        # Automatic Lock Cleanup
-        lock_file = user_data_dir / "SingletonLock"
-        if lock_file.exists():
-            print("  [Auto-Fix] detected Chrome SingletonLock. removing...")
-            try:
-                lock_file.unlink()
-                print("  [Auto-Fix] Lock file removed. Please restart.")
-                return 
-            except Exception as lock_e:
-                 print(f"  [Auto-Fix Failed] Could not remove lock file: {lock_e}")
 
+    try:
+        # Use optimized launch with retry logic
+        context = await launch_browser_with_retry(playwright, user_data_dir, max_retries=3)
+    except Exception as launch_e:
+        print(f"  [CRITICAL ERROR] Failed to launch browser after all retries: {launch_e}")
         print("  [Action Required] Please ensure no other Chrome/Playwright instances are running.")
         print("  [Info] Try 'taskkill /F /IM chrome.exe /T' if this persists.")
         return
@@ -174,6 +261,8 @@ async def run_football_com_booking(playwright: Playwright):
                 except Exception as nav_e:
                     print(f"  [Error] Extraction failed for {target_date}: {nav_e}")
                     continue
+
+                
 
                 # Run Matcher on the newly extracted/stored matches
                 new_mappings = await match_predictions_with_site(unmatched_predictions, cached_site_matches)

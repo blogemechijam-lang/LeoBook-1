@@ -11,13 +11,20 @@ class SemanticMatcher:
         """
         self.model = model
         self.api_url = os.getenv("LLM_API_URL", "http://127.0.0.1:8080/v1/chat/completions")
-        self.timeout = int(os.getenv("LLM_TIMEOUT", "60"))
+        self.timeout = int(os.getenv("LLM_TIMEOUT", "15"))  # Reduced from 60s to 15s for better performance
+        self.cache = {}  # Add caching to avoid repeated LLM calls
 
-    async def is_match(self, desc1: str, desc2: str, league: Optional[str] = None) -> bool:
+    async def is_match(self, desc1: str, desc2: str, league: Optional[str] = None) -> Optional[bool]:
         """
         Determines if two match descriptions refer to the same football fixture.
         Asynchronous to allow non-blocking I/O.
+        Returns None on error (instead of False) to allow fallback logic.
         """
+        # Create cache key
+        cache_key = f"{desc1}|{desc2}|{league or ''}"
+        if cache_key in self.cache:
+            return self.cache[cache_key]
+
         context = ""
         if league:
             context = f"Both matches are in the league/competition: {league}. "
@@ -29,7 +36,7 @@ class SemanticMatcher:
             f"{context}"
             f"Answer with exactly one word: 'Yes' if they are the same match, or 'No' if they are different."
         )
-        
+
         payload = {
             "model": self.model,
             "messages": [
@@ -55,12 +62,16 @@ class SemanticMatcher:
 
             # Robust yes/no detection
             if content.startswith('yes'):
-                return True
+                result = True
             elif content.startswith('no'):
-                return False
+                result = False
             else:
-                return 'yes' in content
+                result = 'yes' in content
+
+            # Cache the result
+            self.cache[cache_key] = result
+            return result
 
         except Exception as e:
             print(f"  [LLM Matcher Error] {e}")
-            return False
+            return None  # Return None instead of False to indicate error

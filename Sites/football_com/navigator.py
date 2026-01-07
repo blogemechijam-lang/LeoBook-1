@@ -62,11 +62,11 @@ async def load_or_create_session(context: BrowserContext) -> Tuple[BrowserContex
              # Just log title and move on
              await log_page_title(page, "Session Check (Smart Resume)")
         elif page.url == "about:blank":
-             await page.goto("https://www.football.com/ng/m/sport/football/", wait_until='domcontentloaded', timeout=NAVIGATION_TIMEOUT)
+             await page.goto("https://www.football.com/ng", wait_until='domcontentloaded', timeout=NAVIGATION_TIMEOUT)
              await log_page_title(page, "Session Check")
         else:
              print("  [Resume] On unknown page. Navigating to home base...")
-             await page.goto("https://www.football.com/ng/m/sport/football/", wait_until='domcontentloaded', timeout=NAVIGATION_TIMEOUT)
+             await page.goto("https://www.football.com/ng", wait_until='domcontentloaded', timeout=NAVIGATION_TIMEOUT)
              await log_page_title(page, "Session Check")
         
         # await asyncio.sleep(2) # Reduced sleep
@@ -97,8 +97,8 @@ async def load_or_create_session(context: BrowserContext) -> Tuple[BrowserContex
 
 async def perform_login(page: Page):
     print("  [Navigation] Going to Football.com...")
-    # Go directly to sports/football if possible, or main mobile page
-    await page.goto("https://www.football.com/ng/m/sport/football/", wait_until='domcontentloaded', timeout=NAVIGATION_TIMEOUT)
+    # Go directly to main mobile page
+    await page.goto("https://www.football.com/ng", wait_until='domcontentloaded', timeout=NAVIGATION_TIMEOUT)
     await log_page_title(page, "Login Entry")
     # await asyncio.sleep(2) # Reduced sleep
 

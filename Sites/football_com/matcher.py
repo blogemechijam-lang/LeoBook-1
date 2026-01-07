@@ -243,25 +243,39 @@ async def match_predictions_with_site(day_predictions: List[Dict], site_matches:
         
         # Phase 3: LLM Verification (Only for the single best candidate if borderline)
         final_match_found = False
-        
+
         if top['total_score'] >= 0.92:
             final_match_found = True
             print(f"    [Matcher] Strong match found: {pred_home} vs {pred_away} (Score: {top['total_score']:.3f})")
+        elif top['total_score'] >= 0.75:  # Increased threshold to reduce LLM calls
+            # Higher confidence matches don't need LLM verification
+            final_match_found = True
+            print(f"    [Matcher] High confidence match found: {pred_home} vs {pred_away} (Score: {top['total_score']:.3f})")
         elif top['total_score'] >= 0.65 and llm_matcher:
             # Borderline case: Ask AI
             m = top['match']
             site_home = m.get('home', '') or m.get('home_team', '')
             site_away = m.get('away', '') or m.get('away_team', '')
             print(f"    [LLM Check] Verifying borderline candidate: Pred '{pred_home} vs {pred_away}' ↔ Site '{site_home} vs {site_away}' (Score: {top['total_score']:.3f})")
-            if await llm_matcher.is_match(
+
+            llm_result = await llm_matcher.is_match(
                 f"{pred_home} vs {pred_away} in {pred_region_league}",
                 f"{site_home} vs {site_away} in {m.get('league', '')}",
                 league=pred_region_league
-            ):
+            )
+
+            if llm_result is True:
                 print("      -> AI confirmed match!")
                 final_match_found = True
-            else:
+            elif llm_result is False:
                 print("      -> AI rejected match.")
+            else:
+                # LLM failed/timeout - use high confidence score as fallback
+                if top['total_score'] >= 0.75:
+                    print("      -> AI timeout, but high score - accepting match!")
+                    final_match_found = True
+                else:
+                    print("      -> AI timeout, score too low - rejecting match.")
 
         if final_match_found:
             site_url = top['match'].get('url')

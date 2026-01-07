@@ -4,7 +4,5 @@ Centralized timeout and configuration constants.
 """
 
 # Timeout Constants (in milliseconds)
-NAVIGATION_TIMEOUT = 360000  # 6 minutes for page navigation
-WAIT_FOR_LOAD_STATE_TIMEOUT = 360000  # 6 minutes for all other operations
-
-
+NAVIGATION_TIMEOUT = 180000  # 3 minutes for page navigation (balanced between speed and reliability)
+WAIT_FOR_LOAD_STATE_TIMEOUT = 90000  # 1.5 minutes for load state operations
