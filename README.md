@@ -16,7 +16,7 @@ LATEST UPDATES (v3.2.0):
 - **v2.7 Algorithm Compliance**: Full implementation of the "Harvest -> Execute" strategy for maximum reliability.
 - **Fractional Kelly Staking**: Precise risk-aware staking (0.25 * Kelly) clamped for bankroll safety.
 - **Centralized Audit Logging**: All financial movements and cycle statuses are logged to `DB/audit_log.csv`.
-- **Advanced Withdrawal Flow**: Automated triggers (Balance >= ₦10k) with Telegram approval simulation and a strict ₦5,000 liquidity floor.
+- **Live Telegram Integration**: Semi-automated withdrawal flow with polling listener, 30-min approval timeout, and state-aware floors (₦5,000).
 - **Outcome Synchronization**: Phase 0 reviews now cross-sync results between prediction and match registries.
 
 CORE ARCHITECTURE:

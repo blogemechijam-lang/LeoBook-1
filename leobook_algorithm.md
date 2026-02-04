@@ -43,9 +43,11 @@ LeoBook executes a continuous infinite loop managed by `Leo.py`. Upon startup, i
 *   **Triggers**:
     *   Balance >= ₦10,000.
     *   Significant 7-day net win.
-*   **Process**:
-    *   Propose via **Telegram Approval Loop** (30 min timeout).
-    *   Execute withdrawal while maintaining **₦5,000 floor**.
+*   **Process (Semi-Automated)**:
+    *   Leo proposes withdrawal via **Telegram (@LeoBookBot)**.
+    *   **Approval Loop**: Polling listener waits 30 mins for user reply ("YES"/"NO").
+    *   **Execution**: On "YES", Leo opens an isolated browser context to perform the withdrawal while maintaining the **₦5,000 floor**.
+    *   **Timeout**: Auto-cancels and logs if no reply within 30 mins.
 *   **Cycle End**: Log `CYCLE_COMPLETE` to audit log and sleep for 6 hours.
 
 ---

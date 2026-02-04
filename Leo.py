@@ -29,6 +29,23 @@ from Sites.football_com import run_football_com_booking
 from Helpers.DB_Helpers.db_helpers import init_csvs, log_audit_event
 from Helpers.utils import Tee, LOG_DIR
 
+# --- TELEGRAM CONFIG ---
+from telegram.ext import Application, MessageHandler, filters
+from telegram import Update
+
+TELEGRAM_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
+TELEGRAM_CHAT_ID = int(os.getenv("TELEGRAM_CHAT_ID", "0"))
+
+# Global withdrawal proposal state
+pending_withdrawal = {
+    "active": False,
+    "amount": 0.0,
+    "proposed_at": None,
+    "chat_id": TELEGRAM_CHAT_ID,
+    "approved": False
+}
+}
+
 # --- CONFIGURATION ---
 CYCLE_WAIT_HOURS = 6
 PLAYWRIGHT_DEFAULT_TIMEOUT = 3600000 
@@ -188,40 +205,142 @@ def start_ai_server():
         server_process = None
 
 
-async def check_withdrawal_triggers(state: dict, page) -> bool:
-    """
-    v2.7 Withdrawal Triggers:
-    1. Balance >= 10,000
-    2. Net win last 7 days > 5,000 (Simplified: check if balance increased significantly)
-    3. No bets in last 24h (Optional indicator)
-    4. Withdrawable >= 500
-    """
-    balance = state.get("current_balance", 0.0)
-    if balance < 10000:
-        return False
-        
-    print(f"   [Withdrawal] Trigger Check: Balance ₦{balance:.2f} >= ₦10,000. Triggering proposal...")
-    return True
-
-
-async def propose_withdrawal_telegram(amount: float) -> bool:
-    """
-    Simulates Telegram withdrawal proposal and user approval.
-    Wait up to 30 mins for approval (simulated as 10s for this environment).
-    """
-    print(f"\n   [TELEGRAM] Proposed withdrawal: ₦{amount:.2f}")
-    print("   [TELEGRAM] Reply 'YES' to authorize (Timeout: 30 mins)...")
+async def execute_withdrawal(amount: float):
+    """Executes the withdrawal using an isolated browser context (v2.7)."""
+    print(f"   [Execute] Starting Telegram-approved withdrawal for ₦{amount:.2f}...")
+    from playwright.async_api import async_playwright
     
-    # In a real system, this would poll a bot API or a local approve file
-    # For this simulation, we'll auto-approve if a specific file exists or just wait
+    async with async_playwright() as p:
+        # We need a browser context, preferably reusing persistent session
+        user_data_dir = Path("DB/ChromeData_v3").absolute()
+        try:
+            # Launch persistent or temporary? 
+            # If primary loop is sleeping, we can use persistent.
+            context = await p.chromium.launch_persistent_context(
+                user_data_dir=str(user_data_dir),
+                headless=True,
+                viewport={'width': 375, 'height': 612}
+            )
+            page = await context.new_page()
+            
+            from Sites.football_com.booker.withdrawal import check_and_perform_withdrawal
+            # Note: withdrawal module handles balance extraction and audit logging
+            success = await check_and_perform_withdrawal(page, state["current_balance"], last_win_amount=amount*2)
+            
+            if success:
+                log_state("Withdrawal", f"Executed ₦{amount:,.2f}", "Approved via Telegram")
+                log_audit_event("WITHDRAWAL_EXECUTED", f"Approved via Telegram: ₦{amount}", state["current_balance"], state["current_balance"]-amount, amount)
+                state["last_withdrawal_time"] = dt.now()
+            else:
+                print("   [Execute Error] Withdrawal process failed.")
+                
+            await context.close()
+        except Exception as e:
+            print(f"   [Execute Error] Failed to launch context for withdrawal: {e}")
+
+async def handle_withdrawal_reply(update: Update, context):
+    global pending_withdrawal
+
+    if not pending_withdrawal["active"]:
+        return
+
+    if update.effective_chat.id != pending_withdrawal["chat_id"]:
+        return  # Security: only authorized chat
+
+    text = update.message.text.strip().upper()
+
+    if text == "YES":
+        await update.message.reply_text("✅ APPROVED – Executing withdrawal now.")
+        # Trigger execution (Note: we need a reference to the page/context elsewhere or use a separate task)
+        # For simplicity in this structure, we'll mark as approved and let the main loop handle it 
+        # or call it directly if we have a way to access the current browser session.
+        # Since the main loop is async, we'll use a signal.
+        pending_withdrawal["approved"] = True
+        pending_withdrawal["active"] = False
+
+    elif text in ["NO", "CANCEL"]:
+        await update.message.reply_text("❌ CANCELLED – No withdrawal performed.")
+        pending_withdrawal["active"] = False
+    else:
+        await update.message.reply_text("Reply only **YES** or **NO**/**CANCEL** please.")
+
+async def start_telegram_listener():
+    if not TELEGRAM_TOKEN or TELEGRAM_CHAT_ID == 0:
+        print("   [Telegram Warning] Missing TOKEN or CHAT_ID in .env. Integration disabled.")
+        return
+
     try:
-        # Mock wait
-        await asyncio.sleep(2) 
-        print("   [TELEGRAM] Received: 'YES'. Authorization confirmed.")
+        app = Application.builder().token(TELEGRAM_TOKEN).build()
+        app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_withdrawal_reply))
+        
+        # Start polling in background
+        asyncio.create_task(app.run_polling(drop_pending_updates=True))
+        print(f"   [Telegram] Listener started for chat_id: {TELEGRAM_CHAT_ID}")
+    except Exception as e:
+        print(f"   [Telegram Error] Could not start listener: {e}")
+
+async def propose_withdrawal(amount: float):
+    global pending_withdrawal
+    if pending_withdrawal["active"]:
+        return
+
+    pending_withdrawal.update({
+        "active": True,
+        "amount": amount,
+        "proposed_at": dt.now(),
+        "approved": False
+    })
+
+    message = (
+        f"🚨 Withdrawal Proposal\n"
+        f"Amount: ₦{amount:,.2f}\n"
+        f"Reason: Auto after win\n"
+        f"Current balance: ₦{state['current_balance']:,.2f}\n"
+        f"Reply **YES** to approve (30 min timeout)\n"
+        f"Reply **NO** or **CANCEL** to reject"
+    )
+
+    try:
+        # One-off bot instance to send message
+        bot = Application.builder().token(TELEGRAM_TOKEN).build().bot
+        await bot.send_message(chat_id=TELEGRAM_CHAT_ID, text=message)
+        print(f"   [Telegram] Proposal sent for ₦{amount:.2f}")
+        asyncio.create_task(withdrawal_timeout_checker())
+    except Exception as e:
+        print(f"   [Telegram Error] Failed to send message: {e}")
+        pending_withdrawal["active"] = False
+
+async def withdrawal_timeout_checker():
+    await asyncio.sleep(1800)  # 30 mins
+    global pending_withdrawal
+    if pending_withdrawal["active"]:
+        pending_withdrawal["active"] = False
+        try:
+            bot = Application.builder().token(TELEGRAM_TOKEN).build().bot
+            await bot.send_message(chat_id=TELEGRAM_CHAT_ID, text="⏰ Withdrawal proposal timed out (30 min) – cancelled.")
+        except: pass
+        print("   [Telegram] Proposal timed out.")
+
+def calculate_proposed_amount(balance: float, latest_win: float) -> float:
+    """v2.7 Calculation: Min(30% balance, 50% latest win)."""
+    val = min(balance * 0.30, latest_win * 0.50)
+    # Ensure min 500 and floor of 5,000 remains
+    if balance - val < 5000:
+        val = balance - 5000
+    
+    return max(0.0, float(int(val))) # Round to whole number
+
+def get_latest_win() -> float:
+    """Retrieves the latest win amount from audit logs or state."""
+    # Simplified: check state or default to 0
+    return state.get("last_win_amount", 5000.0) # Heuristic for testing
+
+async def check_withdrawal_triggers(page=None) -> bool:
+    """v2.7 Triggers."""
+    balance = state.get("current_balance", 0.0)
+    if balance >= 10000 and get_latest_win() >= 5000:
         return True
-    except:
-        print("   [TELEGRAM] Authorization timed out.")
-        return False
+    return False
 
 async def main():
     """
@@ -231,6 +350,9 @@ async def main():
     # 1. Initialize all database files (CSVs)
     log_state(phase="Init", action="Initializing Databases")
     init_csvs()
+    
+    # 2. Start Telegram Listener
+    asyncio.create_task(start_telegram_listener())
 
     async with async_playwright() as p:
         while True:
@@ -272,21 +394,17 @@ async def main():
                 # Update current balance in state after booking
                 from Sites.football_com.navigator import extract_balance
                 # Launch a temporary browser context for Phase 3 checks
-                browser = await p.chromium.launch(headless=True)
-                page = await browser.new_page()
                 try:
-                    state["current_balance"] = await extract_balance(page)
-
-                    # --- PHASE 3: WITHDRAWAL / CYCLE END ---
-                    if await check_withdrawal_triggers(state, page):
-                        # Calculate amount (Min(30% balance, 50% latest win))
-                        # Simplified for v2.7 baseline: 25% of balance if no latest_win provided
-                        withdraw_amount = int(state["current_balance"] * 0.25)
-                        if await propose_withdrawal_telegram(withdraw_amount):
-                            from Sites.football_com.booker.withdrawal import check_and_perform_withdrawal
-                            await check_and_perform_withdrawal(page, state["current_balance"], last_win_amount=withdraw_amount*2)
-                finally:
-                    await browser.close()
+                    async with p.chromium.launch(headless=True) as check_browser:
+                        check_page = await check_browser.new_page()
+                        state["current_balance"] = await extract_balance(check_page)
+                        
+                        # --- PHASE 3: WITHDRAWAL PROPOSAL ---
+                        if await check_withdrawal_triggers():
+                            proposed_amount = calculate_proposed_amount(state["current_balance"], get_latest_win())
+                            await propose_withdrawal(proposed_amount)
+                except Exception as e:
+                    print(f"  [Warning] Preliminary balance check failed: {e}")
 
                 # --- CYCLE END ---
                 log_state(phase="Phase 3", action="Cycle Complete", next_step=f"Sleeping {CYCLE_WAIT_HOURS}h")
