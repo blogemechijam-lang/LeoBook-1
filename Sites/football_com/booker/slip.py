@@ -44,6 +44,8 @@ async def force_clear_slip(page: Page, retry_count: int = 3):
     4. If failed, RETRY.
     5. If all retries fail, DELETE STORAGE & RAISE FATAL ERROR.
     """
+    import os
+    from Helpers.DB_Helpers.db_helpers import log_audit_event
     for attempt in range(retry_count):
         count = await get_bet_slip_count(page)
         if count == 0:
@@ -102,11 +104,14 @@ async def force_clear_slip(page: Page, retry_count: int = 3):
 
         except Exception as e:
             print(f"    [Slip Error] Attempt {attempt+1} failed: {e}")
+            await asyncio.sleep(2)
 
-    # --- FINAL CHECK ---
+    # --- FINAL VERIFICATION ---
     final_count = await get_bet_slip_count(page)
     if final_count > 0:
-        print(f"!!! [CRITICAL] Slip Force-Clear Failed. {final_count} bets remain. !!!")
+        print(f"!!! [CRITICAL] Slip Force-Clear Failed. {final_count} bets remain after {retry_count} retries. !!!")
+        
+        # log_audit_event("FATAL_ERROR", f"Slip stuck dirty with {final_count} items. Escalating.")
         print("!!! [CRITICAL] Deleting storage state and triggering restart. !!!")
         
         # Delete storage state to force fresh login next time

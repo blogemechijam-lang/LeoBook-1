@@ -18,7 +18,7 @@ from Helpers.constants import WAIT_FOR_LOAD_STATE_TIMEOUT
 from .navigator import load_or_create_session, navigate_to_schedule, select_target_date, extract_balance, log_page_title
 from .extractor import extract_league_matches
 from .matcher import match_predictions_with_site, filter_pending_predictions
-from .booker.booking_code import book_single_match
+from .booker.booking_code import harvest_single_match_code
 from .booker.placement import place_multi_bet_from_codes
 from .booker.slip import force_clear_slip
 
@@ -26,6 +26,7 @@ from Helpers.DB_Helpers.db_helpers import (
     PREDICTIONS_CSV, 
     update_prediction_status, 
     load_site_matches, 
+    load_harvested_site_matches,
     save_site_matches, 
     update_site_match_status,
     get_site_match_id
@@ -210,7 +211,6 @@ async def run_football_com_booking(playwright: Playwright):
 
                 # --- STEP 2: HARVEST PHASE ---
                 print(f"  [Phase 2a] Entering Harvest for {len(matched_urls)} matches...")
-                harvested_codes = []
                 
                 for match_id, match_url in matched_urls.items():
                     pred = next((p for p in day_preds if str(p['fixture_id']) == str(match_id)), None)
@@ -222,29 +222,24 @@ async def run_football_com_booking(playwright: Playwright):
                         'home_team': pred['home_team'], 'away_team': pred['away_team']
                     }
                     
+                    # Check if already harvested
                     matches_now = load_site_matches(target_date)
                     existing_m = next((m for m in matches_now if m['site_match_id'] == match_dict['site_match_id']), None)
-                    if existing_m and existing_m.get('booking_code'):
-                         harvested_codes.append(existing_m['booking_code'])
+                    if existing_m and existing_m.get('booking_status') == 'harvested':
                          continue
 
-                    success = await book_single_match(page, match_dict, pred)
-                    if success:
-                        updated_matches = load_site_matches(target_date)
-                        curr_m = next((m for m in updated_matches if m['site_match_id'] == match_dict['site_match_id']), None)
-                        if curr_m and curr_m.get('booking_code'):
-                            harvested_codes.append(curr_m['booking_code'])
-                
-                print(f"  [Harvest] Completed. Collected {len(harvested_codes)} codes.")
+                    # Execute Harvest
+                    await harvest_single_match_code(page, match_dict, pred)
                 
                 # --- STEP 3: EXECUTE PHASE ---
-                if harvested_codes:
-                    print(f"  [Phase 2b] Entering Execution for {len(harvested_codes)} selections...")
-                    success = await place_multi_bet_from_codes(page, harvested_codes, current_balance)
+                harvested_matches = load_harvested_site_matches(target_date)
+                if harvested_matches:
+                    print(f"  [Phase 2b] Entering Execution for {len(harvested_matches)} selections...")
+                    success = await place_multi_bet_from_codes(page, harvested_matches, current_balance)
                     if success:
                         print(f"  [Execute] Multi-bet placed successfully for {target_date}!")
                 else:
-                    print("  [Execute] No codes available to place multi-bet.")
+                    print("  [Execute] No harvested matches available to place multi-bet for this date.")
 
             # If we reached here without raising FatalSessionError, we are done
             break

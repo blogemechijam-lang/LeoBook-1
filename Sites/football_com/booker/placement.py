@@ -149,80 +149,88 @@ async def place_bets_for_matches(page: Page, matched_urls: Dict[str, str], day_p
 
 def calculate_kelly_stake(balance: float, odds: float, probability: float = 0.60) -> int:
     """
-    Calculates fractional Kelly stake.
-    Full Kelly = (edge * odds - 1) / (odds - 1)
-    conservative_kelly = 0.25 * Full Kelly
-    We use a default probability of 60% if not specified by RuleEngine.
+    Calculates fractional Kelly stake (v2.7).
+    Formula: 0.25 * ((probability * odds - 1) / (odds - 1))
+    Where edge = probability - (1/odds)
     """
     if odds <= 1.0: return max(1, int(balance * 0.01))
     
-    edge = probability - (1.0 / odds)
-    if edge <= 0:
-        # If no mathematical edge, use a small 1% exploration stake
-        full_kelly = 0.01
-    else:
-        full_kelly = edge / (odds - 1)
+    # edge = probability - (1.0 / odds)
+    # full_kelly = edge / (1 - (1/odds)) # This is another way to write it
+    # Simplified version matching user request:
+    numerator = (probability * odds) - 1
+    denominator = odds - 1
+    
+    if denominator <= 0: return max(1, int(balance * 0.01))
+    
+    full_kelly = numerator / denominator
     
     # Applied Fractional Kelly (0.25)
-    applied_kelly = 0.25 * full_kelly
-    raw_stake = balance * applied_kelly
+    applied_stake = 0.25 * full_kelly * balance
     
     # Clamp rules: Min = max(1% balance, 1), Max = 50% balance
-    min_stake = max(1, int(balance * 0.01))
+    min_stake = int(max(1, balance * 0.01))
     max_stake = int(balance * 0.50)
     
-    final_stake = int(max(min_stake, min(raw_stake, max_stake)))
+    final_stake = int(max(min_stake, min(applied_stake, max_stake)))
     return final_stake
 
 
-async def place_multi_bet_from_codes(page: Page, harvested_codes: List[str], current_balance: float) -> bool:
+async def place_multi_bet_from_codes(page: Page, harvested_matches: List[Dict], current_balance: float) -> bool:
     """
     Phase 2b (Execute):
-    1. Filter codes (Validation).
-    2. Add selections to slip (via comma-separated shareCode URL).
-    3. Calculate stake (min ₦1, max 50% balance).
-    4. Place bet and Verify.
+    1. Force clear slip.
+    2. Loop up to 12 codes -> Add to slip via URL.
+    3. Verify count.
+    4. Calculate Kelly Stake.
+    5. Place & Confirm.
+    6. Update status in CSVs.
     """
-    if not harvested_codes:
-        print("    [Execute] No codes to place.")
+    if not harvested_matches:
+        print("    [Execute] No harvested matches to place.")
         return False
 
-    # A. Validate & Limit (Max 12 selections for stability)
-    final_codes = [c for c in harvested_codes if c and len(str(c)) >= 5][:12]
+    final_codes = []
+    # Up to 12 as per v2.7 rules
+    for m in harvested_matches[:12]:
+        code = m.get('booking_code')
+        if code: final_codes.append(m)
+
     if not final_codes:
-        print("    [Execute] No valid codes found after filtering.")
+        print("    [Execute] No valid codes found in harvested list.")
         return False
 
-    print(f"    [Execute] Building Multi with {len(final_codes)} selections.")
+    print(f"\n   [Execute] Starting execution for {len(final_codes)} matches...")
     
-    # B. Inject Codes via URL (Combined for speed)
-    # Comma-separated shareCode automatically populates the slip
-    combined_codes = ",".join(final_codes)
-    load_url = f"https://www.football.com/ng/m?shareCode={combined_codes}"
-    
+    # 1. Force Clear
+    await force_clear_slip(page)
+
     try:
-        print(f"    [Execute] Injecting all codes via shareURL...")
-        # Force clear slip first to ensure a clean multi-bet
-        await force_clear_slip(page)
-        
-        await page.goto(load_url, timeout=45000, wait_until='domcontentloaded')
-        # Wait for meaningful content
-        await asyncio.sleep(3)
-        
-        # C. Verify Slip Count matches
+        # 2. Add via URL
+        for m in final_codes:
+            code = m.get('booking_code')
+            url = f"https://www.football.com/ng/m?shareCode={code}"
+            print(f"    [Execute] Injecting code {code}...")
+            await page.goto(url, timeout=30000, wait_until='domcontentloaded')
+            await asyncio.sleep(1.5) # Wait for slip to update
+
+        # 3. Verify Count
         total_in_slip = await get_bet_slip_count(page)
-        # Calculate combined odds for staking (Heuristic)
-        # Since we just loaded codes, we don't have exact odds easily until slip is open, 
-        # but the MD suggests Kelly based on slip. We'll use a conservative estimate.
-        estimated_combined_odds = 2.0 * len(final_codes) # Heuristic for multi
-        
-        print(f"    [Execute] Verification: {total_in_slip} bets in slip (Expected {len(final_codes)}).")
+        print(f"    [Execute] Verification: {total_in_slip} in slip (Expected {len(final_codes)}).")
         
         if total_in_slip < 1:
-            print("    [Execute Failure] No bets in slip after loading codes.")
+            print("    [Execute Error] Slip is empty after injection.")
             return False
-            
-        # D. Open Slip
+
+        # 4. Calculate Stake (Kelly v2.7)
+        # We'll use a conservative odds estimate of 2.0^count or similar, 
+        # but the Kelly formula needs a single odds number. 
+        # Ideally we extract the odds from the slip, but for v2.7 logic we'll use a baseline.
+        estimated_odds = 2.0 ** len(final_codes) 
+        final_stake = calculate_kelly_stake(current_balance, estimated_odds)
+        print(f"    [Execute] Final Stake: ₦{final_stake} (Balance: ₦{current_balance:.2f})")
+
+        # 5. Place
         slip_trigger = SelectorManager.get_selector_strict("fb_match_page", "slip_trigger_button")
         btn = page.locator(slip_trigger).first
         if await btn.count() > 0:
@@ -235,71 +243,41 @@ async def place_multi_bet_from_codes(page: Page, harvested_codes: List[str], cur
             print("    [Execute Error] Could not find slip trigger.")
             return False
 
-        # E. Calculate Stake (Kelly v2.7)
-        final_stake = calculate_kelly_stake(current_balance, estimated_combined_odds)
-        
-        print(f"    [Execute] Final Stake: ₦{final_stake} (Balance: ₦{current_balance:.2f})")
+        amount_input = SelectorManager.get_selector_strict("fb_match_page", "betslip_stake_input")
+        await page.locator(amount_input).fill(str(final_stake))
+        await asyncio.sleep(1)
 
-        # F. Enter Stake
-        stake_input_sel = SelectorManager.get_selector("fb_match_page", "betslip_stake_input")
-        inp = page.locator(stake_input_sel).first
-        if await inp.count() > 0:
-            await inp.scroll_into_view_if_needed()
-            await inp.fill(str(final_stake))
-            await page.keyboard.press("Enter")
-            await asyncio.sleep(1)
-        else:
-            print("    [Execute Error] Stake input not visible in slip.")
-            return False
-
-        # G. Place & Confirm
-        place_btn_sel = SelectorManager.get_selector_strict("fb_match_page", "betslip_place_bet_button")
-        place_btn = page.locator(place_btn_sel).first
-        if await place_btn.count() > 0 and await place_btn.is_enabled():
-            print("    [Execute] Clicking 'Place Bet'...")
-            # Use JS click for place button as it's often a span inside a div
-            await place_btn.click(force=True)
-            await asyncio.sleep(2)
+        place_btn = SelectorManager.get_selector_strict("fb_match_page", "betslip_place_bet_button")
+        btn = page.locator(place_btn).first
+        if await btn.count() > 0 and await btn.is_enabled():
+            await robust_click(btn, page)
             
-            # Detect confirmation dialog
-            confirm_sel = SelectorManager.get_selector("fb_match_page", "confirm_bet_button")
-            conf_btn = page.locator(confirm_sel).first
-            if await conf_btn.count() > 0 and await conf_btn.is_visible():
-                print("    [Execute] Confirming multi-bet...")
-                await conf_btn.click()
-                await asyncio.sleep(5) # Wait for processing
-
-            # H. Final Verification (Balance Decrease)
+            # --- CONFIRMATION ---
+            await asyncio.sleep(2)
             from ..navigator import extract_balance
             new_balance = await extract_balance(page)
-            if new_balance < (current_balance - (final_stake * 0.9)): # Use 0.9 to avoid edge case rounding
+            
+            if new_balance < (current_balance - (final_stake * 0.9)):
                 print(f"    [Execute Success] Multi-bet placed! New Balance: ₦{new_balance:.2f}")
-                log_audit_event(
-                    event_type="BET_PLACEMENT",
-                    description=f"Multi-bet with {len(final_codes)} selections placed via shareCode.",
-                    balance_before=current_balance,
-                    balance_after=new_balance,
-                    stake=float(final_stake),
-                    status="success"
-                )
+                
+                # Update Statuses
+                from Helpers.DB_Helpers.db_helpers import update_site_match_status, update_prediction_status, log_audit_event
+                for m in final_codes:
+                    update_site_match_status(m['site_match_id'], status='booked')
+                    if m.get('fixture_id'):
+                        update_prediction_status(m['fixture_id'], m['date'], 'booked')
+                
+                log_audit_event("BET_PLACEMENT", f"Multi-bet ({len(final_codes)} matches) placed.", current_balance, new_balance, float(final_stake))
                 return True
             else:
-                print("    [Execute Warning] Balance did not decrease. Placement might have failed or is pending.")
-                log_audit_event(
-                    event_type="BET_PLACEMENT",
-                    description=f"Multi-bet placement failed or pending verification.",
-                    balance_before=current_balance,
-                    balance_after=new_balance,
-                    stake=float(final_stake),
-                    status="warning"
-                )
-                return False
+                 print("    [Execute Error] Balance did not decrease. Placement failed.")
+                 return False
         else:
-            print("    [Execute Error] Place Multi button not found or disabled.")
-            return False
+             print("    [Execute Error] Place button not enabled.")
+             return False
 
     except Exception as e:
-        print(f"    [Execute Error] Unexpected failure: {e}")
-        
-    return False
+        print(f"    [Execute Error] Critical failure: {e}")
+        return False
 
+```

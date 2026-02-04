@@ -236,6 +236,14 @@ def load_site_matches(target_date: str) -> List[Dict[str, Any]]:
     all_matches = _read_csv(FOOTBALL_COM_MATCHES_CSV)
     return [m for m in all_matches if m.get('date') == target_date]
 
+def load_harvested_site_matches(target_date: str) -> List[Dict[str, Any]]:
+    """Loads all harvested site matches for a specific date (v2.7)."""
+    if not os.path.exists(FOOTBALL_COM_MATCHES_CSV):
+        return []
+    
+    all_matches = _read_csv(FOOTBALL_COM_MATCHES_CSV)
+    return [m for m in all_matches if m.get('date') == target_date and m.get('booking_status') == 'harvested']
+
 def update_site_match_status(site_match_id: str, status: str, fixture_id: Optional[str] = None, details: Optional[str] = None, booking_code: Optional[str] = None, booking_url: Optional[str] = None):
     """Updates the booking status, fixture_id, or booking details for a site match."""
     if not os.path.exists(FOOTBALL_COM_MATCHES_CSV):
