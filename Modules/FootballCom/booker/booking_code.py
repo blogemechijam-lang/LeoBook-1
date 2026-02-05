@@ -111,8 +111,23 @@ async def harvest_single_match_code(page: Page, match: Dict, prediction: Dict) -
             await asyncio.sleep(2)
 
             # Wait for market results
-            market_container = SelectorManager.get_selector_strict("fb_match_page", "market_container") or ".markets-container"
-            await page.wait_for_selector(market_container, timeout=15000)
+            # Wait for market results - Flexible Wait
+            market_container_sel = ".markets-container, .market-list, .betting-markets, .m-market-list"
+            market_found = False
+            for _ in range(10): # 10 * 1s = 10s flexible wait
+                try:
+                    if await page.locator(market_container_sel).first.is_visible():
+                        market_found = True
+                        break
+                except: pass
+                await asyncio.sleep(1)
+            
+            if not market_found:
+                 # It's possible the search result IS the market list (e.g. filtered view)
+                 # so we proceed but log a warning if strictly needed
+                 print("    [Harvest Warning] Market container not strictly visible, but proceeding to outcome search...")
+
+            await asyncio.sleep(1)
 
             # Expand market if collapsed
             header_sel = SelectorManager.get_selector_strict("fb_match_page", "market_header")
@@ -173,7 +188,7 @@ async def harvest_single_match_code(page: Page, match: Dict, prediction: Dict) -
 
             print(f"    [Harvest Success] Code: {code}")
             await page.screenshot(path=f"Logs/Debug/harvest_success_{fixture_id}.png")
-            log_state("Harvest", f"Success {fixture_id}", f"Code: {code}")
+            print(f"    [Harvest Success] {fixture_id} -> Code: {code}")
             return True
 
         except Exception as e:
@@ -183,7 +198,7 @@ async def harvest_single_match_code(page: Page, match: Dict, prediction: Dict) -
 
     print(f"    [Harvest Failed] {fixture_id} after 3 attempts")
     update_prediction_status(fixture_id, prediction.get('date'), "failed_harvest")
-    log_state("Harvest", f"Failed {fixture_id}", "All attempts failed")
+    print(f"    [Harvest Error] {fixture_id}: All attempts failed")
     return False
 
     
