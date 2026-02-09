@@ -1,9 +1,15 @@
+"""
+Unified Batch Matcher - v7 (Prompt Fix + No-Match Handling + Data Validation)
+High-reliability batch matching with your specified models.
+"""
+
 import os
 import json
 import asyncio
 import aiohttp
-from typing import List, Dict, Any, Optional
+import re
 from datetime import datetime
+from typing import List, Dict, Optional
 
 class UnifiedBatchMatcher:
     def __init__(self):
@@ -11,227 +17,202 @@ class UnifiedBatchMatcher:
         self.gemini_key = os.getenv("GOOGLE_API_KEY")
         self.openrouter_key = os.getenv("OPENROUTER_API_KEY")
         
-        self.timeout = aiohttp.ClientTimeout(total=120)  # 2 minute timeout as requested
+        self.timeout = aiohttp.ClientTimeout(total=180)  # 3 min
         self.max_retries = 3
+        self.chunk_size = 8  # Safe for token limits
+
+        self.grok_model = "grok-4-1-fast-reasoning"
+        self.gemini_model = "gemini-3-flash"
+        self.openrouter_model = "google/gemini-2.5-flash"
 
     async def match_batch(self, date: str, predictions: List[Dict], site_matches: List[Dict]) -> Dict[str, str]:
-        """
-        Coordinates the batch matching process with rotation, using chunking to avoid LLM overload.
-        """
         all_results = {}
-        chunk_size = 20 # Conservative chunk size for stability
-        
-        # Sort predictions by fixture_id for consistent chunking
         predictions = sorted(predictions, key=lambda x: x.get('fixture_id', ''))
-        total_chunks = (len(predictions) + chunk_size - 1) // chunk_size
+        total_chunks = (len(predictions) + self.chunk_size - 1) // self.chunk_size
         
-        print(f"  [AI Matcher] Processing {len(predictions)} predictions in {total_chunks} chunks (Size: {chunk_size})...")
+        print(f"  [AI Matcher] Processing {len(predictions)} predictions in {total_chunks} chunks (size {self.chunk_size})...")
 
-        for i in range(0, len(predictions), chunk_size):
-            chunk_preds = predictions[i:i + chunk_size]
-            chunk_idx = (i // chunk_size) + 1
-            print(f"  [AI Matcher] Processing Chunk {chunk_idx}/{total_chunks} ({len(chunk_preds)} items)...")
+        if not site_matches or all(m.get('home') == 'None' or m.get('away') == 'None' for m in site_matches):
+            print("  [AI Matcher] No valid site matches for date – skipping batch")
+            return {}
+
+        for i in range(0, len(predictions), self.chunk_size):
+            chunk_preds = predictions[i:i + self.chunk_size]
+            chunk_idx = (i // self.chunk_size) + 1
+            print(f"  [AI Matcher] Chunk {chunk_idx}/{total_chunks} ({len(chunk_preds)} items)...")
             
             chunk_result = await self._process_single_chunk(date, chunk_preds, site_matches)
             if chunk_result:
                 all_results.update(chunk_result)
                 print(f"  [AI Matcher] Chunk {chunk_idx} matched {len(chunk_result)} fixtures.")
             else:
-                 print(f"  [AI Matcher] Chunk {chunk_idx} failed to resolve any matches.")
+                print(f"  [AI Matcher] Chunk {chunk_idx} returned no matches.")
 
+        print(f"  [AI Matcher] Final: {len(all_results)}/{len(predictions)} matched")
         return all_results
 
     async def _process_single_chunk(self, date: str, predictions: List[Dict], site_matches: List[Dict]) -> Dict[str, str]:
-        """Process a single chunk of predictions against ALL site matches."""
-        prompt = self._build_batch_prompt(date, predictions, site_matches)
+        prompt = self._build_improved_prompt(date, predictions, site_matches)
         
-        # Define the rotation: (function, name)
         rotation = [
-            (self._call_grok, "Grok"),
-            (self._call_gemini, "Gemini"),
-            (self._call_openrouter, "OpenRouter")
+            (self._call_grok, "Grok", self.grok_model),
+            (self._call_gemini, "Gemini", self.gemini_model),
+            (self._call_openrouter, "OpenRouter", self.openrouter_model)
         ]
         
-        for call_func, model_name in rotation:
+        for call_func, model_name, model_id in rotation:
+            if not (model_name == "Grok" and self.grok_key or
+                    model_name == "Gemini" and self.gemini_key or
+                    model_name == "OpenRouter" and self.openrouter_key):
+                print(f"  [AI Skip] {model_name} key missing – skipping")
+                continue
+
             for attempt in range(1, self.max_retries + 1):
                 try:
-                    # print(f"    [AI Chunk] {model_name} Attempt {attempt}...")
-                    result = await call_func(prompt)
-                    if result is not None:
-                        # Allow {} as a valid result
-                        parsed = self._parse_response(result)
-                        if isinstance(parsed, dict):
+                    print(f"    [AI Chunk] {model_name} ({model_id}) Attempt {attempt}...")
+                    result = await call_func(prompt, model_id)
+                    if result:
+                        print(f"    [AI Raw Response] {result[:3000]}...")  # Debug
+                        parsed = self._robust_parse(result)
+                        if parsed:
+                            print(f"    [AI Success] Parsed {len(parsed)} matches from {model_name}")
                             return parsed
-                        else:
-                            print(f"    [AI Error] {model_name} returned unparseable content. Raw start: {result[:50]}...")
                     else:
-                        print(f"    [AI Error] {model_name} returned None (API Error).")
+                        print(f"    [AI] {model_name} returned empty/null")
                 except Exception as e:
-                    print(f"    [AI Exception] {model_name} attempt {attempt} failed: {e}")
+                    print(f"    [AI Exception] {model_name} attempt {attempt}: {e}")
                     if attempt < self.max_retries:
-                        await asyncio.sleep(2)
-            
-            print(f"    [AI Fail] {model_name} failed chunk after {self.max_retries} attempts. Rotating...")
-            
+                        await asyncio.sleep(5)
+            print(f"    [AI] {model_name} exhausted retries")
+
+        print("  [AI] All models failed for chunk")
         return {}
 
-    def _build_batch_prompt(self, date: str, predictions: List[Dict], site_matches: List[Dict]) -> str:
-        """Constructs the advanced batch prompt."""
-        now_str = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    def _build_improved_prompt(self, date: str, predictions: List[Dict], site_matches: List[Dict]) -> str:
+        now_str = datetime.now().strftime("%Y-%m-%d %H:%M:%S WAT")
         
-        pred_data = []
-        for p in predictions:
-            pred_data.append({
-                "fixture_id": p.get('fixture_id'),
-                "region_league": p.get('region_league'),
-                "home_team": p.get('home_team'),
-                "away_team": p.get('away_team'),
-                "match_time": p.get('match_time'),
-                "date": p.get('date')
-            })
-            
-        site_data = []
-        for s in site_matches:
-            site_data.append({
-                "url": s.get('url'),
-                "league": s.get('league'),
-                "home": s.get('home') or s.get('home_team'),
-                "away": s.get('away') or s.get('away_team'),
-                "time": s.get('time'),
-                "date": s.get('date')
-            })
+        pred_summary = [f"{p.get('fixture_id')}: {p.get('home_team')} vs {p.get('away_team')} at {p.get('match_time')} ({p.get('date')})" for p in predictions]
+        site_summary = [f"{s.get('home')} vs {s.get('away')} at {s.get('time')} ({s.get('date')}) - URL: {s.get('url')}" for s in site_matches]
 
-        prompt = f"""You are a high-intelligence sports betting data synchronizer.
-Current System Time: {now_str} (WAT - West Africa Time / Nigerian Time)
-Target Date: {date}
+    
 
-TASK:
-Match the fixtures from 'PREDICTIONS' to the exact same fixtures in 'SITE_MATCHES'. 
-Return a mapping of 'fixture_id' from PREDICTIONS to the corresponding 'url' from SITE_MATCHES.
+        prompt = f"""You are a 100% precise fixture matcher for betting.
+Current time: {now_str} (WAT/Nigeria)
+Target date: {date}
 
-RULES:
-1. STRICT MATCHING: Be EXTREMELY precise. Only match if you are "100% sure" the fixtures represent the exact same physical event (Team A vs Team B).
-2. NIGERIAN TIME (WAT): All dates and times provided in 'PREDICTIONS' are in Nigerian Time (UTC+1). Use this as your reference for all comparisons.
-3. TIME & STATUS FILTERING:
-   - Perform a WEB SEARCH to verify the real-time status and kickoff time of each candidate match.
-   - DISCARD any match that has already started or finished according to:
-     a) The kickoff time and date provided in 'PREDICTIONS' (Predictions.csv data).
-     b) The Current System Time ({now_str} WAT).
-     c) Your real-time web search results.
-   - If a match is LIVE, COMPLETED, or POSTPONED, it MUST be excluded.
-   - Discard matches starting within the next 5 minutes as a safety buffer.
-4. NO FUZZY OVERHEAD: Ignore minor spelling differences or team name suffixes (FC, SC, etc.).
-5. NO PARTIALS: Only include mappings for matches found in BOTH datasets. Return {{}} if no matches qualify.
+TASK: Return JSON ONLY: {{"fixture_id": "url"}} for matches with >80% confidence.
+If no match for a fixture_id, do NOT include it.
+If no valid matches at all, return empty object {{}}.
 
-DATA:
---- PREDICTIONS (Source: predictions.csv) ---
-{json.dumps(pred_data, indent=2)}
+STRICT RULES:
+1. Match ONLY if teams are the same (ignore minor suffixes like FC, SC, Utd).
+2. Time must be within 1 hour (discard if started/finished/postponed using current time).
+3. Discard if league differs significantly.
+4. Allow obvious equivalents (e.g. "Fatih Karagumruk" = "Karagumruk").
+5. Output MUST be valid JSON object. NO markdown, NO text, NO explanations.
 
---- SITE_MATCHES (Source: Football.com) ---
-{json.dumps(site_data, indent=2)}
+Few-shot examples:
+Input: PRED: "Liverpool vs Man Utd at 20:00" SITE: "Liverpool FC vs Manchester United at 20:00" → {{"Liverpool_fixture": "https://..."}}
+Input: PRED: "Arsenal vs Chelsea at 15:00" SITE: "Arsenal U21 vs Chelsea U21 at 15:00" → {{}} (discard - U21)
+Input: PRED: "Real Madrid vs Barcelona at 21:00" SITE: no match → {{}}
 
-RESPONSE FORMAT:
-You MUST respond with a valid JSON object only. The keys should be 'fixture_id' and values should be the 'url'.
-Example: {{"123456": "https://www.football.com/match/fixture-id"}}
+PREDICTIONS:
+{'\n'.join(pred_summary)}
 
-Response:"""
+SITE_MATCHES:
+{'\n'.join(site_summary)}
+
+RESPONSE: Valid JSON only.
+"""
         return prompt
 
-    async def _call_grok(self, prompt: str) -> Optional[str]:
-        if not self.grok_key: return None
+    async def _call_grok(self, prompt: str, model: str) -> Optional[str]:
         url = "https://api.x.ai/v1/chat/completions"
-        headers = {
-            "Content-Type": "application/json",
-            "Authorization": f"Bearer {self.grok_key}"
-        }
+        headers = {"Content-Type": "application/json", "Authorization": f"Bearer {self.grok_key}"}
         payload = {
-            "messages": [
-                {"role": "system", "content": "You are a precise data matching assistant that only outputs JSON."},
-                {"role": "user", "content": prompt}
-            ],
-            "model": "grok-4-1-fast-reasoning", # Note: using the model name from user request
-            "stream": False,
-            "temperature": 0
+            "messages": [{"role": "user", "content": prompt}],
+            "model": model,
+            "temperature": 0.0,
+            "max_tokens": 2048
         }
-        async with aiohttp.ClientSession(timeout=self.timeout) as session:
-            try:
-                async with session.post(url, headers=headers, json=payload) as resp:
-                    if resp.status == 200:
-                        data = await resp.json()
-                        return data['choices'][0]['message']['content']
-                    print(f"    [Grok Error] Status: {resp.status} - {await resp.text()}")
-                    return None
-            except Exception as e:
-                print(f"    [Grok Exception] {e}")
-                return None
+        return await self._make_api_call(url, headers, payload)
 
-    async def _call_gemini(self, prompt: str) -> Optional[str]:
-        if not self.gemini_key: return None
-        url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash:generateContent?key={self.gemini_key}"
-        payload = {
-            "contents": [{"parts": [{"text": prompt}]}],
-            "generationConfig": {"temperature": 0, "responseMimeType": "application/json"}
-        }
-        async with aiohttp.ClientSession(timeout=self.timeout) as session:
-            try:
-                async with session.post(url, json=payload) as resp:
-                    if resp.status == 200:
-                        data = await resp.json()
-                        return data['candidates'][0]['content']['parts'][0]['text']
-                    print(f"    [Gemini Error] Status: {resp.status} - {await resp.text()}")
-                    return None
-            except Exception as e:
-                 print(f"    [Gemini Exception] {e}")
-                 return None
+    async def _call_gemini(self, prompt: str, model: str) -> Optional[str]:
+        url = f"https://generativelanguage.googleapis.com/v1/models/{model}:generateContent?key={self.gemini_key}"
+        payload = {"contents": [{"parts": [{"text": prompt}]}]}
+        return await self._make_api_call(url, {}, payload)
 
-    async def _call_openrouter(self, prompt: str) -> Optional[str]:
-        if not self.openrouter_key: return None
+    async def _call_openrouter(self, prompt: str, model: str) -> Optional[str]:
         url = "https://openrouter.ai/api/v1/chat/completions"
         headers = {
             "Authorization": f"Bearer {self.openrouter_key}",
-            "HTTP-Referer": "https://github.com/emechijam/LeoBook",
+            "HTTP-Referer": "https://leo-book.com",
             "X-Title": "LeoBook Matcher"
         }
         payload = {
-            "model": "google/gemini-2.5-flash",
+            "model": model,
             "messages": [{"role": "user", "content": prompt}],
-            "temperature": 0
+            "temperature": 0.0,
+            "max_tokens": 2048
         }
+        return await self._make_api_call(url, headers, payload)
+
+    async def _make_api_call(self, url: str, headers: Dict, payload: Dict) -> Optional[str]:
         async with aiohttp.ClientSession(timeout=self.timeout) as session:
             try:
                 async with session.post(url, headers=headers, json=payload) as resp:
-                    if resp.status == 200:
-                        data = await resp.json()
-                        return data['choices'][0]['message']['content']
-                    print(f"    [OpenRouter Error] Status: {resp.status} - {await resp.text()}")
+                    text = await resp.text()
+                    if resp.status in (200, 201):
+                        data = json.loads(text)
+                        if 'choices' in data and data['choices']:
+                            return data['choices'][0]['message']['content']
+                        elif 'candidates' in data and data['candidates']:
+                            return data['candidates'][0]['content']['parts'][0]['text']
+                    print(f"  [API Error] Status {resp.status} - {text[:200]}...")
                     return None
             except Exception as e:
-                 print(f"    [OpenRouter Exception] {e}")
-                 return None
+                print(f"  [API Exception] {e}")
+                return None
 
-    def _parse_response(self, text: str) -> Optional[Dict[str, str]]:
-        """Extracts JSON from response, handling markdown blocks and extra text."""
-        try:
-            # 1. Try direct parse
-            text = text.strip()
-            if text.startswith("{") and text.endswith("}"):
-                return json.loads(text)
-            
-            # 2. Extract from markdown code blocks
-            if "```json" in text:
-                text = text.split("```json")[1].split("```")[0]
-            elif "```" in text:
-                text = text.split("```")[1].split("```")[0]
-            
-            # 3. Last ditch search for first '{' and last '}'
-            start = text.find('{')
-            end = text.rfind('}')
-            if start != -1 and end != -1:
-                text = text[start:end+1]
-                
-            return json.loads(text.strip())
-        except Exception as e:
-            # Only print error if it's truly broken. 
-            if '{' in text:
-                print(f"  [AI Matcher Parse Error] {e} | Content Snippet: {text[:100]}...")
+    def _robust_parse(self, text: str) -> Optional[Dict[str, str]]:
+        text = text.strip()
+        if not text:
             return None
+
+        # Strip markdown/code blocks
+        if "```json" in text:
+            text = text.split("```json")[1].split("```")[0].strip()
+        elif "```" in text:
+            text = text.split("```")[1].split("```")[0].strip()
+
+        # Find JSON block
+        start = text.find('{')
+        end = text.rfind('}') + 1
+        if start != -1 and end > start:
+            text = text[start:end]
+
+        try:
+            parsed = json.loads(text)
+            if isinstance(parsed, dict):
+                # Filter invalid entries
+                valid = {k: v for k, v in parsed.items() if k and v and isinstance(v, str) and v.startswith("http")}
+                if valid:
+                    return valid
+                else:
+                    print("  [Parse] Filtered empty/invalid entries – returning {}")
+                    return {}
+        except json.JSONDecodeError as e:
+            print(f"  [Parse Error] JSON decode failed: {e}")
+
+        # Manual fallback
+        matches = re.findall(r'"(\w+)":\s*"([^"]+)"', text)
+        if matches:
+            valid = {k: v for k, v in dict(matches).items() if v.startswith("http")}
+            if valid:
+                return valid
+            else:
+                print("  [Parse] Manual fallback found no valid URLs")
+                return {}
+
+        print(f"  [Parse Fail] Raw: {text[:200]}...")
+        return {}

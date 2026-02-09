@@ -34,9 +34,9 @@ MAIN WORKFLOW:
    - **Phase 1 (Analysis)**: Generates high-confidence predictions via the Rule Engine.
 
 3. ACT: PHASE 2 (Betting Orchestration):
-   - **Phase 2 (Execution)**: Single-pass orchestration via `place_bets_for_matches()`.
-   - **Logic**: Navigates, checks start time, finds markets via dynamic sectors, and builds accumulator directly.
-   - **Financial Safety**: Stake is entered and confirmed. Codes are extracted post-placement for audit.
+   - **Phase 2a (Harvesting)**: Navigates to each match, extracts a single booking code, saves it to `fb_matches.csv`, and **force clears the slip** after each match.
+   - **Phase 2b (Execution)**: Batch-injects all harvested codes for the day and places a single combined accumulator bet.
+   - **Financial Safety**: Stake is calculated using a Fractional Kelly formula (min ₦100, max 50% balance).
 
 4. VERIFY & WITHDRAW (Phase 3):
    - **Withdrawal**: Checks triggers (₦10k balance) and maintained bankroll floor (₦5,000).

@@ -74,10 +74,13 @@ For a high-level visual representation, see: [leobook_algorithm.mmd](file:///c:/
 - **Logic**:
   - **Registry Check**: Checks `fb_matches.csv` for the target date before crawling.
   - **Match Matching (Direct)**: Re-uses URLs for already-mapped `fixture_id`s in the registry.
-  - **Match Matching (AI Batch)**: Runs **AI Batch Prompt** against cached matches if registry is populated.
-  - **Retry Logic**: Predictions with `status: failed_harvest` are automatically picked up for retry.
+  - **Match Matching (AI Batch)**: Runs **Improved AI Batch Prompt** against cached matches.
+  - **Improved Prompt Rules**:
+    - **Rule 1**: Strict team matching (ignore minor suffixes).
+    - **Rule 2**: Time must be within **1 hour** (discard if started/finished/postponed).
+    - **Rule 3**: Discard if league differs significantly.
   - **Action**: Extracts sharing booking codes via [booking_code.py](file:///c:/Users/Admin/Desktop/ProProjection/LeoBook/Modules/FootballCom/booker/booking_code.py).
-    - [booking_code.py](file:///c:/Users/Admin/Desktop/ProProjection/LeoBook/Modules/FootballCom/booker/booking_code.py): `place_bets_for_matches()` (renamed/repurposed to `harvest_booking_codes()`):
+    - [booking_code.py](file:///c:/Users/Admin/Desktop/ProProjection/LeoBook/Modules/FootballCom/booker/booking_code.py): `harvest_booking_codes()`:
         - **Navigation**: Visits match URL, scrolls to outcome.
         - **Extraction**: Clicks outcome -> Opens slip -> Extracts code -> Saves to `fb_matches.csv`.
         - **Clearing**: Calls `force_clear_slip()` after *each* extraction to keep the UI clean.

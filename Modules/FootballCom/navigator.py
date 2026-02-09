@@ -289,10 +289,7 @@ async def hide_overlays(page: Page):
         await page.add_style_tag(content=css_content)
         
         # Force JS hide for persistent elements
-        js_eval = f"""() => {{
-            document.querySelectorAll('{overlay_sel}').forEach(el => el.style.display = 'none');
-        }}"""
-        await page.evaluate(js_eval)
+        await page.evaluate(f"document.querySelectorAll(\"{overlay_sel}\").forEach(el => el.style.display = 'none');")
         
        # print("  [UI] Overlays hidden via CSS injection.")
     except Exception as e:
@@ -300,51 +297,28 @@ async def hide_overlays(page: Page):
 
 
 async def navigate_to_schedule(page: Page):
-    """Navigate to the full schedule page using dynamic selectors."""
-    
-    # Pre-emptive dismissal of overlays/tooltips
+    """Simplified navigation to schedule."""
     await fb_universal_popup_dismissal(page)
-
-    # 1. Check if we are ALREADY there (Smart Resume)
-    current_url = page.url
-    if "/sport/football" in current_url and "live" not in current_url:
-        # print("  [Navigation] Smart Resume: Already on a football schedule page.")
-        await hide_overlays(page)
-        # Optional: check if Date filter is visible to confirm
-        date_filter = SelectorManager.get_selector_strict("fb_schedule_page", "filter_dropdown_today")
-        if date_filter:
-            if await page.locator(date_filter).count() > 0:
-                 print("  [Navigation] Confirmed: Date filter is visible. No navigation needed.")
-                 return
-
-    # Try dynamic selector first
-    schedule_sel = SelectorManager.get_selector_strict("fb_global", "full_schedule_button")
-
     
-    if schedule_sel:
-        try:
-            print(f"  [Navigation] Trying dynamic selector: {schedule_sel}")
-            if await page.locator(schedule_sel).count() > 0:
-                print(f"  [Navigation] Clicked schedule button: {schedule_sel}")
-                await page.locator(schedule_sel).first.scroll_into_view_if_needed()
-                await page.locator(schedule_sel).first.click(timeout=15000, force=True)
-                await page.wait_for_load_state('domcontentloaded', timeout=WAIT_FOR_LOAD_STATE_TIMEOUT)
-                await log_page_title(page, "Schedule Page")
-                print("  [Navigation] Schedule page loaded via dynamic selector.")
-                await hide_overlays(page)
-                return
-            else:
-                 print(f"  [Navigation] Dynamic selector not found on page: {schedule_sel}")
-        except Exception as e:
-            print(f"  [Navigation] Dynamic selector failed: {e}")
+    if "/sport/football/" in page.url:
+         return await hide_overlays(page)
 
-    # Fallback: direct URL navigation
-    print("  [Navigation] Dynamic selector failed. Using direct URL navigation.")
-    await page.goto("https://www.football.com/ng/m/sport/football/", wait_until='domcontentloaded', timeout=30000)
-    await log_page_title(page, "Schedule Page (Direct)")
-    print("  [Navigation] Schedule page loaded via direct URL.")
+    # Use the selector from knowledge.json as per rule
+    sel = SelectorManager.get_selector_strict("fb_global", "full_schedule_button")
+    
+    try:
+        # Standard Playwright: Check visibility and click
+        if sel and await page.locator(sel).is_visible(timeout=3000):
+            await page.locator(sel).first.click(force=True)
+            await page.wait_for_load_state("domcontentloaded", timeout=10000)
+        else:
+            print("  [Navigation] Button not found, using direct URL.")
+            await page.goto("https://www.football.com/ng/m/sport/football/", wait_until="domcontentloaded")
+    except Exception:
+        # Most reliable fallback
+        await page.goto("https://www.football.com/ng/m/sport/football/", wait_until="domcontentloaded")
+        
     await hide_overlays(page)
-    await asyncio.sleep(1)
     
 
 async def select_target_date(page: Page, target_date: str) -> bool:

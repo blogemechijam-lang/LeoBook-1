@@ -35,6 +35,7 @@
     - [x] **Timezone Sync**: Align `predictions.csv` and site to Nigerian Time (UTC+1) (Done).
     - [x] **Market Discovery**: Implement search-based discovery (Click Search -> Input -> Enter) (Done).
     - [x] **Navigation**: Improve `football_com` selector robustness (Done).
+    - [x] **Navigation**: Simplify `navigate_to_schedule` and fix `hide_overlays` JS syntax (Done).
     - [x] **Architecture**: Remove local LLM server and enforce OpenRouter (Done).
     - [ ] Copy artifacts to project root.
     - [ ] Verify no changes made to Phase 0 or Phase 1.
