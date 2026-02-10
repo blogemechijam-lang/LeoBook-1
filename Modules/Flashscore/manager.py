@@ -74,7 +74,7 @@ async def run_flashscore_analysis(playwright: Playwright):
         last_processed_info = get_last_processed_info()
 
         # --- Daily Loop ---
-        for day_offset in range(1):
+        for day_offset in range(7):
             target_date = dt.now(NIGERIA_TZ) + timedelta(days=day_offset)
             target_full = target_date.strftime("%d.%m.%Y")
             

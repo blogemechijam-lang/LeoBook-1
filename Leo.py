@@ -97,7 +97,7 @@ async def main():
                     # --- PHASE 2: BOOKING (Act) ---
                     log_state(phase="Phase 2", action="Starting Booking Process", next_step="Withdrawal Check")
                     # This phase now follows the Unified "Search & Place" flow
-                    await run_football_com_booking(p)
+                    #await run_football_com_booking(p)
                     
                     # Update current balance in state after booking
                     from Modules.FootballCom.navigator import extract_balance
@@ -118,7 +118,7 @@ async def main():
                     log_state(phase="Phase 3", action="Cycle Complete", next_step=f"Sleeping {CYCLE_WAIT_HOURS}h")
                     log_audit_event("CYCLE_COMPLETE", f"Cycle #{state['cycle_count']} finished successfully.")
                     print(f"   [System] Cycle #{state['cycle_count']} finished at {dt.now().strftime('%H:%M:%S')}. Sleeping for {CYCLE_WAIT_HOURS} hours...")
-                    await asyncio.sleep(CYCLE_WAIT_HOURS * 3600)
+                    await asyncio.sleep(CYCLE_WAIT_HOURS * 6)
 
                 except Exception as e:
                     state["error_log"].append(f"{dt.now()}: {e}")
