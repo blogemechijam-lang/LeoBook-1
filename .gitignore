@@ -88,6 +88,10 @@ Mind/*.gguf
 
 # Chrome Profile Data & Data Layer
 Data/Auth/
-Data/Store/
+Data/Store/*
+!Data/Store/schedules.csv
+!Data/Store/predictions.csv
+!Data/Store/recommended.json
+!Data/Store/teams.csv
 DB/
 storage_state.json
