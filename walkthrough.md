@@ -2,7 +2,19 @@
 
 This walkthrough covers the major architectural upgrade to the LeoBook booking system and the resolution of critical dependency and import issues.
 
-## 1. Phase 2: Harvest -> Execute Strategy
+## 1. UI Standardization (Stitch System)
+
+- [x] **UI Atoms & Styling Standardization (Stitch v4)**
+  - Updated `AppColors` with v4 semantic tokens: `successGreen` (#34C759) and `liveRed` (#FF3B30).
+  - Refined `AppTheme` with global Lexend typography for titles and body text.
+  - Standardized border treatments (0.05 opacity) and shadows across all cards.
+- [x] **Search System Implementation (Stitch v2)**
+  - Implemented `SearchScreen` with high-fidelity header and categorization logic.
+  - Added "Recent Searches" with persistence (runtime) and "Popular Teams" horizontal list.
+  - Developed `SearchCubit` for efficient filtering across matches and leagues.
+  - Integrated search triggers on `HomeScreen` and `HeaderSection`.
+
+## 2. Phase 2: Harvest -> Execute Strategy
 
 We have completely refactored the booking process for Football.com to ensure maximum robustness.
 

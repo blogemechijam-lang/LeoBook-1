@@ -1,9 +1,9 @@
 # Leo
-**Manufacturer**: Emenike Chinenye James  
+**Manufacturer**: Materialless LLC  
 **Powered by**: Grok 4.1 & Gemini 3
 
 """
-Leo v3.2: Elite Autonomous Betting Agent (Manufacturer: Emenike Chinenye James)
+Leo v3.2: Elite Autonomous Betting Agent (Manufacturer: Materialless LLC)
 
 A comprehensive AI-powered system that observes, analyzes, predicts, and executes betting strategies with advanced self-healing capabilities.
 
@@ -23,11 +23,6 @@ CORE ARCHITECTURE:
 - **Phase 2 (Betting)**: Direct match navigation, dynamic market discovery, and real-time accumulator building.
 - **Self-Healing UI**: Automated selector discovery via Grok 4 and robust slip clearing with fatal escalation.
 - **Modular Data Layer**: Optimized CSV storage with absolute pathing and centralized audit trails.
-
-MAIN WORKFLOW:
-1. INFRASTRUCTURE INIT:
-   - **Windows**: `.\Mind\run_split_model.bat` or `USE_GROK_API=true` in `.env`.
-   - **Initialization**: `init_csvs()` sets up the audit log and registries.
 
 2. OBSERVE & DECIDE (Phases 0 & 1):
    - **Phase 0 (Review)**: Cross-syncs past outcomes and updates momentum weights.
@@ -50,11 +45,22 @@ SYSTEM COMPONENTS:
 - **Core/**: The Brain (Intelligence, Visual Analyzer, System primitives, Browser helpers).
 - **Data/**: Central data layer (Persistence, Access, DB helpers).
 - **Modules/**: Site-specific integrations (Flashscore, Football.com).
+- **leobookapp/**: Pilot X Mobile/Web App.
+# LeoBook - Elite Betting Dashboard
+
+Elite, autonomous betting dashboard with direct GitHub data synchronization and persistent local caching.
+
+## Key Features
+- **GitHub Sync**: Direct data fetching from repository eliminates the need for a local Python server.
+- **Offline Caching**: Built-in persistence for seamless viewing under low-network conditions.
+- **High-Fidelity Predictions**: Real-time accent lines and live-status indicators.
 - **Match Registry**: `Data/Store/fb_matches.csv` (Mapped URLs and booking codes).
+- **Code Quality**: 100% migrated to modern `withValues` API and standardized `debugPrint` logging.
 - **Scripts/**: Utility tools for reporting and DB maintenance.
 
 MAINTENANCE:
 - Monitor **`DB/audit_log.csv`** for real-time financial transparency.
 - Review **`walkthrough.md`** for detailed implementation logs of current session.
-- Refer to **`leobook_algorithm.md`** for exhaustive file and function documentation.
+- Refer to **`pilot_algorithm.md`** for exhaustive file and function documentation.
+- Use `python Scripts/recommend_bets.py --save --all` and push to GitHub to refresh the app data.
 """

@@ -1,5 +1,17 @@
 # Task Checklist - LeoBook Algorithm Upgrade
 
+- [x] **UI Atoms & Styling Standardization (Stitch v4)** <!-- id: 73 -->
+  - [x] Update `AppColors` with v4 success and error tokens <!-- id: 75 -->
+  - [x] Standardize section header typography globally <!-- id: 76 -->
+  - [x] Refine card borders and shadow treatments (v4) <!-- id: 77 -->
+  - [x] Verify UI atom fidelity against v4 reference <!-- id: 78 -->
+- [x] **Search System Implementation (Stitch v2)** <!-- id: 79 -->
+  - [x] Implement `SearchScreen` with v2 search bar and cancel button <!-- id: 81 -->
+  - [x] Add "Recent Searches" and "Popular Teams" sections <!-- id: 82 -->
+  - [x] Implement categorized search results (Leagues vs Matches) <!-- id: 83 -->
+  - [x] Integrate search logic with `SearchCubit` <!-- id: 84 -->
+  - [x] Verify search flow UX against v2 reference <!-- id: 85 -->
+
 - [x] **Startup & Initialization**
     - [x] Update `Leo.py` with strict phase loop (completed).
     - [x] Update `Leo.py` state tracking (pending full implementation).

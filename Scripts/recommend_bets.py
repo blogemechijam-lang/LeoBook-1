@@ -127,6 +127,7 @@ def get_recommendations(target_date=None, show_all_upcoming=False, **kwargs):
 
             recommendations.append({
                 'match': f"{p['home_team']} vs {p['away_team']}",
+                'fixture_id': p.get('fixture_id', ''),
                 'time': p_time_str,
                 'date': p_date_str,
                 'prediction': p['prediction'],
@@ -194,14 +195,25 @@ def get_recommendations(target_date=None, show_all_upcoming=False, **kwargs):
             os.makedirs(recommendations_dir, exist_ok=True)
             
         file_date = target_date if target_date else now.strftime("%d.%m.%Y")
-        file_path = os.path.join(recommendations_dir, f"recommendations_{file_date}.txt")
+        
+        # 1. Save Human-Readable TXT
+        file_path_txt = os.path.join(recommendations_dir, f"recommendations_{file_date}.txt")
         try:
-            with open(file_path, 'w', encoding='utf-8') as f:
-                # Use output_lines (no colors)
+            with open(file_path_txt, 'w', encoding='utf-8') as f:
                 f.write("\n".join(output_lines))
-            print(f"\n[OK] Recommendations saved to: {file_path}")
+            print(f"\n[OK] Recommendations (TXT) saved to: {file_path_txt}")
         except Exception as e:
-            print(f"\n[Error] Failed to save recommendations: {e}")
+            print(f"\n[Error] Failed to save TXT recommendations: {e}")
+
+        # 2. Save Structured JSON for App
+        import json
+        json_path = os.path.join(p_root, "Data", "Store", "recommended.json")
+        try:
+            with open(json_path, 'w', encoding='utf-8') as f:
+                json.dump(recommendations, f, ensure_ascii=False, indent=2)
+            print(f"[OK] Recommendations (JSON) saved to: {json_path}")
+        except Exception as e:
+            print(f"[Error] Failed to save JSON recommendations: {e}")
             
     return recommendations
 
