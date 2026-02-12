@@ -13,6 +13,7 @@ class AppColors {
   static const Color successGreen = Color(
     0xFF34C759,
   ); // Stitch v4 Success Green
+  static const Color accentBlue = Color(0xFF00D2FF); // From HTML Design
 
   static const Color textDark = Color(0xFF0F172A); // Slate 900
   static const Color textLight = Color(0xFFF1F5F9); // Slate 100
@@ -20,4 +21,9 @@ class AppColors {
 
   static const Color warning = Color(0xFFEAB308); // Yellow 500
   static const Color success = successGreen; // Alias for backward compatibility
+
+  static const Color aiPurple = Color(0xFF8B5CF6);
+  static const Color accentYellow = Color(
+    0xFFFFCC00,
+  ); // Yellow/Orange for stars/ratings
 }

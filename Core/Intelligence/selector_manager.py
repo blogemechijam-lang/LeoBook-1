@@ -191,7 +191,7 @@ class SelectorManager:
     @staticmethod
     def get_popup_selectors(context: str) -> list:
         """
-        Get context-aware popup dismissal selectors with Phase 2 priority
+        Get context-aware popup dismissal selectors with Chapter 1C/2A priority
 
         Args:
             context: Page context (fb_match_page, fb_general, generic)
@@ -199,7 +199,7 @@ class SelectorManager:
         Returns:
             list: Ordered list of selectors (priority first)
         """
-        # Phase 2: Football.com match page priority selectors - GUIDED TOUR SEQUENCE
+        # Chapter 1C/2A: Football.com match page priority selectors - GUIDED TOUR SEQUENCE
         if context == 'fb_match_page':
             return [
                 # Step 1: Next button for guided tour

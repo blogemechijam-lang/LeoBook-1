@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
-import '../../../logic/cubit/home_cubit.dart';
-import '../../core/constants/app_colors.dart';
+import 'package:leobookapp/logic/cubit/home_cubit.dart';
+import 'package:leobookapp/core/constants/app_colors.dart';
 import '../widgets/match_card.dart';
 import '../widgets/filter_modal.dart';
 
@@ -138,7 +138,7 @@ class AllPredictionsScreen extends StatelessWidget {
               padding: EdgeInsets.symmetric(vertical: 8),
               itemCount: matches.length,
               itemBuilder: (context, index) {
-                return MatchCard(match: matches[index]);
+                return MatchCard(match: matches[index], showLiveBadge: false);
               },
             );
           }

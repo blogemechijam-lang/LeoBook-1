@@ -35,7 +35,10 @@ VERSION = "2.6.0"
 COMPATIBLE_MODELS = ["2.5", "2.6"]  # Compatible with these model versions
 
 # --- IMPORTS ---
-from .db_helpers import PREDICTIONS_CSV, SCHEDULES_CSV, save_schedule_entry, REGION_LEAGUE_CSV, FB_MATCHES_CSV, files_and_headers
+from .db_helpers import (
+    PREDICTIONS_CSV, SCHEDULES_CSV, TEAMS_CSV, REGION_LEAGUE_CSV, 
+    FB_MATCHES_CSV, files_and_headers, save_team_entry, save_region_league_entry
+)
 from .csv_operations import upsert_entry, _read_csv, _write_csv
 from Core.Intelligence.intelligence import get_selector_auto, get_selector
 
@@ -123,8 +126,59 @@ def get_predictions_to_review() -> List[Dict]:
         except (ValueError, TypeError):
             continue
 
-    print(f"[Review] Found {len(to_review)} past predictions to review (Limit: {LOOKBACK_LIMIT}).")
-    return to_review
+def get_schedules_to_update(full_refresh=False) -> List[Dict]:
+    """
+    Reads the schedules CSV and returns entries that need enrichment.
+    """
+    if not os.path.exists(SCHEDULES_CSV):
+        return []
+
+    to_update = []
+    with open(SCHEDULES_CSV, 'r', encoding='utf-8', newline='') as f:
+        reader = csv.DictReader(f)
+        for row in reader:
+            if full_refresh:
+                to_update.append(row)
+                continue
+            
+            # Enrich if missing URLs or status is unknown
+            status = row.get('status', row.get('match_status', '')).lower()
+            if not row.get('match_link'):
+                continue
+                
+            if status in ['', 'scheduled', 'pending', 'unknown'] or not row.get('home_team_id'):
+                to_update.append(row)
+
+    print(f"[Chapter 0] Found {len(to_update)} schedule entries to enrich/update.")
+    return to_update
+
+def smart_parse_datetime(dt_str: str):
+    """
+    Attempts to parse date/time which might be merged or in various formats.
+    Example: '12.02.2026 15:00' or '12.02.202615:00'
+    """
+    dt_str = dt_str.strip()
+    # Remove day of week if present (e.g. 'Thu 12.02.2026')
+    if len(dt_str) > 10 and not dt_str[0].isdigit():
+        dt_str = " ".join(dt_str.split()[1:])
+
+    # Handle merged: 12.02.202615:00 -> 12.02.2026 15:00
+    if len(dt_str) == 15 and dt_str[10].isdigit():
+        dt_str = dt_str[:10] + " " + dt_str[10:]
+    
+    try:
+        # Standard format
+        parts = dt_str.split()
+        if len(parts) == 2:
+            d_part, t_part = parts
+            # Standardize date to YYYY-MM-DD
+            if '.' in d_part:
+                p = d_part.split('.')
+                d_part = f"{p[2]}-{p[1]}-{p[0]}"
+            return d_part, t_part
+    except:
+        pass
+    return None, None
 
 
 def save_single_outcome(match_data: Dict, new_status: str):
@@ -142,8 +196,8 @@ def save_single_outcome(match_data: Dict, new_status: str):
 
             reader = csv.DictReader(infile)
             fieldnames = reader.fieldnames
-            if fieldnames is None: # Handle empty file case
-                fieldnames = []
+            if fieldnames is None: 
+                fieldnames = files_and_headers[PREDICTIONS_CSV]
 
             writer = csv.DictWriter(outfile, fieldnames=fieldnames)
             writer.writeheader()
@@ -153,7 +207,11 @@ def save_single_outcome(match_data: Dict, new_status: str):
 
                 if current_id == target_id:
                     row['status'] = new_status
-                    row['actual_score'] = match_data.get('actual_score', 'N/A')
+                    row['actual_score'] = match_data.get('actual_score', row.get('actual_score', 'N/A'))
+                    
+                    # Update scores if available in match_data (from schedules)
+                    if 'home_score' in match_data and 'away_score' in match_data:
+                        row['actual_score'] = f"{match_data['home_score']}-{match_data['away_score']}"
 
                     if new_status == 'reviewed':
                         prediction = row.get('prediction', '')
@@ -161,7 +219,6 @@ def save_single_outcome(match_data: Dict, new_status: str):
                         home_team = row.get('home_team', '')
                         away_team = row.get('away_team', '')
                         is_correct = evaluate_prediction(prediction, actual_score, home_team, away_team)
-                        # Only update if evaluation was successful
                         if is_correct is not None:
                             row['outcome_correct'] = str(is_correct)
 
@@ -171,16 +228,51 @@ def save_single_outcome(match_data: Dict, new_status: str):
 
         if updated:
             os.replace(temp_file, PREDICTIONS_CSV)
-            # --- v2.7 synchronization to football_com_matches.csv ---
             if new_status == 'reviewed' and target_id:
                 _sync_outcome_to_site_registry(target_id, match_data)
         else:
             if os.path.exists(temp_file):
                 os.remove(temp_file)
-
     except Exception as e:
         HealthMonitor.log_error("csv_save_error", f"Failed to save CSV: {e}", "high")
         print(f"    [File Error] Failed to write CSV: {e}")
+
+def sync_schedules_to_predictions():
+    """
+    Ensures all entries in schedules.csv exist in predictions.csv.
+    """
+    if not os.path.exists(SCHEDULES_CSV) or not os.path.exists(PREDICTIONS_CSV):
+        return
+
+    schedules = _read_csv(SCHEDULES_CSV)
+    predictions = _read_csv(PREDICTIONS_CSV)
+    pred_ids = {p.get('fixture_id') for p in predictions if p.get('fixture_id')}
+
+    added_count = 0
+    for s in schedules:
+        fid = s.get('fixture_id')
+        if fid and fid not in pred_ids:
+            # Create a shell prediction entry
+            new_pred = {
+                'fixture_id': fid,
+                'date': s.get('date'),
+                'match_time': s.get('match_time'),
+                'region_league': s.get('region_league'),
+                'home_team': s.get('home_team'),
+                'away_team': s.get('away_team'),
+                'home_team_id': s.get('home_team_id'),
+                'away_team_id': s.get('away_team_id'),
+                'prediction': 'PENDING',
+                'confidence': 'Low',
+                'status': s.get('status', 'pending'),
+                'match_link': s.get('match_link'),
+                'actual_score': f"{s.get('home_score', '')}-{s.get('away_score', '')}" if s.get('home_score') else 'N/A'
+            }
+            upsert_entry(PREDICTIONS_CSV, new_pred, files_and_headers[PREDICTIONS_CSV], 'fixture_id')
+            added_count += 1
+    
+    if added_count > 0:
+        print(f"  [Sync] Added {added_count} missing entries from schedules to predictions.")
 
 
 def _sync_outcome_to_site_registry(fixture_id: str, match_data: Dict):
@@ -216,119 +308,176 @@ def _sync_outcome_to_site_registry(fixture_id: str, match_data: Dict):
         print(f"    [Sync Error] Failed to sync outcome: {e}")
 
 
-async def process_review_task(match: Dict, browser, semaphore: asyncio.Semaphore) -> None:
+async def process_enrichment_task(match: Dict, browser, semaphore: asyncio.Semaphore) -> None:
     """
-    Worker function for a single match review.
-    Includes a retry mechanism with progressive delays for transient errors.
+    Task to enrich a schedule entry with full match details.
     """
     async with semaphore:
-        # Import here to avoid circular imports
         from playwright.async_api import async_playwright
         from Core.Browser.site_helpers import fs_universal_popup_dismissal
         from Core.Utils.utils import log_error_state
         from Core.Intelligence.intelligence import get_selector_auto, get_selector
 
         context = await browser.new_context(viewport={"width": 1280, "height": 720})
-        # Block images and fonts for speed
         await context.route("**/*.{png,jpg,jpeg,gif,webp,svg,woff,woff2}", lambda route: route.abort())
         page = await context.new_page()
 
-        match_id = match.get('fixture_id')
-        home_team = match.get('home_team', 'Unknown')
-        away_team = match.get('away_team', 'Unknown')
-
-        # --- OPTIMIZATION: Handle DB-sourced scores directly ---
-        if match.get('source') == 'db':
-            print(f"  [DB Check] {home_team} vs {away_team} -> Score: {match['actual_score']}")
-            save_single_outcome(match, 'reviewed')
-            await context.close()
-            return
-
-        # --- Web Scraping Fallback with Retry Logic ---
         url = match.get('match_link')
         if not url:
-            
-            save_single_outcome({'fixture_id': match_id}, 'no_url')
             await context.close()
             return
 
         if not url.startswith('http'):
             url = f"https://www.flashscore.com{url}"
 
-        # Progressive retry delays: 5s, 10s, 15s
-        retry_delays = [5, 10, 15]
-        max_retries = len(retry_delays)
-
-        for attempt in range(max_retries):
-            try:
-                print(f"  [Score Check] {home_team} vs {away_team} (Attempt {attempt + 1})")
-                await page.goto(url, wait_until="domcontentloaded", timeout=180000) 
-                await fs_universal_popup_dismissal(page)
-
-                # Extract league URL and update region_league.csv if applicable
-                league_url = await get_league_url(page)
-                region_league = match.get('region_league')
-                if league_url and region_league:
-                    update_region_league_url(region_league, league_url)
-
-                final_score = await get_final_score(page)
-
-                if final_score == "NOT_FINISHED":
-                    print(f"    [Skip]  {home_team} vs {away_team} Match not finished yet.")
-                    # Don't mark as pending, just skip for now - will be retried in future runs
-                    save_single_outcome({'fixture_id': match_id}, 'pending')
-                    await context.close()
-                    return
-                elif final_score == "Match_POSTPONED":
-                    print(f"    [Skip]  {home_team} vs {away_team} Match postponed.")
-                    save_single_outcome({'fixture_id': match_id}, 'match_postponed')
-                    await context.close()
-                    return
-                elif final_score == "Error":
-                    print(f"    [Fail] {home_team} vs {away_team} Could not extract score from page.")
-                    # Continue to retry
-                    if attempt < max_retries - 1:
-                        delay = retry_delays[attempt]
-                        print(f"      Retrying in {delay} seconds...")
-                        await asyncio.sleep(delay)
-                        continue
-                    else:
-                        # Max retries reached, will handle after loop
-                        break
-                else:
-                    print(f"    [Success] {home_team} vs {away_team} -> Score: {final_score}")
-                    match['actual_score'] = final_score
-                    save_single_outcome(match, 'reviewed')
-                    await context.close()
-                    return
-
-            except Exception as e:
-                HealthMonitor.log_error("review_task_error", f"Review failed for {match_id}: {e}", "medium")
-                print(f"    [Attempt {attempt + 1} Failed] Error for {match_id}: {e}")
-                if attempt < max_retries - 1:
-                    delay = retry_delays[attempt]
-                    print(f"      Retrying in {delay} seconds...")
-                    await asyncio.sleep(delay)
-                else:
-                    # Max retries reached, will handle after loop
-                    break
-
-        # After all retries exhausted, check final status
         try:
-            ERROR_HEADER = page.get_by_text("Error:", exact=True)
-            ERROR_MESSAGE = page.get_by_text("The requested page can't be displayed. Please try again later.")
-            is_error_visible = (await ERROR_HEADER.is_visible()) and (await ERROR_MESSAGE.is_visible())
-            if is_error_visible:
-                print(f"    [Match Canceled] {home_team} vs {away_team}")
-                save_single_outcome({'fixture_id': match_id}, 'match_canceled')
-            else:
-                print(f"    [Review Failed] {home_team} vs {away_team}")
-                save_single_outcome({'fixture_id': match_id}, 'review_failed')
-        except Exception as e:
-            print(f"    [Review Failed] {home_team} vs {away_team}")
-            save_single_outcome({'fixture_id': match_id}, 'review_failed')
+            print(f"  [Enriching] {match.get('home_team')} vs {match.get('away_team')}")
+            await page.goto(url, wait_until="domcontentloaded", timeout=60000)
+            await fs_universal_popup_dismissal(page)
 
-        await context.close()
+            # --- 1. Extract Detailed Status & Score ---
+            status_text = "Scheduled"
+            try:
+                status_sel = "div.fixedHeaderDuel__detailStatus"
+                status_text = await page.locator(status_sel).first.inner_text(timeout=5000)
+            except:
+                pass
+            
+            final_score = await get_final_score(page)
+            
+            # --- 2. Extract Team Info ---
+            home_team_link = page.locator("a.duelParticipant__home a.participant__participantName").first
+            away_team_link = page.locator("a.duelParticipant__away a.participant__participantName").first
+            
+            try:
+                home_url = await home_team_link.get_attribute('href', timeout=5000)
+                home_name = await home_team_link.inner_text()
+                home_id = home_url.split('/')[-2] if home_url else ''
+                
+                away_url = await away_team_link.get_attribute('href', timeout=5000)
+                away_name = await away_team_link.inner_text()
+                away_id = away_url.split('/')[-2] if away_url else ''
+                
+                if home_id:
+                    save_team_entry({
+                        'team_id': home_id,
+                        'team_name': home_name,
+                        'team_url': home_url,
+                        'rl_ids': match.get('region_league')
+                    })
+                if away_id:
+                    save_team_entry({
+                        'team_id': away_id,
+                        'team_name': away_name,
+                        'team_url': away_url,
+                        'rl_ids': match.get('region_league')
+                    })
+                
+                match['home_team_id'] = home_id
+                match['away_team_id'] = away_id
+            except:
+                pass
+
+            # --- 3. Extract League Info ---
+            try:
+                # Breadcrumbs: Flashscore.com / Football / ENGLAND / Premier League
+                breadcrumb_sel = "span.breadcrumb__item"
+                items = await page.locator(breadcrumb_sel).all_inner_texts()
+                if len(items) >= 4:
+                    region = items[2].strip()
+                    league = items[3].strip()
+                    
+                    league_link = page.locator("span.breadcrumb__item >> a").last
+                    league_url = await league_link.get_attribute('href')
+                    
+                    save_region_league_entry({
+                        'region': region,
+                        'league': league,
+                        'league_url': league_url
+                    })
+                    match['region_league'] = f"{region}: {league}"
+            except:
+                pass
+
+            # --- 4. Smart Date/Time Detection ---
+            try:
+                dt_sel = "div.duelParticipant__startTime"
+                dt_text = await page.locator(dt_sel).inner_text()
+                std_date, std_time = smart_parse_datetime(dt_text)
+                if std_date:
+                    match['date'] = std_date
+                    match['match_time'] = std_time
+            except:
+                pass
+
+            # Finalize status mapping
+            if "finish" in status_text.lower() or "ft" in status_text.lower():
+                match['status'] = 'FINISHED'
+                if final_score and '-' in final_score:
+                    parts = final_score.split('-')
+                    match['home_score'] = parts[0]
+                    match['away_score'] = parts[1]
+            elif "postp" in status_text.lower():
+                match['status'] = 'POSTPONED'
+            elif "canc" in status_text.lower():
+                match['status'] = 'CANCELED'
+            elif "live" in status_text.lower():
+                match['status'] = 'LIVE'
+            else:
+                match['status'] = 'SCHEDULED'
+
+            # Upsert back to schedules.csv
+            upsert_entry(SCHEDULES_CSV, match, files_and_headers[SCHEDULES_CSV], 'fixture_id')
+            print(f"    [Updated] {match.get('fixture_id')}: {match['status']} {final_score or ''}")
+
+        except Exception as e:
+            print(f"    [Error] Enrichment failed for {match.get('fixture_id')}: {e}")
+        finally:
+            await context.close()
+
+
+async def process_review_task(match: Dict, browser, semaphore: asyncio.Semaphore) -> None:
+    """
+    Task to review a single past prediction.
+    """
+    async with semaphore:
+        from playwright.async_api import async_playwright
+        from Core.Browser.site_helpers import fs_universal_popup_dismissal
+
+        context = await browser.new_context(viewport={"width": 1280, "height": 720})
+        await context.route("**/*.{png,jpg,jpeg,gif,webp,svg,woff,woff2}", lambda route: route.abort())
+        page = await context.new_page()
+
+        url = match.get('match_link')
+        if not url:
+            save_single_outcome(match, 'review_failed')
+            await context.close()
+            return
+
+        if not url.startswith('http'):
+            url = f"https://www.flashscore.com{url}"
+
+        try:
+            print(f"  [Reviewing] {match.get('home_team')} vs {match.get('away_team')}")
+            await page.goto(url, wait_until="domcontentloaded", timeout=60000)
+            await fs_universal_popup_dismissal(page)
+
+            final_score = await get_final_score(page)
+            
+            if final_score == "Error":
+                save_single_outcome(match, 'review_failed')
+            elif final_score == "Match_POSTPONED":
+                save_single_outcome(match, 'match_postponed')
+            elif final_score != "NOT_FINISHED":
+                match['actual_score'] = final_score
+                save_single_outcome(match, 'reviewed')
+                print(f"    [Result] {match.get('home_team')} {final_score} {match.get('away_team')}")
+
+        except Exception as e:
+            print(f"    [Error] Review failed: {e}")
+            save_single_outcome(match, 'review_failed')
+        finally:
+            await context.close()
 
 
 async def get_league_url(page):
@@ -423,10 +572,15 @@ def update_region_league_url(region_league: str, url: str):
 async def run_review_process(playwright: Playwright):
     """Main review process orchestration"""
     print("--- LEO V2.6: Outcome Review Engine (Concurrent) ---")
+    
+    # 1. Review Predictions (Calculates model accuracy)
     matches_to_review = get_predictions_to_review()
+    
+    # 2. Enrich Schedules (Chapter 0 upgrade)
+    schedules_to_update = get_schedules_to_update()
 
-    if not matches_to_review:
-        print("--- No new past matches to review. ---")
+    if not matches_to_review and not schedules_to_update:
+        print("--- Nothing to review or enrich. ---")
         return
 
     browser = await playwright.chromium.launch(
@@ -438,22 +592,32 @@ async def run_review_process(playwright: Playwright):
         sem = asyncio.Semaphore(BATCH_SIZE)
         tasks = []
 
-        print(f"[Processing] Starting batch review for {len(matches_to_review)} matches...")
+        # Queue enrichment tasks
+        if schedules_to_update:
+            print(f"[Processing] Starting batch enrichment for {len(schedules_to_update)} schedules...")
+            for s in schedules_to_update:
+                tasks.append(asyncio.create_task(process_enrichment_task(s, browser, sem)))
 
-        for match in matches_to_review:
-            task = asyncio.create_task(process_review_task(match, browser, sem))
-            tasks.append(task)
+        # Queue review tasks
+        if matches_to_review:
+            print(f"[Processing] Starting batch review for {len(matches_to_review)} matches...")
+            for match in matches_to_review:
+                tasks.append(asyncio.create_task(process_review_task(match, browser, sem)))
 
         await asyncio.gather(*tasks)
 
+        # 3. Final Sync
+        sync_schedules_to_predictions()
+
         # Update learning weights based on reviewed outcomes
-        try:
-            from Core.Intelligence.model import update_learning_weights
-            updated_weights = update_learning_weights()
-            print(f"--- Learning Engine: Updated {len(updated_weights)-1} rule weights ---")
-        except Exception as e:
-            HealthMonitor.log_error("learning_update_error", f"Failed to update learning weights: {e}", "medium")
-            print(f"--- Learning Engine Error: {e} ---")
+        if matches_to_review:
+            try:
+                from Core.Intelligence.model import update_learning_weights
+                updated_weights = update_learning_weights()
+                print(f"--- Learning Engine: Updated {len(updated_weights)-1} rule weights ---")
+            except Exception as e:
+                HealthMonitor.log_error("learning_update_error", f"Failed to update learning weights: {e}", "medium")
+                print(f"--- Learning Engine Error: {e} ---")
             
     finally:
         await browser.close()

@@ -4,7 +4,7 @@
 
 """
 Flashscore Orchestrator
-Pure coordinator of Phase 1 Analysis.
+Pure coordinator of Chapter 1A and 1B logic.
 """
 
 import asyncio
@@ -34,7 +34,7 @@ async def run_flashscore_analysis(playwright: Playwright):
     Main function to handle Flashscore data extraction and analysis.
     Coordinates browser launch, navigation, schedule extraction, and batch processing.
     """
-    print("\n--- Running Flashscore Analysis ---")
+    print("\n--- Running Chapter 1A/1B: Data Extraction & Analysis ---")
 
     browser = await playwright.chromium.launch(
         headless=True,
@@ -72,8 +72,7 @@ async def run_flashscore_analysis(playwright: Playwright):
         await fs_universal_popup_dismissal(page, "fs_home_page")
 
         last_processed_info = get_last_processed_info()
-
-        # --- Daily Loop ---
+        print(f"  [Chapter 1A] Starting analysis loop for 7 days...")
         for day_offset in range(7):
             target_date = dt.now(NIGERIA_TZ) + timedelta(days=day_offset)
             target_full = target_date.strftime("%d.%m.%Y")
@@ -161,7 +160,7 @@ async def run_flashscore_analysis(playwright: Playwright):
         if 'browser' in locals():
              await browser.close()
              
-    print(f"\n--- Flashscore Analysis Complete: {total_cycle_predictions} new predictions found. ---")
+    print(f"\n--- Data Extraction & Analysis Complete: {total_cycle_predictions} new predictions found. ---")
     
     # Trigger Recommendations
     print("\n   [Auto] Generating betting recommendations for today...")

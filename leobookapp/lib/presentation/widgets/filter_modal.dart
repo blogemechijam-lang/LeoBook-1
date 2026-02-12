@@ -1,6 +1,6 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
-import '../../core/constants/app_colors.dart';
+import 'package:leobookapp/core/constants/app_colors.dart';
 
 class FilterModal extends StatefulWidget {
   final List<String> initialLeagues;

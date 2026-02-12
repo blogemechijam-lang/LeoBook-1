@@ -1,7 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'search_state.dart';
-import '../../data/models/match_model.dart';
-import '../../data/models/recommendation_model.dart';
+import 'package:leobookapp/data/models/match_model.dart';
+import 'package:leobookapp/data/models/recommendation_model.dart';
 
 class SearchCubit extends Cubit<SearchState> {
   final List<MatchModel> allMatches;

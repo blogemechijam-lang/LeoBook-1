@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
-import '../../core/constants/app_colors.dart';
-import '../../data/models/recommendation_model.dart';
+import 'package:provider/provider.dart';
+import 'package:leobookapp/core/constants/app_colors.dart';
+import 'package:leobookapp/data/models/recommendation_model.dart';
+import 'package:leobookapp/data/repositories/data_repository.dart';
+import '../screens/team_screen.dart';
+import '../screens/league_screen.dart';
 
 class RecommendationCard extends StatelessWidget {
   final RecommendationModel recommendation;
@@ -58,13 +62,26 @@ class RecommendationCard extends StatelessWidget {
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          recommendation.league.toUpperCase(),
-                          style: TextStyle(
-                            color: AppColors.textGrey.withValues(alpha: 0.6),
-                            fontSize: 9,
-                            fontWeight: FontWeight.w900,
-                            letterSpacing: 0.8,
+                        GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => LeagueScreen(
+                                  leagueId: recommendation.league,
+                                  leagueName: recommendation.league,
+                                ),
+                              ),
+                            );
+                          },
+                          child: Text(
+                            recommendation.league.toUpperCase(),
+                            style: TextStyle(
+                              color: AppColors.textGrey.withValues(alpha: 0.6),
+                              fontSize: 9,
+                              fontWeight: FontWeight.w900,
+                              letterSpacing: 0.8,
+                            ),
                           ),
                         ),
                         if (isLive)
@@ -76,7 +93,8 @@ class RecommendationCard extends StatelessWidget {
                           Padding(
                             padding: const EdgeInsets.only(top: 4),
                             child: Text(
-                              "TODAY, ${recommendation.time}".toUpperCase(),
+                              "${recommendation.date}, ${recommendation.time}"
+                                  .toUpperCase(),
                               style: const TextStyle(
                                 color: AppColors.primary,
                                 fontSize: 9,
@@ -103,45 +121,60 @@ class RecommendationCard extends StatelessWidget {
                   children: [
                     // Home Team
                     Expanded(
-                      child: Column(
-                        children: [
-                          Container(
-                            width: 52,
-                            height: 52,
-                            decoration: BoxDecoration(
-                              color: isDark
-                                  ? Colors.white.withValues(alpha: 0.03)
-                                  : Colors.grey[50],
-                              shape: BoxShape.circle,
-                              border: Border.all(
-                                color: isDark
-                                    ? Colors.white10
-                                    : Colors.black.withValues(alpha: 0.05),
+                      child: GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => TeamScreen(
+                                teamName: recommendation.homeTeam,
+                                repository: context.read<DataRepository>(),
                               ),
                             ),
-                            child: Center(
-                              child: Text(
-                                recommendation.homeShort,
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.w900,
-                                  fontSize: 13,
+                          );
+                        },
+                        child: Column(
+                          children: [
+                            Container(
+                              width: 52,
+                              height: 52,
+                              decoration: BoxDecoration(
+                                color: isDark
+                                    ? Colors.white.withValues(alpha: 0.03)
+                                    : Colors.grey[50],
+                                shape: BoxShape.circle,
+                                border: Border.all(
+                                  color: isDark
+                                      ? Colors.white10
+                                      : Colors.black.withValues(alpha: 0.05),
+                                ),
+                              ),
+                              child: Center(
+                                child: Text(
+                                  recommendation.homeShort,
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.w900,
+                                    fontSize: 13,
+                                  ),
                                 ),
                               ),
                             ),
-                          ),
-                          const SizedBox(height: 8),
-                          Text(
-                            recommendation.homeTeam,
-                            textAlign: TextAlign.center,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w800,
-                              color: isDark ? Colors.white : AppColors.textDark,
+                            const SizedBox(height: 8),
+                            Text(
+                              recommendation.homeTeam,
+                              textAlign: TextAlign.center,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w800,
+                                color: isDark
+                                    ? Colors.white
+                                    : AppColors.textDark,
+                              ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ),
 
@@ -161,45 +194,60 @@ class RecommendationCard extends StatelessWidget {
 
                     // Away Team
                     Expanded(
-                      child: Column(
-                        children: [
-                          Container(
-                            width: 52,
-                            height: 52,
-                            decoration: BoxDecoration(
-                              color: isDark
-                                  ? Colors.white.withValues(alpha: 0.03)
-                                  : Colors.grey[50],
-                              shape: BoxShape.circle,
-                              border: Border.all(
-                                color: isDark
-                                    ? Colors.white10
-                                    : Colors.black.withValues(alpha: 0.05),
+                      child: GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => TeamScreen(
+                                teamName: recommendation.awayTeam,
+                                repository: context.read<DataRepository>(),
                               ),
                             ),
-                            child: Center(
-                              child: Text(
-                                recommendation.awayShort,
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.w900,
-                                  fontSize: 13,
+                          );
+                        },
+                        child: Column(
+                          children: [
+                            Container(
+                              width: 52,
+                              height: 52,
+                              decoration: BoxDecoration(
+                                color: isDark
+                                    ? Colors.white.withValues(alpha: 0.03)
+                                    : Colors.grey[50],
+                                shape: BoxShape.circle,
+                                border: Border.all(
+                                  color: isDark
+                                      ? Colors.white10
+                                      : Colors.black.withValues(alpha: 0.05),
+                                ),
+                              ),
+                              child: Center(
+                                child: Text(
+                                  recommendation.awayShort,
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.w900,
+                                    fontSize: 13,
+                                  ),
                                 ),
                               ),
                             ),
-                          ),
-                          const SizedBox(height: 8),
-                          Text(
-                            recommendation.awayTeam,
-                            textAlign: TextAlign.center,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w800,
-                              color: isDark ? Colors.white : AppColors.textDark,
+                            const SizedBox(height: 8),
+                            Text(
+                              recommendation.awayTeam,
+                              textAlign: TextAlign.center,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w800,
+                                color: isDark
+                                    ? Colors.white
+                                    : AppColors.textDark,
+                              ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ),
                   ],
@@ -222,7 +270,7 @@ class RecommendationCard extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            "PREDICTION",
+                            "RELIABILITY",
                             style: TextStyle(
                               color: AppColors.textGrey.withValues(alpha: 0.6),
                               fontSize: 9,
@@ -232,7 +280,7 @@ class RecommendationCard extends StatelessWidget {
                           ),
                           const SizedBox(height: 4),
                           Text(
-                            recommendation.prediction,
+                            "${(recommendation.reliabilityScore * 10).toStringAsFixed(0)}%",
                             style: TextStyle(
                               color: isDark ? Colors.white : AppColors.textDark,
                               fontWeight: FontWeight.w900,
@@ -242,9 +290,45 @@ class RecommendationCard extends StatelessWidget {
                         ],
                       ),
                     ),
+                    const SizedBox(width: 8),
                     Container(
                       padding: const EdgeInsets.symmetric(
-                        horizontal: 20,
+                        horizontal: 16,
+                        vertical: 10,
+                      ),
+                      decoration: BoxDecoration(
+                        color: isDark ? Colors.white10 : Colors.grey[100],
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: isDark ? Colors.white10 : Colors.black12,
+                        ),
+                      ),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Text(
+                            "ACCURACY",
+                            style: TextStyle(
+                              color: AppColors.textGrey,
+                              fontSize: 8,
+                              fontWeight: FontWeight.w900,
+                            ),
+                          ),
+                          Text(
+                            recommendation.overallAcc,
+                            style: TextStyle(
+                              color: isDark ? Colors.white : AppColors.textDark,
+                              fontSize: 12,
+                              fontWeight: FontWeight.w900,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
                         vertical: 12,
                       ),
                       decoration: BoxDecoration(
@@ -271,7 +355,7 @@ class RecommendationCard extends StatelessWidget {
                           ),
                           const SizedBox(width: 8),
                           Text(
-                            recommendation.score.toStringAsFixed(2),
+                            recommendation.marketOdds.toStringAsFixed(2),
                             style: const TextStyle(
                               color: Colors.white,
                               fontSize: 16,

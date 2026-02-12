@@ -1,0 +1,8 @@
+{
+    "name": "MonitorTest",
+    "description": "Verification of monitor script",
+    "xg_advantage": 5.0,
+    "xg_draw": 1.0,
+    "h2h_home_win": 5.0,
+    "h2h_lookback_days": 365
+}

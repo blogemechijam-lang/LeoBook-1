@@ -40,7 +40,7 @@ async def cmd_status(update: Update, context):
     msg = (
         f"📊 **System Status**\n"
         f"Cycle: #{state.get('cycle_count', 0)}\n"
-        f"Phase: {state.get('current_phase', 'N/A')}\n"
+        f"Chapter: {state.get('current_chapter', 'N/A')}\n"
         f"Last Action: {state.get('last_action', 'N/A')}\n"
         f"Booked this cycle: {state.get('booked_this_cycle', 0)}\n"
         f"Failed this cycle: {state.get('failed_this_cycle', 0)}"
@@ -52,7 +52,7 @@ async def cmd_help(update: Update, context):
     msg = (
         "❓ **Available Commands:**\n"
         "/balance - Check latest account balance\n"
-        "/status - Current operation phase and cycle stats\n"
+        "/status - Current operation chapter and cycle stats\n"
         "/summary - Brief recap of the last 24h audit\n"
         "/help - Show this menu\n\n"
         "Reply **YES** or **NO** to withdrawal proposals."

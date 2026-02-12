@@ -8,9 +8,16 @@
 - [x] **Search System Implementation (Stitch v2)** <!-- id: 79 -->
   - [x] Implement `SearchScreen` with v2 search bar and cancel button <!-- id: 81 -->
   - [x] Add "Recent Searches" and "Popular Teams" sections <!-- id: 82 -->
-  - [x] Implement categorized search results (Leagues vs Matches) <!-- id: 83 -->
-  - [x] Integrate search logic with `SearchCubit` <!-- id: 84 -->
-  - [x] Verify search flow UX against v2 reference <!-- id: 85 -->
+
+## Phase 9: UI Bug Fixes & Stability (Done)
+- [x] Fix 2-pixel vertical overflow in `LeagueScreen` AppBar <!-- id: 1401 -->
+- [x] Fix undefined 'context' lint errors in `MatchCard` <!-- id: 1402 -->
+- [x] Sync `toolbarHeight` and `PreferredSize` for robust header layout <!-- id: 1403 -->
+
+## Phase 10: Web UI & Network Stability
+- [x] Fix 7-pixel vertical overflow in `HeaderSection` (Date Strip) <!-- id: 1501 -->
+- [ ] Investigate and resolve `Failed to fetch` errors in Web renderer <!-- id: 1502 -->
+- [ ] Optimize font loading strategies for canvaskit/html renderers <!-- id: 1503 -->
 
 - [x] **Startup & Initialization**
     - [x] Update `Leo.py` with strict phase loop (completed).

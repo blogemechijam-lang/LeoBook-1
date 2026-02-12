@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../../logic/cubit/home_cubit.dart';
-import '../../../logic/cubit/search_cubit.dart';
+import 'package:leobookapp/logic/cubit/home_cubit.dart';
+import 'package:leobookapp/logic/cubit/search_cubit.dart';
 import '../screens/search_screen.dart';
 import 'package:intl/intl.dart';
-import '../../core/constants/app_colors.dart';
+import 'package:leobookapp/core/constants/app_colors.dart';
 
-class HeaderSection extends StatelessWidget {
+class HeaderSection extends StatefulWidget {
   final DateTime selectedDate;
   final String selectedSport;
+  final List<String> availableSports;
   final Function(DateTime) onDateChanged;
   final Function(String) onSportChanged;
 
@@ -16,138 +17,174 @@ class HeaderSection extends StatelessWidget {
     super.key,
     required this.selectedDate,
     required this.selectedSport,
+    required this.availableSports,
     required this.onDateChanged,
     required this.onSportChanged,
   });
+
+  @override
+  State<HeaderSection> createState() => _HeaderSectionState();
+}
+
+class _HeaderSectionState extends State<HeaderSection> {
+  late ScrollController _scrollController;
+  final double itemWidth = 83.0; // 75px + 8px horizontal margin total
+
+  @override
+  void initState() {
+    super.initState();
+    // Calculate initial offset to center 'Today' (index 3)
+    // Formula: (index * itemWidth) - (viewportWidth / 2) + (itemWidth / 2)
+    // We'll estimate viewport width as 428 for now, but better to do it in build
+    _scrollController = ScrollController();
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     final now = DateTime.now();
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        // Top Bar
-        Container(
-          padding: const EdgeInsets.fromLTRB(16, 8, 8, 8),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Row(
+    // Use LayoutBuilder to get exact width for centering
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final viewportWidth = constraints.maxWidth;
+        final initialOffset =
+            (3 * itemWidth) - (viewportWidth / 2) + (itemWidth / 2);
+
+        // We only set the offset if the controller is newly created
+        if (!_scrollController.hasClients) {
+          Future.microtask(() {
+            if (_scrollController.hasClients) {
+              _scrollController.jumpTo(initialOffset);
+            }
+          });
+        }
+
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Top Bar
+            Container(
+              padding: const EdgeInsets.fromLTRB(16, 8, 8, 8),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Icon(Icons.sports_soccer, color: AppColors.primary, size: 30),
-                  const SizedBox(width: 10),
-                  Text(
-                    "LeoBook",
-                    style: TextStyle(
-                      fontSize: 22,
-                      fontWeight: FontWeight.w800,
-                      color: isDark ? Colors.white : AppColors.textDark,
-                      letterSpacing: -0.5,
-                    ),
+                  Row(
+                    children: [
+                      Icon(
+                        Icons.sports_soccer,
+                        color: AppColors.primary,
+                        size: 30,
+                      ),
+                      const SizedBox(width: 10),
+                      Text(
+                        "LeoBook",
+                        style: TextStyle(
+                          fontSize: 22,
+                          fontWeight: FontWeight.w800,
+                          color: isDark ? Colors.white : AppColors.textDark,
+                          letterSpacing: -0.5,
+                        ),
+                      ),
+                    ],
                   ),
-                ],
-              ),
-              Row(
-                children: [
-                  IconButton(
-                    icon: Icon(
-                      Icons.search,
-                      color: AppColors.textGrey,
-                      size: 24,
-                    ),
-                    onPressed: () {
-                      final homeState = context.read<HomeCubit>().state;
-                      if (homeState is HomeLoaded) {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => BlocProvider(
-                              create: (context) => SearchCubit(
-                                allMatches: homeState.allMatches,
-                                allRecommendations:
-                                    homeState.allRecommendations,
+                  Row(
+                    children: [
+                      IconButton(
+                        icon: Icon(
+                          Icons.search,
+                          color: AppColors.textGrey,
+                          size: 24,
+                        ),
+                        onPressed: () {
+                          final homeState = context.read<HomeCubit>().state;
+                          if (homeState is HomeLoaded) {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => BlocProvider(
+                                  create: (context) => SearchCubit(
+                                    allMatches: homeState.allMatches,
+                                    allRecommendations:
+                                        homeState.allRecommendations,
+                                  ),
+                                  child: const SearchScreen(),
+                                ),
                               ),
-                              child: const SearchScreen(),
-                            ),
-                          ),
-                        );
-                      }
-                    },
-                  ),
-                  IconButton(
-                    icon: Icon(Icons.menu, color: AppColors.textGrey, size: 24),
-                    onPressed: () {},
+                            );
+                          }
+                        },
+                      ),
+                    ],
                   ),
                 ],
               ),
-            ],
-          ),
-        ),
-
-        // Navigation Tabs (Active Sport)
-        SizedBox(
-          height: 48,
-          child: SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: Row(
-              children: [
-                _buildNavTab(context, "All", selectedSport == 'ALL'),
-                _buildNavTab(context, "Football", selectedSport == 'FOOTBALL'),
-                _buildNavTab(
-                  context,
-                  "Basketball",
-                  selectedSport == 'BASKETBALL',
-                ),
-                _buildNavTab(context, "Tennis", selectedSport == 'TENNIS'),
-                _buildNavTab(context, "Esports", selectedSport == 'ESPORTS'),
-              ],
             ),
-          ),
-        ),
 
-        Divider(
-          height: 1,
-          color: isDark
-              ? AppColors.cardDark
-              : Colors.grey.withValues(alpha: 0.2),
-        ),
+            // Navigation Tabs (Active Sport)
+            SizedBox(
+              height: 48,
+              child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: Row(
+                  children: widget.availableSports.map((sport) {
+                    return _buildNavTab(
+                      sport[0].toUpperCase() + sport.substring(1).toLowerCase(),
+                      widget.selectedSport == sport,
+                    );
+                  }).toList(),
+                ),
+              ),
+            ),
 
-        // Date Strip
-        Container(
-          height: 85, // Increased from 75 to prevent overflow
-          margin: const EdgeInsets.only(top: 4),
-          child: ListView.builder(
-            scrollDirection: Axis.horizontal,
-            itemCount: 7,
-            padding: const EdgeInsets.symmetric(horizontal: 12),
-            itemBuilder: (context, index) {
-              final dayOffset = index - 3;
-              final date = DateTime(
-                now.year,
-                now.month,
-                now.day,
-              ).add(Duration(days: dayOffset));
+            Divider(
+              height: 1,
+              color: isDark ? AppColors.cardDark : Colors.grey.withAlpha(50),
+            ),
 
-              final isSelected =
-                  date.year == selectedDate.year &&
-                  date.month == selectedDate.month &&
-                  date.day == selectedDate.day;
+            // Date Strip - Centered on Today
+            Container(
+              height: 85,
+              margin: const EdgeInsets.only(top: 4),
+              child: ListView.builder(
+                controller: _scrollController,
+                scrollDirection: Axis.horizontal,
+                itemCount: 7,
+                padding: const EdgeInsets.symmetric(horizontal: 12),
+                itemBuilder: (context, index) {
+                  final dayOffset = index - 3;
+                  final date = DateTime(
+                    now.year,
+                    now.month,
+                    now.day,
+                  ).add(Duration(days: dayOffset));
 
-              return _buildDateItem(context, date, isSelected);
-            },
-          ),
-        ),
-        const SizedBox(height: 12),
-      ],
+                  final isSelected =
+                      date.year == widget.selectedDate.year &&
+                      date.month == widget.selectedDate.month &&
+                      date.day == widget.selectedDate.day;
+
+                  return _buildDateItem(date, isSelected);
+                },
+              ),
+            ),
+            const SizedBox(height: 12),
+          ],
+        );
+      },
     );
   }
 
-  Widget _buildNavTab(BuildContext context, String title, bool isSelected) {
+  Widget _buildNavTab(String title, bool isSelected) {
     return GestureDetector(
-      onTap: () => onSportChanged(title.toUpperCase()),
+      onTap: () => widget.onSportChanged(title.toUpperCase()),
       child: Container(
         margin: const EdgeInsets.only(right: 28),
         alignment: Alignment.center,
@@ -171,7 +208,7 @@ class HeaderSection extends StatelessWidget {
     );
   }
 
-  Widget _buildDateItem(BuildContext context, DateTime date, bool isSelected) {
+  Widget _buildDateItem(DateTime date, bool isSelected) {
     final now = DateTime.now();
     final isToday =
         date.year == now.year && date.month == now.month && date.day == now.day;
@@ -181,11 +218,11 @@ class HeaderSection extends StatelessWidget {
     final dayNum = DateFormat('d MMM').format(date).toUpperCase();
 
     return GestureDetector(
-      onTap: () => onDateChanged(date),
+      onTap: () => widget.onDateChanged(date),
       child: Container(
         width: 75,
-        margin: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
-        padding: const EdgeInsets.symmetric(vertical: 8),
+        margin: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
+        padding: const EdgeInsets.symmetric(vertical: 4),
         decoration: BoxDecoration(
           color: isSelected
               ? AppColors.primary.withValues(alpha: 0.1)

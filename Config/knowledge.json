@@ -17,6 +17,16 @@
         "tab_finished": ".filters__tab[data-analytics-alias=\"finished\"]"
     },
     "fs_match_page": {
+        "region_flag_img": "ol.wcl-breadcrumbList_lC9sI img[data-testid^='wcl-flag-']",
+        "region_name": "ol.wcl-breadcrumbList_lC9sI li:nth-child(2) a span",
+        "region_url": "ol.wcl-breadcrumbList_lC9sI li:nth-child(2) a",
+        "league_url": "ol.wcl-breadcrumbList_lC9sI li:nth-child(3) a",
+        "home_crest": ".duelParticipant__home .participant__image",
+        "home_name": ".duelParticipant__home .participant__participantName a",
+        "home_url": ".duelParticipant__home .participant__participantLink",
+        "away_crest": ".duelParticipant__away .participant__image",
+        "away_name": ".duelParticipant__away .participant__participantName a",
+        "away_url": ".duelParticipant__away .participant__participantLink",
         "match_header": ".duelParticipant",
         "home_team": ".duelParticipant__home .participant__participantName",
         "away_team": ".duelParticipant__away .participant__participantName",

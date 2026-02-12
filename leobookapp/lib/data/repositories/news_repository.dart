@@ -1,36 +1,23 @@
-
-import '../models/news_model.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:leobookapp/data/models/news_model.dart';
 
 class NewsRepository {
+  final SupabaseClient _supabase = Supabase.instance.client;
+
   Future<List<NewsModel>> fetchNews() async {
-    // Mock Data for now as no backend source exists yet
-    await Future.delayed(Duration(milliseconds: 800)); // Simulate latency
-    
-    return [
-      NewsModel(
-        id: '1',
-        title: "Mbappe Scores Hat-trick in Real Madrid Thriller",
-        imageUrl: "https://via.placeholder.com/150", // Placeholder
-        source: "Marca",
-        timeAgo: "1h ago",
-        url: "https://www.marca.com",
-      ),
-      NewsModel(
-        id: '2',
-        title: "Premier League Title Race Heats Up: Arsenal vs City",
-        imageUrl: "https://via.placeholder.com/150",
-        source: "Sky Sports",
-        timeAgo: "3h ago",
-        url: "https://www.skysports.com",
-      ),
-      NewsModel(
-        id: '3',
-        title: "Transfer Rumors: Neymar to return to Santos?",
-        imageUrl: "https://via.placeholder.com/150",
-        source: "Goal.com",
-        timeAgo: "5h ago",
-        url: "https://www.goal.com",
-      ),
-    ];
+    try {
+      final response = await _supabase
+          .from('news')
+          .select()
+          .order('published_at', ascending: false)
+          .limit(10);
+
+      return (response as List)
+          .map((json) => NewsModel.fromJson(json))
+          .toList();
+    } catch (e) {
+      // Fallback or empty list on error
+      return [];
+    }
   }
 }

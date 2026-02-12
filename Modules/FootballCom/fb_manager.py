@@ -22,10 +22,10 @@ from Core.System.lifecycle import log_state
 
 async def run_football_com_booking(playwright: Playwright):
     """
-    Main Phase 2 Orchestrator.
+    Main Chapter 1C/2A Orchestrator.
     Manages the session retry loop and calls modular components.
     """
-    print("\n--- Running Football.com Booking (Phase 2) ---")
+    print("\n--- Running Football.com Odds & Booking (Chapter 1C/2A) ---")
     
     predictions_by_date = await get_pending_predictions_by_date()
     if not predictions_by_date:
@@ -49,25 +49,23 @@ async def run_football_com_booking(playwright: Playwright):
             
             current_balance = await extract_balance(page)
             print(f"  [Balance] Current: ₦{current_balance:.2f}")
-            log_state("Phase 2", "Session Validated", f"Balance: ₦{current_balance:.2f}")
+            log_state(chapter="Chapter 1C", action="Processing matches")
 
             for target_date, day_preds in sorted(predictions_by_date.items()):
                 print(f"\n--- Date: {target_date} ({len(day_preds)} matches) ---")
                 
-                # 1. URL Resolution (Registry Check + Harvest Fallback)
+                # 1. Chapter 1C: Odds Discovery & URL Resolution
                 matched_urls = await resolve_urls(page, target_date, day_preds)
                 if not matched_urls:
                     continue
 
-                # 2. Phase 2a: Harvest (Code Discovery)
+                # 2. Chapter 1C: Odds Selection (Harvest)
                 # Visits each match, extracts code, and clears slip.
-                print(f"  [Phase 2a] Starting code harvesting for {target_date}...")
+                print(f"  [Chapter 1C] Starting odds discovery for {target_date}...")
                 from Modules.FootballCom.booker.booking_code import harvest_booking_codes
                 await harvest_booking_codes(page, matched_urls, day_preds, target_date)
                 
-                # 3. Phase 2b: Execution (Multi-Bet Placement)
-                # Injects codes and places final accumulator.
-                print(f"  [Phase 2b] Finalizing multi-bet for {target_date}...")
+                # 3. Chapter 2A: Automated Booking (Execution)
                 from Modules.FootballCom.booker.placement import place_multi_bet_from_codes
                 # Fetch all harvested matches for this date from registry/csv
                 from Modules.FootballCom.fb_url_resolver import get_harvested_matches_for_date
@@ -78,7 +76,7 @@ async def run_football_com_booking(playwright: Playwright):
                 else:
                     print(f"  [Warning] No harvested codes found for {target_date}. Skipping multi-bet.")
 
-                log_state("Phase 2", "Cycle Complete", f"Processed {target_date}")
+                log_state(chapter="Chapter 2A", action="Booking Complete", next_step=f"Processed {target_date}")
 
             break  # Success exit
 
@@ -94,8 +92,8 @@ async def run_football_com_booking(playwright: Playwright):
                 await asyncio.sleep(5)
                 continue
             else:
-                await log_error_state(page, "phase2_fatal", e)
-                print(f"  [CRITICAL] Phase 2 failed: {e}")
+                await log_error_state(page, "chapter_fatal", e)
+                print(f"  [CRITICAL] Chapter execution failed: {e}")
                 break
         
         finally:

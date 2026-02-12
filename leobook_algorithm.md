@@ -6,12 +6,12 @@ This document serves as the **Source of Truth** for the LeoBook Autonomous Betti
 
 ## 🏗️ System Architecture
 
-The system operates in a continuous `while True` loop inside [Leo.py](file:///c:/Users/Admin/Desktop/ProProjection/LeoBook/Leo.py), executing four distinct phases sequentially every 6 hours.
+The system operates in a continuous `while True` loop inside [Leo.py](file:///c:/Users/Admin/Desktop/ProProjection/LeoBook/Leo.py), executing distinct chapters sequentially every 6 hours.
 
 For a high-level visual representation, see: [leobook_algorithm.mmd](file:///c:/Users/Admin/Desktop/ProProjection/LeoBook/leobook_algorithm.mmd)
 
-### Phase 0: Initialization & Outcome Review
-**Objective**: Observe past performance, update financial records, and adjust AI learning weights.
+### Chapter 0: Accuracy Review & Registry Updater
+**Objective**: Observe past performance, update financial records, and adjust AI learning weights. Prediction accuracy reviewer and outcome updater.
 
 1.  **Singleton Protection**: [Leo.py](file:///c:/Users/Admin/Desktop/ProProjection/LeoBook/Leo.py) uses a `leo.lock` file to prevent multiple instances from running simultaneously. This protects the Telegram Bot communication from `getUpdates` conflicts and ensures data integrity.
 2.  **System Initialization**:
@@ -22,7 +22,7 @@ For a high-level visual representation, see: [leobook_algorithm.mmd](file:///c:/
     - [telegram_bridge.py](file:///c:/Users/Admin/Desktop/ProProjection/LeoBook/Core/System/telegram_bridge.py): `start_telegram_listener()` launches the interactive bot.
 
 2.  **Outcome Processing**:
-    - [review_outcomes.py](file:///c:/Users/Admin/Desktop/ProProjection/LeoBook/Data/Access/review_outcomes.py): `run_review_process()` orchestrates the phase.
+    - [review_outcomes.py](file:///c:/Users/Admin/Desktop/ProProjection/LeoBook/Data/Access/review_outcomes.py): `run_review_process()` orchestrates the chapter.
     - [outcome_reviewer.py](file:///c:/Users/Admin/Desktop/ProProjection/LeoBook/Data/Access/outcome_reviewer.py):
         - `get_predictions_to_review()`: Filters `predictions.csv` for past matches needing review.
         - `process_review_task()`: Worker function (concurrency 5) that navigating to Flashscore via Playwright.
@@ -34,8 +34,8 @@ For a high-level visual representation, see: [leobook_algorithm.mmd](file:///c:/
 
 ---
 
-### **Phase 1: Analysis & Prediction**
-**Objective**: Analyze upcoming fixtures and generate betting selections using an ensemble of rules and AI.
+### **Chapter 1A: Schedules & Info Extraction**
+**Objective**: Harvest upcoming fixtures and metadata (historical data and stats).
 
 1.  **Schedule Harvesting**:
     - [manager.py](file:///c:/Users/Admin/Desktop/ProProjection/LeoBook/Modules/Flashscore/manager.py): `run_flashscore_analysis()` navigates to the Flashscore football page.
@@ -48,7 +48,8 @@ For a high-level visual representation, see: [leobook_algorithm.mmd](file:///c:/
         - [h2h_extractor.py](file:///c:/Users/Admin/Desktop/ProProjection/LeoBook/Core/Browser/Extractors/h2h_extractor.py): `extract_h2h_data()` parses match history.
         - [standings_extractor.py](file:///c:/Users/Admin/Desktop/ProProjection/LeoBook/Core/Browser/Extractors/standings_extractor.py): `extract_standings_data()` parses league tables.
 
-3.  **Intelligence Analysis**:
+3.  **Chapter 1B: Data Analysis & Prediction**
+**Objective**: Execute AI models and rules to generate betting selections.
     - [rule_engine.py](file:///c:/Users/Admin/Desktop/ProProjection/LeoBook/Core/Intelligence/rule_engine.py): `RuleEngine.analyze()` coordinates sub-processes:
         - [ml_model.py](file:///c:/Users/Admin/Desktop/ProProjection/LeoBook/Core/Intelligence/ml_model.py): `MLModel.predict()` evaluates patterns via trained models.
         - [goal_predictor.py](file:///c:/Users/Admin/Desktop/ProProjection/LeoBook/Core/Intelligence/goal_predictor.py): `predict_goals_distribution()` calculates Poisson probabilities.
@@ -58,16 +59,17 @@ For a high-level visual representation, see: [leobook_algorithm.mmd](file:///c:/
 
 ---
 
-### **Phase 2: Booking (Act)**
-**Objective**: Harvest booking codes for single matches and then execute them as a multi-bet accumulator.
+### **Chapter 1C: Odds Discovery & Market Analysis**
+**Objective**: Extraction of booking site match outcome bets and odds for the predicted matches.
 
-1.  **Session & Preparation**:
-    - [fb_manager.py](file:///c:/Users/Admin/Desktop/ProProjection/LeoBook/Modules/FootballCom/fb_manager.py): `run_football_com_booking()` orchestrates the acting phase.
+1.  **Preparation**:
+    - [fb_manager.py](file:///c:/Users/Admin/Desktop/ProProjection/LeoBook/Modules/FootballCom/fb_manager.py): `run_football_com_booking()` orchestrates the Chapter 1C and 2A logic.
     - [fb_session.py](file:///c:/Users/Admin/Desktop/ProProjection/LeoBook/Modules/FootballCom/fb_session.py): `launch_browser_with_retry()` initializes the anti-detect session.
     - [navigator.py](file:///c:/Users/Admin/Desktop/ProProjection/LeoBook/Modules/FootballCom/navigator.py): `load_or_create_session()` and `extract_balance()` validate the account state.
     - **Navigation Robustness**: Implements a mandatory **Scroll-Before-Click** strategy and pre-emptive popup dismissal before critical page transitions.
 
-2. ### **Phase 2a: Harvest (Code Discovery)**
+2. ### **Chapter 2A: Automated Booking**
+**Objective**: Single and multiple bet automated booking and bets management.
 **Objective**: Connect prediction data to bookmaker URLs and extract individual booking codes.
 
 - **Orchestrator**: [fb_url_resolver.py](file:///c:/Users/Admin/Desktop/ProProjection/LeoBook/Modules/FootballCom/fb_url_resolver.py)
@@ -85,7 +87,8 @@ For a high-level visual representation, see: [leobook_algorithm.mmd](file:///c:/
         - **Extraction**: Clicks outcome -> Opens slip -> Extracts code -> Saves to `fb_matches.csv`.
         - **Clearing**: Calls `force_clear_slip()` after *each* extraction to keep the UI clean.
 
-3. ### **Phase 2b: Execution (Multi-Bet Placement)**
+3. ### **Chapter 2B: Funds & Withdrawal**
+**Objective**: Monitor bankroll and execute payouts based on profit rules (funds management).
 **Objective**: Inject all harvested codes and place a single combined accumulator bet.
 - **Action**: [placement.py](file:///c:/Users/Admin/Desktop/ProProjection/LeoBook/Modules/FootballCom/booker/placement.py): `place_multi_bet_from_codes()`:
     - **Injection**: Loops through harvested codes for the date and injects them via the bookmaker's "m-m" URL.
@@ -96,8 +99,8 @@ For a high-level visual representation, see: [leobook_algorithm.mmd](file:///c:/
 
 ---
 
-### **Phase 3: Completion & Withdrawal**
-**Objective**: Monitor bankroll and execute payouts based on profit rules.
+### **Chapter 3: Chief Engineer Oversight**
+**Objective**: Live monitoring system overseeing all chapters (0 to 2B) in real-time.
 
 1.  **Bankroll Monitoring**:
     - [Leo.py](file:///c:/Users/Admin/Desktop/ProProjection/LeoBook/Leo.py): Extracts post-booking balance.
@@ -115,7 +118,7 @@ For a high-level visual representation, see: [leobook_algorithm.mmd](file:///c:/
 
 ## 🔒 Self-Healing & Resilience Layer
 
-This layer operates globally across all phases to ensure the system never stops due to UI changes.
+This layer operates globally across all chapters to ensure the system never stops due to UI changes.
 
 | Component | Responsibility | Key Hook |
 | :--- | :--- | :--- |

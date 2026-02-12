@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
-import '../../core/constants/app_colors.dart';
-import '../../data/models/news_model.dart';
+import 'package:leobookapp/core/constants/app_colors.dart';
+import 'package:leobookapp/data/models/news_model.dart';
 
 class NewsFeed extends StatelessWidget {
   final List<NewsModel> news;

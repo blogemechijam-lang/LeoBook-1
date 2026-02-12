@@ -1,11 +1,18 @@
 import 'package:flutter/material.dart';
-import '../../data/models/match_model.dart';
-import '../../core/constants/app_colors.dart';
+import 'package:provider/provider.dart';
+import 'package:leobookapp/data/models/match_model.dart';
+import 'package:leobookapp/core/constants/app_colors.dart';
+import 'package:leobookapp/data/repositories/data_repository.dart';
 import '../screens/match_details_screen.dart';
+import '../screens/team_screen.dart';
+import '../screens/league_screen.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 class MatchCard extends StatelessWidget {
   final MatchModel match;
-  const MatchCard({super.key, required this.match});
+  final bool showLiveBadge;
+  const MatchCard({super.key, required this.match, this.showLiveBadge = true});
+
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
@@ -29,12 +36,12 @@ class MatchCard extends StatelessWidget {
           color: isDark ? AppColors.cardDark : Colors.white,
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
-            color: match.isLive
+            color: (match.isLive || match.isStartingSoon)
                 ? AppColors.liveRed.withValues(alpha: 0.3)
                 : (isDark
                       ? Colors.white.withValues(alpha: 0.05)
                       : Colors.black.withValues(alpha: 0.05)),
-            width: match.isLive ? 1.5 : 1.0,
+            width: (match.isLive || match.isStartingSoon) ? 1.5 : 1.0,
           ),
           boxShadow: [
             if (!isDark)
@@ -50,37 +57,54 @@ class MatchCard extends StatelessWidget {
             Column(
               children: [
                 // Header (League & Time)
-                Column(
-                  children: [
-                    Text(
-                      (match.league ?? "SOCCER").toUpperCase(),
-                      style: TextStyle(
-                        fontSize: 10,
-                        fontWeight: FontWeight.w900,
-                        color: AppColors.textGrey.withValues(alpha: 0.8),
-                        letterSpacing: 1.2,
+                GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => LeagueScreen(
+                          leagueId: match.league ?? "SOCCER",
+                          leagueName: match.league ?? "SOCCER",
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      match.status.toUpperCase(),
-                      style: TextStyle(
-                        fontSize: 10,
-                        fontWeight: FontWeight.bold,
-                        color: match.isLive
-                            ? AppColors.liveRed
-                            : AppColors.textGrey,
+                    );
+                  },
+                  child: Column(
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            (match.league ?? "SOCCER").toUpperCase(),
+                            style: TextStyle(
+                              fontSize: 10,
+                              fontWeight: FontWeight.w900,
+                              color: AppColors.textGrey.withValues(alpha: 0.8),
+                              letterSpacing: 1.2,
+                            ),
+                          ),
+                        ],
                       ),
-                    ),
-                  ],
+                      Text(
+                        "${match.date} • ${match.time}${match.displayStatus.isEmpty ? '' : ' • ${match.displayStatus}'}",
+                        style: TextStyle(
+                          fontSize: 10,
+                          fontWeight: FontWeight.bold,
+                          color: match.isLive
+                              ? AppColors.liveRed
+                              : AppColors.textGrey,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
                 const SizedBox(height: 16),
 
                 // Teams Comparison / Result
                 if (isFinished)
-                  _buildFinishedLayout(isDark)
+                  _buildFinishedLayout(context, isDark)
                 else
-                  _buildActiveLayout(isDark),
+                  _buildActiveLayout(context, isDark),
 
                 const SizedBox(height: 20),
 
@@ -138,6 +162,15 @@ class MatchCard extends StatelessWidget {
                                   : null,
                             ),
                           ),
+                          if (match.marketReliability != null)
+                            Text(
+                              "RELIABILITY: ${match.marketReliability}%",
+                              style: TextStyle(
+                                fontSize: 9,
+                                fontWeight: FontWeight.bold,
+                                color: AppColors.success.withValues(alpha: 0.7),
+                              ),
+                            ),
                         ],
                       ),
                       if (match.odds != null)
@@ -177,13 +210,15 @@ class MatchCard extends StatelessWidget {
                 ),
               ],
             ),
-            if (match.isLive)
+            if (showLiveBadge && (match.isLive || match.isStartingSoon))
               Positioned(
                 top: 0,
                 right: 0,
-                child: _LiveBadge(minute: match.liveMinute),
+                child: _LiveBadge(
+                  minute: match.isLive ? match.liveMinute : "SOON",
+                ),
               ),
-            if (isFinished)
+            if (isFinished && match.isPredictionAccurate)
               Positioned(
                 top: 0,
                 right: 0,
@@ -215,44 +250,63 @@ class MatchCard extends StatelessWidget {
     );
   }
 
-  Widget _buildActiveLayout(bool isDark) {
+  Widget _buildActiveLayout(BuildContext context, bool isDark) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Expanded(child: _buildTeamLogoCol(match.homeTeam, isDark)),
+        Expanded(child: _buildTeamLogoCol(context, match.homeTeam, isDark)),
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 12),
           child:
               match.isLive ||
                   (match.homeScore != null && match.awayScore != null)
-              ? Row(
+              ? Column(
+                  mainAxisSize: MainAxisSize.min,
                   children: [
-                    Text(
-                      match.homeScore ?? "0",
-                      style: TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.w900,
-                        color: isDark ? Colors.white : AppColors.textDark,
-                      ),
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          match.homeScore ?? "0",
+                          style: TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.w900,
+                            color: isDark ? Colors.white : AppColors.textDark,
+                          ),
+                        ),
+                        const Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 4.0),
+                          child: Text(
+                            "-",
+                            style: TextStyle(
+                              color: AppColors.textGrey,
+                              fontSize: 18,
+                            ),
+                          ),
+                        ),
+                        Text(
+                          match.awayScore ?? "0",
+                          style: TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.w900,
+                            color: isDark ? Colors.white : AppColors.textDark,
+                          ),
+                        ),
+                      ],
                     ),
-                    const Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 4.0),
-                      child: Text(
-                        "-",
+                    const SizedBox(height: 2),
+                    if (match.displayStatus.isNotEmpty)
+                      Text(
+                        match.displayStatus,
                         style: TextStyle(
-                          color: AppColors.textGrey,
-                          fontSize: 18,
+                          fontSize: 8,
+                          fontWeight: FontWeight.bold,
+                          color: match.isLive
+                              ? AppColors.liveRed
+                              : AppColors.primary,
+                          letterSpacing: 0.5,
                         ),
                       ),
-                    ),
-                    Text(
-                      match.awayScore ?? "0",
-                      style: TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.w900,
-                        color: isDark ? Colors.white : AppColors.textDark,
-                      ),
-                    ),
                   ],
                 )
               : const Text(
@@ -265,21 +319,33 @@ class MatchCard extends StatelessWidget {
                   ),
                 ),
         ),
-        Expanded(child: _buildTeamLogoCol(match.awayTeam, isDark)),
+        Expanded(child: _buildTeamLogoCol(context, match.awayTeam, isDark)),
       ],
     );
   }
 
-  Widget _buildFinishedLayout(bool isDark) {
+  Widget _buildFinishedLayout(BuildContext context, bool isDark) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Expanded(
           child: Column(
             children: [
-              _buildFinishedRow(match.homeTeam, match.homeScore ?? "0", isDark),
+              _buildFinishedRow(
+                context,
+                match.homeTeam,
+                match.homeScore ?? "0",
+                isDark,
+                match.homeCrestUrl,
+              ),
               const SizedBox(height: 8),
-              _buildFinishedRow(match.awayTeam, match.awayScore ?? "0", isDark),
+              _buildFinishedRow(
+                context,
+                match.awayTeam,
+                match.awayScore ?? "0",
+                isDark,
+                match.awayCrestUrl,
+              ),
             ],
           ),
         ),
@@ -313,6 +379,16 @@ class MatchCard extends StatelessWidget {
                   color: isDark ? Colors.white : AppColors.textDark,
                 ),
               ),
+              const SizedBox(height: 2),
+              Text(
+                match.displayStatus,
+                style: TextStyle(
+                  fontSize: 8,
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.primary,
+                  letterSpacing: 0.5,
+                ),
+              ),
             ],
           ),
         ),
@@ -320,73 +396,133 @@ class MatchCard extends StatelessWidget {
     );
   }
 
-  Widget _buildFinishedRow(String teamName, String score, bool isDark) {
-    return Row(
-      children: [
-        Container(
-          width: 24,
-          height: 24,
-          decoration: BoxDecoration(
-            color: isDark
-                ? Colors.white.withValues(alpha: 0.05)
-                : AppColors.backgroundLight,
-            shape: BoxShape.circle,
+  Widget _buildFinishedRow(
+    BuildContext context,
+    String teamName,
+    String score,
+    bool isDark,
+    String? crestUrl,
+  ) {
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => TeamScreen(
+              teamName: teamName,
+              repository: context.read<DataRepository>(),
+            ),
           ),
-          child: Center(
+        );
+      },
+      child: Row(
+        children: [
+          Container(
+            width: 24,
+            height: 24,
+            decoration: BoxDecoration(
+              color: isDark
+                  ? Colors.white.withValues(alpha: 0.05)
+                  : AppColors.backgroundLight,
+              shape: BoxShape.circle,
+            ),
+            child: ClipOval(
+              child: crestUrl != null && crestUrl.isNotEmpty
+                  ? CachedNetworkImage(
+                      imageUrl: crestUrl,
+                      fit: BoxFit.contain,
+                      placeholder: (context, url) => Center(
+                        child: Text(
+                          teamName.substring(0, 1).toUpperCase(),
+                          style: const TextStyle(
+                            fontSize: 8,
+                            color: AppColors.textGrey,
+                          ),
+                        ),
+                      ),
+                      errorWidget: (context, url, error) => Center(
+                        child: Text(
+                          teamName.substring(0, 1).toUpperCase(),
+                          style: const TextStyle(
+                            fontSize: 8,
+                            color: AppColors.textGrey,
+                          ),
+                        ),
+                      ),
+                    )
+                  : Center(
+                      child: Text(
+                        teamName.substring(0, 1).toUpperCase(),
+                        style: TextStyle(
+                          fontSize: 10,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.textGrey,
+                        ),
+                      ),
+                    ),
+            ),
+          ),
+          const SizedBox(width: 8),
+          Expanded(
             child: Text(
-              teamName.substring(0, 1).toUpperCase(),
+              teamName,
               style: TextStyle(
-                fontSize: 10,
-                fontWeight: FontWeight.bold,
-                color: AppColors.textGrey,
+                fontSize: 13,
+                fontWeight: FontWeight.w700,
+                color: isDark ? Colors.white : AppColors.textDark,
               ),
             ),
           ),
-        ),
-        const SizedBox(width: 8),
-        Expanded(
-          child: Text(
-            teamName,
+          Text(
+            score,
             style: TextStyle(
-              fontSize: 13,
-              fontWeight: FontWeight.w700,
+              fontSize: 16,
+              fontWeight: FontWeight.w900,
               color: isDark ? Colors.white : AppColors.textDark,
             ),
           ),
-        ),
-        Text(
-          score,
-          style: TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.w900,
-            color: isDark ? Colors.white : AppColors.textDark,
-          ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
-  Widget _buildTeamLogoCol(String teamName, bool isDark) {
-    return Column(
-      children: [
-        _buildTeamLogo(teamName, isDark),
-        const SizedBox(height: 8),
-        Text(
-          teamName,
-          textAlign: TextAlign.center,
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-          style: TextStyle(
-            fontSize: 12,
-            fontWeight: FontWeight.w800,
-            color: isDark ? Colors.white : AppColors.textDark,
+  Widget _buildTeamLogoCol(BuildContext context, String teamName, bool isDark) {
+    final crestUrl = (teamName == match.homeTeam)
+        ? match.homeCrestUrl
+        : match.awayCrestUrl;
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => TeamScreen(
+              teamName: teamName,
+              repository: context.read<DataRepository>(),
+            ),
           ),
-        ),
-      ],
+        );
+      },
+      child: Column(
+        children: [
+          _buildTeamLogo(teamName, isDark, crestUrl),
+          const SizedBox(height: 8),
+          Text(
+            teamName,
+            textAlign: TextAlign.center,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w800,
+              color: isDark ? Colors.white : AppColors.textDark,
+            ),
+          ),
+        ],
+      ),
     );
   }
 
-  Widget _buildTeamLogo(String teamName, bool isDark) {
+  Widget _buildTeamLogo(String teamName, bool isDark, String? crestUrl) {
     return Container(
       width: 56,
       height: 56,
@@ -401,15 +537,42 @@ class MatchCard extends StatelessWidget {
               : Colors.black.withValues(alpha: 0.05),
         ),
       ),
-      child: Center(
-        child: Text(
-          teamName.substring(0, 1).toUpperCase(),
-          style: TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.w900,
-            color: AppColors.textGrey.withValues(alpha: 0.5),
-          ),
-        ),
+      child: ClipOval(
+        child: crestUrl != null && crestUrl.isNotEmpty
+            ? CachedNetworkImage(
+                imageUrl: crestUrl,
+                fit: BoxFit.contain,
+                placeholder: (context, url) => Center(
+                  child: Text(
+                    teamName.substring(0, 1).toUpperCase(),
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w900,
+                      color: AppColors.textGrey.withValues(alpha: 0.3),
+                    ),
+                  ),
+                ),
+                errorWidget: (context, url, error) => Center(
+                  child: Text(
+                    teamName.substring(0, 1).toUpperCase(),
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w900,
+                      color: AppColors.textGrey.withValues(alpha: 0.3),
+                    ),
+                  ),
+                ),
+              )
+            : Center(
+                child: Text(
+                  teamName.substring(0, 1).toUpperCase(),
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.w900,
+                    color: AppColors.textGrey.withValues(alpha: 0.5),
+                  ),
+                ),
+              ),
       ),
     );
   }

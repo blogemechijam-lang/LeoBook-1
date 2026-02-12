@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'dart:ui';
-import '../../core/constants/app_colors.dart';
-import '../../data/models/recommendation_model.dart';
-import '../../data/models/match_model.dart';
-import '../../logic/cubit/home_cubit.dart';
+import 'package:leobookapp/core/constants/app_colors.dart';
+import 'package:leobookapp/data/models/recommendation_model.dart';
+import 'package:leobookapp/data/models/match_model.dart';
+import 'package:leobookapp/logic/cubit/home_cubit.dart';
 import '../widgets/recommendation_card.dart';
 import '../screens/match_details_screen.dart';
 // We'll reuse the DateItem logic if possible, or just re-implement cleanly

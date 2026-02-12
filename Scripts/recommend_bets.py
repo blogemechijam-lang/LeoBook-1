@@ -7,6 +7,9 @@ import os
 import sys
 import argparse
 from datetime import datetime, timedelta
+import json
+from dotenv import load_dotenv
+from supabase import create_client, Client
 
 # Handle Windows terminal encoding for emojis
 if sys.stdout.encoding != 'utf-8':
@@ -215,13 +218,73 @@ def get_recommendations(target_date=None, show_all_upcoming=False, **kwargs):
         except Exception as e:
             print(f"[Error] Failed to save JSON recommendations: {e}")
             
+    # 3. Update predictions.csv with recommendation data
+    if kwargs.get('save_to_file'):
+        save_recommendations_to_predictions_csv(recommendations)
+            
     return recommendations
+
+def save_recommendations_to_predictions_csv(recommendations):
+    """Updates predictions.csv with is_recommended flag and score."""
+    if not os.path.exists(PREDICTIONS_CSV):
+        print(f"[Error] predictions.csv not found at {PREDICTIONS_CSV}")
+        return
+
+    # Create a lookup map for faster access
+    # Key: fixture_id (preferred) or home_away_date fallback
+    rec_map = {r['fixture_id']: r for r in recommendations if r.get('fixture_id')}
+    
+    # Also map by team names for fallback
+    rec_map_teams = {f"{r['match']}_{r['date']}": r for r in recommendations}
+
+    updated_rows = []
+    headers = []
+    updates_count = 0
+
+    try:
+        with open(PREDICTIONS_CSV, 'r', newline='', encoding='utf-8') as f:
+            reader = csv.DictReader(f)
+            headers = reader.fieldnames
+            data = list(reader)
+
+        if 'is_recommended' not in headers:
+            headers.append('is_recommended')
+        if 'recommendation_score' not in headers:
+            headers.append('recommendation_score')
+
+        for row in data:
+            # Reset by default to ensure clean state
+            row['is_recommended'] = 'False'
+            row['recommendation_score'] = '0.0'
+
+            # Try to match
+            fid = row.get('fixture_id')
+            match_key = f"{row.get('home_team')} vs {row.get('away_team')}_{row.get('date')}"
+            
+            matched_rec = rec_map.get(fid) or rec_map_teams.get(match_key)
+
+            if matched_rec:
+                row['is_recommended'] = 'True'
+                row['recommendation_score'] = str(matched_rec['score'])
+                updates_count += 1
+            
+            updated_rows.append(row)
+
+        with open(PREDICTIONS_CSV, 'w', newline='', encoding='utf-8') as f:
+            writer = csv.DictWriter(f, fieldnames=headers)
+            writer.writeheader()
+            writer.writerows(updated_rows)
+            
+        print(f"[DB] Updated predictions.csv with {updates_count} recommendations.")
+
+    except Exception as e:
+        print(f"[Error] Failed to update predictions.csv: {e}")
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Get betting recommendations.")
     parser.add_argument("--date", help="Target date (DD.MM.YYYY)")
     parser.add_argument("--all", action="store_true", help="Show all upcoming matches")
-    parser.add_argument("--save", action="store_true", help="Save recommendations to a file in DB folder")
+    parser.add_argument("--save", action="store_true", help="Save recommendations to DB and update CSV")
     args = parser.parse_args()
     
     get_recommendations(target_date=args.date, show_all_upcoming=args.all, save_to_file=args.save)

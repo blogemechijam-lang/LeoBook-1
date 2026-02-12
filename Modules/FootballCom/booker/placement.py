@@ -182,7 +182,7 @@ def calculate_kelly_stake(balance: float, odds: float, probability: float = 0.60
 
 async def place_multi_bet_from_codes(page: Page, harvested_matches: List[Dict], current_balance: float) -> bool:
     """
-    Phase 2b (Execute):
+    Chapter 2A (Automated Booking):
     1. Force clear slip.
     2. Loop up to 12 codes -> Add to slip via URL.
     3. Verify count.
@@ -227,11 +227,18 @@ async def place_multi_bet_from_codes(page: Page, harvested_matches: List[Dict], 
             return False
 
         # 4. Calculate Stake (Kelly v2.7)
-        # We'll use a conservative odds estimate of 2.0^count or similar, 
-        # but the Kelly formula needs a single odds number. 
-        # Ideally we extract the odds from the slip, but for v2.7 logic we'll use a baseline.
-        estimated_odds = 2.0 ** len(final_codes) 
-        final_stake = calculate_kelly_stake(current_balance, estimated_odds)
+        # Use real extracted odds from matched site matches
+        total_odds = 1.0
+        for m in final_codes:
+            try:
+                # Use extracted odds, fallback to 1.5 if missing/invalid
+                m_odds = float(m.get('odds', 1.5))
+                total_odds *= m_odds
+            except:
+                total_odds *= 1.5
+        
+        print(f"    [Execute] Total Accumulator Odds: {total_odds:.2f}")
+        final_stake = calculate_kelly_stake(current_balance, total_odds)
         print(f"    [Execute] Final Stake: ₦{final_stake} (Balance: ₦{current_balance:.2f})")
 
         # 5. Place

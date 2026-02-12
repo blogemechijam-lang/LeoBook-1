@@ -1,6 +1,6 @@
 # lifecycle.py: Global state management and application lifecycle control.
 # Refactored for Clean Architecture (v2.7)
-# This script manages phase transitions, audit logging, and process initialization.
+# This script manages chapter transitions, audit logging, and process initialization.
 
 import os
 import sys
@@ -12,7 +12,7 @@ from Core.Utils.utils import Tee, LOG_DIR
 state = {
     "cycle_start_time": None, 
     "cycle_count": 0,
-    "current_phase": "Startup",
+    "current_chapter": "Startup",
     "last_action": "Init",
     "next_expected": "Startup Checks",
     "why_this_step": "System initialization",
@@ -27,28 +27,28 @@ state = {
     "error_log": []
 }
 
-def log_state(phase=None, action=None, next_step=None, why=None, expect=None):
+def log_state(chapter=None, action=None, next_step=None, why=None, expect=None):
     """Updates and prints the current system state."""
     global state
-    if phase: state["current_phase"] = phase
+    if chapter: state["current_chapter"] = chapter
     if action: state["last_action"] = action
     if next_step: state["next_expected"] = next_step
     if why: state["why_this_step"] = why
     if expect: state["expected_outcome"] = expect
     
-    print(f"   [STATE] {state['current_phase']} | Done: {state['last_action']} | Next: {state['next_expected']} | Why: {state['why_this_step']}")
+    print(f"   [STATE] {state['current_chapter']} | Done: {state['last_action']} | Next: {state['next_expected']} | Why: {state['why_this_step']}")
 
-def log_audit_state(phase: str, action: str, details: str = ""):
+def log_audit_state(chapter: str, action: str, details: str = ""):
     """Central state logger — prints to console and appends to audit_log.csv"""
     timestamp = dt.now().strftime("%Y-%m-%d %H:%M:%S")
-    message = f"[{timestamp}] [STATE] {phase} | Action: {action} | {details}"
+    message = f"[{timestamp}] [STATE] {chapter} | Action: {action} | {details}"
     print(message)
     
     from Data.Access.db_helpers import append_to_csv
     append_to_csv("audit_log.csv", {
         "timestamp": timestamp,
         "event_type": "STATE",
-        "description": f"{phase} - {action} - {details}",
+        "description": f"{chapter} - {action} - {details}",
         "balance_before": "",
         "balance_after": "",
         "stake": "",

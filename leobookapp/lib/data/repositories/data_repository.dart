@@ -1,147 +1,75 @@
 import 'package:flutter/foundation.dart';
-import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:csv/csv.dart';
-import '../../core/constants/api_urls.dart';
-import '../models/match_model.dart';
-import '../models/recommendation_model.dart';
-import '../database/predictions_database.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:leobookapp/data/models/match_model.dart';
+import 'package:leobookapp/data/models/recommendation_model.dart';
+import 'package:leobookapp/data/models/standing_model.dart';
 import 'dart:convert';
 
 class DataRepository {
   static const String _keyRecommended = 'cached_recommended';
   static const String _keyPredictions = 'cached_predictions';
 
-  final PredictionsDatabase _predictionsDb = PredictionsDatabase();
+  final SupabaseClient _supabase = Supabase.instance.client;
 
-  Future<List<MatchModel>> fetchMatches() async {
-    // Use SQLite for mobile/desktop, CSV for web
-    if (kIsWeb) {
-      return _fetchMatchesFromCsv();
-    } else {
-      return _fetchMatchesFromDatabase();
-    }
-  }
-
-  /// SQLite approach for mobile/desktop platforms
-  Future<List<MatchModel>> _fetchMatchesFromDatabase() async {
+  Future<List<MatchModel>> fetchMatches({DateTime? date}) async {
     try {
-      // 1. Get database (downloads if not cached)
-      await _predictionsDb.getDatabase(ApiUrls.predictionsDb);
+      var query = _supabase.from('predictions').select();
 
-      // 2. Query all predictions from database
-      final predictions = await _predictionsDb.getAllPredictions();
+      if (date != null) {
+        final dateStr =
+            "${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}";
+        query = query.eq('date', dateStr);
+      }
 
-      debugPrint('Loaded ${predictions.length} predictions from database');
+      final response = await query.order('date', ascending: false).limit(200);
 
-      // 3. Convert database rows to MatchModel objects
-      return predictions
-          .map((row) {
-            // Database row already contains all prediction data
-            return MatchModel.fromCsv(row, row);
-          })
+      debugPrint('Loaded ${response.length} predictions from Supabase');
+
+      // Cache data locally
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString(_keyPredictions, jsonEncode(response));
+
+      return (response as List)
+          .map((row) => MatchModel.fromCsv(row, row))
           .where((m) => m.prediction != null && m.prediction!.isNotEmpty)
           .toList();
     } catch (e) {
-      debugPrint("DataRepository Error (Database): $e");
+      debugPrint("DataRepository Error (Supabase): $e");
 
-      // Fallback: try to use cached database if download failed
-      final isCached = await _predictionsDb.isDatabaseCached();
-      if (isCached) {
+      // Fallback to cache
+      final prefs = await SharedPreferences.getInstance();
+      final cachedString = prefs.getString(_keyPredictions);
+
+      if (cachedString != null) {
         try {
-          await _predictionsDb.getDatabase(ApiUrls.predictionsDb);
-          final predictions = await _predictionsDb.getAllPredictions();
-          return predictions
+          final List<dynamic> cachedData = jsonDecode(cachedString);
+          return cachedData
               .map((row) => MatchModel.fromCsv(row, row))
               .where((m) => m.prediction != null && m.prediction!.isNotEmpty)
               .toList();
         } catch (cacheError) {
-          debugPrint("Failed to load from cached database: $cacheError");
+          debugPrint("Failed to load from cache: $cacheError");
         }
       }
-
       return [];
     }
   }
 
-  /// CSV approach for web platform
-  Future<List<MatchModel>> _fetchMatchesFromCsv() async {
-    final prefs = await SharedPreferences.getInstance();
-
+  Future<List<MatchModel>> getTeamMatches(String teamName) async {
     try {
-      debugPrint('Web platform detected - using CSV approach');
+      final response = await _supabase
+          .from('predictions')
+          .select()
+          .or('home_team.eq.$teamName,away_team.eq.$teamName')
+          .order('date', ascending: false) // Latest first
+          .limit(50); // Limit to last 50 matches
 
-      // 1. Fetch predictions.csv with extended timeout
-      final predictionsResponse = await http
-          .get(Uri.parse(ApiUrls.predictions))
-          .timeout(const Duration(seconds: 180));
-
-      String? predictionsBody;
-
-      if (predictionsResponse.statusCode == 200) {
-        predictionsBody = predictionsResponse.body;
-        await prefs.setString(_keyPredictions, predictionsBody);
-        debugPrint('CSV downloaded and cached successfully');
-      } else {
-        // Fallback to cache if fetch failed
-        predictionsBody = prefs.getString(_keyPredictions);
-        debugPrint('Using cached CSV data');
-      }
-
-      if (predictionsBody == null) return [];
-
-      // 2. Process Predictions CSV
-      List<List<dynamic>> pRows = const CsvToListConverter().convert(
-        predictionsBody,
-        eol: '\n',
-      );
-
-      if (pRows.isEmpty) return [];
-
-      final pHeaders = pRows.first.map((e) => e.toString()).toList();
-      final pData = pRows.skip(1).toList();
-
-      final matches = pData
-          .where((row) => row.length >= pHeaders.length)
-          .map((row) {
-            final map = Map<String, dynamic>.fromIterables(pHeaders, row);
-            return MatchModel.fromCsv(map, map);
-          })
-          .where((m) => m.prediction != null && m.prediction!.isNotEmpty)
+      return (response as List)
+          .map((row) => MatchModel.fromCsv(row, row))
           .toList();
-
-      debugPrint('Loaded ${matches.length} predictions from CSV');
-      return matches;
     } catch (e) {
-      debugPrint("DataRepository Error (CSV): $e");
-
-      // Final fallback to cache
-      final cachedPredictions = prefs.getString(_keyPredictions);
-      if (cachedPredictions != null) {
-        try {
-          List<List<dynamic>> pRows = const CsvToListConverter().convert(
-            cachedPredictions,
-            eol: '\n',
-          );
-
-          if (pRows.isNotEmpty) {
-            final pHeaders = pRows.first.map((e) => e.toString()).toList();
-            final pData = pRows.skip(1).toList();
-
-            return pData
-                .where((row) => row.length >= pHeaders.length)
-                .map((row) {
-                  final map = Map<String, dynamic>.fromIterables(pHeaders, row);
-                  return MatchModel.fromCsv(map, map);
-                })
-                .where((m) => m.prediction != null && m.prediction!.isNotEmpty)
-                .toList();
-          }
-        } catch (cacheError) {
-          debugPrint("Failed to load from cached CSV: $cacheError");
-        }
-      }
-
+      debugPrint("DataRepository Error (Team Matches): $e");
       return [];
     }
   }
@@ -149,34 +77,104 @@ class DataRepository {
   Future<List<RecommendationModel>> fetchRecommendations() async {
     final prefs = await SharedPreferences.getInstance();
     try {
-      final response = await http
-          .get(Uri.parse(ApiUrls.recommended))
-          .timeout(const Duration(seconds: 30));
+      final response = await _supabase
+          .from('predictions')
+          .select()
+          .eq('is_recommended', true)
+          .order('recommendation_score', ascending: false);
 
-      String? body;
-      if (response.statusCode == 200) {
-        body = utf8.decode(response.bodyBytes);
-        await prefs.setString(_keyRecommended, body);
-      } else {
-        body = prefs.getString(_keyRecommended);
-      }
+      debugPrint('Loaded ${response.length} recommendations from Supabase');
 
-      if (body == null) return [];
+      await prefs.setString(_keyRecommended, jsonEncode(response));
 
-      final List<dynamic> jsonList = jsonDecode(body);
-      return jsonList
+      return (response as List)
           .map((json) => RecommendationModel.fromJson(json))
           .toList();
     } catch (e) {
-      debugPrint("Error fetching recommendations: $e");
+      debugPrint("Error fetching recommendations (Supabase): $e");
       final cached = prefs.getString(_keyRecommended);
       if (cached != null) {
-        final List<dynamic> jsonList = jsonDecode(cached);
-        return jsonList
-            .map((json) => RecommendationModel.fromJson(json))
-            .toList();
+        try {
+          final List<dynamic> jsonList = jsonDecode(cached);
+          return jsonList
+              .map((json) => RecommendationModel.fromJson(json))
+              .toList();
+        } catch (cacheError) {
+          debugPrint("Failed to load recommendations from cache: $cacheError");
+        }
       }
       return [];
+    }
+  }
+
+  Future<List<StandingModel>> getStandings(String leagueName) async {
+    try {
+      final response = await _supabase
+          .from('standings')
+          .select()
+          .eq('region_league', leagueName);
+
+      return (response as List)
+          .map((row) => StandingModel.fromJson(row))
+          .toList();
+    } catch (e) {
+      debugPrint("DataRepository Error (Standings): $e");
+      return [];
+    }
+  }
+
+  Future<Map<String, String>> fetchTeamCrests() async {
+    try {
+      final response = await _supabase
+          .from('teams')
+          .select('team_name, team_crest');
+      final Map<String, String> crests = {};
+      for (var row in (response as List)) {
+        if (row['team_name'] != null && row['team_crest'] != null) {
+          crests[row['team_name'].toString()] = row['team_crest'].toString();
+        }
+      }
+      return crests;
+    } catch (e) {
+      debugPrint("DataRepository Error (Team Crests): $e");
+      return {};
+    }
+  }
+
+  Future<List<MatchModel>> fetchAllSchedules({DateTime? date}) async {
+    try {
+      var query = _supabase.from('schedules').select();
+
+      if (date != null) {
+        final dateStr =
+            "${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}";
+        query = query.eq('date', dateStr);
+      }
+
+      final response = await query.order('date', ascending: false).limit(200);
+
+      return (response as List).map((row) => MatchModel.fromCsv(row)).toList();
+    } catch (e) {
+      debugPrint("DataRepository Error (Schedules): $e");
+      return [];
+    }
+  }
+
+  Future<StandingModel?> getTeamStanding(String teamName) async {
+    try {
+      final response = await _supabase
+          .from('standings')
+          .select()
+          .eq('team_name', teamName)
+          .maybeSingle();
+
+      if (response != null) {
+        return StandingModel.fromJson(response);
+      }
+      return null;
+    } catch (e) {
+      debugPrint("DataRepository Error (Team Standing): $e");
+      return null;
     }
   }
 }

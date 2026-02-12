@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../../logic/cubit/home_cubit.dart';
-import '../../../logic/cubit/search_cubit.dart';
-import '../screens/search_screen.dart';
-import '../../core/constants/app_colors.dart';
+import 'package:leobookapp/logic/cubit/home_cubit.dart';
+import 'package:leobookapp/core/constants/app_colors.dart';
 import '../widgets/match_card.dart';
 import '../widgets/header_section.dart';
 import '../widgets/featured_carousel.dart';
 import '../widgets/news_feed.dart';
 import '../widgets/footnote_section.dart';
 import 'all_predictions_screen.dart';
+import 'rule_engine/backtest_dashboard.dart';
+import 'package:leobookapp/logic/cubit/user_cubit.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -34,67 +34,11 @@ class HomeScreen extends StatelessWidget {
                       child: HeaderSection(
                         selectedDate: state.selectedDate,
                         selectedSport: state.selectedSport,
+                        availableSports: state.availableSports,
                         onDateChanged: (date) =>
                             context.read<HomeCubit>().updateDate(date),
                         onSportChanged: (sport) =>
                             context.read<HomeCubit>().updateSport(sport),
-                      ),
-                    ),
-                    SliverPadding(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 16.0,
-                        vertical: 24.0,
-                      ),
-                      sliver: SliverToBoxAdapter(
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Row(
-                              children: [
-                                IconButton(
-                                  icon: Icon(
-                                    Icons.search,
-                                    size: 20,
-                                    color: AppColors.textGrey,
-                                  ),
-                                  onPressed: () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) => BlocProvider(
-                                          create: (context) => SearchCubit(
-                                            allMatches: state.allMatches,
-                                            allRecommendations:
-                                                state.allRecommendations,
-                                          ),
-                                          child: const SearchScreen(),
-                                        ),
-                                      ),
-                                    );
-                                  },
-                                ),
-                                IconButton(
-                                  icon: Icon(
-                                    Icons.tune,
-                                    size: 20,
-                                    color: AppColors.textGrey,
-                                  ),
-                                  onPressed: () {},
-                                ),
-                              ],
-                            ),
-                            Text(
-                              "View More",
-                              style: TextStyle(
-                                fontSize: 11,
-                                fontWeight: FontWeight.bold,
-                                color: AppColors.textGrey.withValues(
-                                  alpha: 0.6,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
                       ),
                     ),
                     SliverToBoxAdapter(
@@ -132,37 +76,6 @@ class HomeScreen extends StatelessWidget {
                                   ),
                                 ),
                               ],
-                            ),
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 8,
-                                vertical: 4,
-                              ),
-                              decoration: BoxDecoration(
-                                color: Colors.green.withValues(alpha: 0.1),
-                                borderRadius: BorderRadius.circular(4),
-                              ),
-                              child: Row(
-                                children: [
-                                  Container(
-                                    width: 4,
-                                    height: 4,
-                                    decoration: const BoxDecoration(
-                                      color: Colors.green,
-                                      shape: BoxShape.circle,
-                                    ),
-                                  ),
-                                  const SizedBox(width: 4),
-                                  const Text(
-                                    "LIVE",
-                                    style: TextStyle(
-                                      fontSize: 8,
-                                      fontWeight: FontWeight.w900,
-                                      color: Colors.green,
-                                    ),
-                                  ),
-                                ],
-                              ),
                             ),
                           ],
                         ),
@@ -243,6 +156,25 @@ class HomeScreen extends StatelessWidget {
             return Container();
           },
         ),
+      ),
+      floatingActionButton: BlocBuilder<UserCubit, UserState>(
+        builder: (context, state) {
+          if (state.user.canCreateCustomRules) {
+            return FloatingActionButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const BacktestDashboard(),
+                  ),
+                );
+              },
+              tooltip: "Rule Engine (Lite/Pro)",
+              child: const Icon(Icons.science),
+            );
+          }
+          return const SizedBox.shrink(); // Hide for unregistered
+        },
       ),
     );
   }

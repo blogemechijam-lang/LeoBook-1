@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../logic/cubit/search_cubit.dart';
-import '../../logic/cubit/search_state.dart';
-import '../../core/constants/app_colors.dart';
+import 'package:leobookapp/logic/cubit/search_cubit.dart';
+import 'package:leobookapp/logic/cubit/search_state.dart';
+import 'package:leobookapp/core/constants/app_colors.dart';
 import '../widgets/match_card.dart';
 
 class SearchScreen extends StatefulWidget {

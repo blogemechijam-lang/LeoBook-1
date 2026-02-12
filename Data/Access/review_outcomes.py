@@ -1,4 +1,4 @@
-# review_outcomes.py: Entry point for reviewing match results (Phase 0).
+# review_outcomes.py: Entry point for reviewing match results (Chapter 0).
 # Refactored for Clean Architecture (v2.7)
 # This script initiates the outcome review process for pending predictions.
 

@@ -1,11 +1,11 @@
 {
-    "name": "leobookapp",
-    "short_name": "leobookapp",
+    "name": "LeoBook",
+    "short_name": "LeoBook",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
     "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
+    "description": "LeoBook: Elite Autonomous Betting Dashboard.",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [

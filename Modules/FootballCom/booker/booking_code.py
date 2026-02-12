@@ -114,7 +114,7 @@ async def check_match_start_time(page: Page) -> bool:
 
 async def harvest_booking_codes(page: Page, matched_urls: Dict[str, str], day_predictions: List[Dict], target_date: str):
     """
-    Phase 2a: Harvest individual booking codes for each matched fixture.
+    Chapter 1C: Odds Selection & Extraction.
     Follows flowchart: Navigate -> Select -> Book -> Save Code -> Clear Slip.
     """
     from .slip import force_clear_slip
@@ -147,7 +147,7 @@ async def harvest_booking_codes(page: Page, matched_urls: Dict[str, str], day_pr
 
             # 3. Search & Click Outcome
             # (Re-using search/click logic with improvements)
-            bet_added = await find_and_click_outcome(page, m_name, o_name)
+            bet_added, odds = await find_and_click_outcome(page, m_name, o_name)
             
             if bet_added:
                 # 4. Extract Code (The "Book Single" step)
@@ -161,9 +161,9 @@ async def harvest_booking_codes(page: Page, matched_urls: Dict[str, str], day_pr
                     booking_code = await extract_booking_details(page)
                     if booking_code and booking_code != "N/A":
                         # Save to registries
-                        update_prediction_status(match_id, target_date, 'harvested', booking_code=booking_code)
+                        update_prediction_status(match_id, target_date, 'harvested', booking_code=booking_code, odds=odds)
                         site_id = get_site_match_id(target_date, pred['home_team'], pred['away_team'])
-                        update_site_match_status(site_id, 'harvested', booking_code=booking_code)
+                        update_site_match_status(site_id, 'harvested', booking_code=booking_code, odds=odds)
                         await save_booking_code(target_date, booking_code, page)
                 
                 # Close Modal if open
@@ -204,14 +204,26 @@ async def find_and_click_outcome(page: Page, m_name: str, o_name: str) -> bool:
         # Outcome discovery
         outcome_sel = f"button:has-text('{o_name}'), div[role='button']:has-text('{o_name}'), .m-outcome-item:has-text('{o_name}')"
         if await frame.locator(outcome_sel).count() > 0:
+             target_btn = frame.locator(outcome_sel).first
+             btn_text = await target_btn.inner_text()
+             
+             # Attempt to parse odds from button text (e.g., "1.45")
+             odds = 1.0
+             import re
+             odds_match = re.search(r"(\d+\.\d{2})", btn_text)
+             if odds_match:
+                 odds = float(odds_match.group(1))
+                 print(f"    [Chapter 1C] Extracted odds: {odds}")
+
              count_before = await get_bet_slip_count(page)
-             await frame.locator(outcome_sel).first.scroll_into_view_if_needed()
-             await frame.locator(outcome_sel).first.click(force=True)
+             await target_btn.scroll_into_view_if_needed()
+             await target_btn.click(force=True)
              await asyncio.sleep(1)
-             return await get_bet_slip_count(page) > count_before
+             success = await get_bet_slip_count(page) > count_before
+             return success, odds
     except:
         pass
-    return False
+    return False, 1.0
 
 async def finalize_accumulator(page: Page, target_date: str) -> bool:
     """Navigate to slip, enter stake, and confirm placement."""

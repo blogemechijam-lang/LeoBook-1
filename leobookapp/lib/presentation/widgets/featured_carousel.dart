@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
-import '../../core/constants/app_colors.dart';
-import '../../data/models/match_model.dart';
-import '../../data/models/recommendation_model.dart'; // Import
-// Reuse logic if needed, but carousel items are different
+import 'package:provider/provider.dart';
+import 'package:leobookapp/core/constants/app_colors.dart';
+import 'package:leobookapp/data/models/match_model.dart';
+import 'package:leobookapp/data/models/recommendation_model.dart';
+import 'package:leobookapp/data/repositories/data_repository.dart';
 import '../screens/top_predictions_screen.dart';
 import '../screens/match_details_screen.dart';
+import '../screens/team_screen.dart';
+import '../screens/league_screen.dart';
 
 class FeaturedCarousel extends StatelessWidget {
   final List<MatchModel> matches;
@@ -155,25 +158,39 @@ class FeaturedCarousel extends StatelessWidget {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Flexible(
-                              child: Container(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 10,
-                                  vertical: 4,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: AppColors.primary,
-                                  borderRadius: BorderRadius.circular(20),
-                                  border: Border.all(color: Colors.white24),
-                                ),
-                                child: Text(
-                                  (match.league ?? "LEO LEAGUE").toUpperCase(),
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: const TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 8,
-                                    fontWeight: FontWeight.w900,
-                                    letterSpacing: 0.8,
+                              child: GestureDetector(
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => LeagueScreen(
+                                        leagueId: match.league ?? "LEAGUE",
+                                        leagueName: match.league ?? "LEAGUE",
+                                      ),
+                                    ),
+                                  );
+                                },
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 10,
+                                    vertical: 4,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: AppColors.primary,
+                                    borderRadius: BorderRadius.circular(20),
+                                    border: Border.all(color: Colors.white24),
+                                  ),
+                                  child: Text(
+                                    (match.league ?? "LEO LEAGUE")
+                                        .toUpperCase(),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 8,
+                                      fontWeight: FontWeight.w900,
+                                      letterSpacing: 0.8,
+                                    ),
                                   ),
                                 ),
                               ),
@@ -185,7 +202,7 @@ class FeaturedCarousel extends StatelessWidget {
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
                                   Text(
-                                    match.isLive ? "LIVE" : "TOMORROW",
+                                    "${match.date} • ${match.time}${match.displayStatus.isEmpty ? '' : ' • ${match.displayStatus}'}",
                                     maxLines: 1,
                                     style: const TextStyle(
                                       color: Colors.white,
@@ -199,17 +216,22 @@ class FeaturedCarousel extends StatelessWidget {
                                       ],
                                     ),
                                   ),
-                                  Text(
-                                    match.time,
-                                    maxLines: 1,
-                                    style: TextStyle(
-                                      color: Colors.white.withValues(
-                                        alpha: 0.8,
+                                  if (match.displayStatus.isNotEmpty &&
+                                      !match.isLive &&
+                                      !match.status.toLowerCase().contains(
+                                        'finish',
+                                      ))
+                                    Text(
+                                      "${match.date} • ${match.time}",
+                                      maxLines: 1,
+                                      style: TextStyle(
+                                        color: Colors.white.withValues(
+                                          alpha: 0.8,
+                                        ),
+                                        fontSize: 8,
+                                        fontWeight: FontWeight.w600,
                                       ),
-                                      fontSize: 8,
-                                      fontWeight: FontWeight.w600,
                                     ),
-                                  ),
                                 ],
                               ),
                             ),
@@ -220,27 +242,47 @@ class FeaturedCarousel extends StatelessWidget {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            _buildFeaturedTeam(match.homeTeam, true),
+                            _buildFeaturedTeam(context, match.homeTeam, true),
                             Padding(
                               padding: const EdgeInsets.symmetric(
                                 horizontal: 16,
                               ),
-                              child: Text(
-                                match.isLive
-                                    ? "${match.homeScore} : ${match.awayScore}"
-                                    : "VS",
-                                style: const TextStyle(
-                                  fontSize: 24,
-                                  fontWeight: FontWeight.w900,
-                                  color: Colors.white,
-                                  fontStyle: FontStyle.italic,
-                                  shadows: [
-                                    Shadow(color: Colors.black, blurRadius: 8),
-                                  ],
-                                ),
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Text(
+                                    match.displayStatus == "FINISHED" ||
+                                            match.isLive
+                                        ? "${match.homeScore} : ${match.awayScore}"
+                                        : "VS",
+                                    style: const TextStyle(
+                                      fontSize: 24,
+                                      fontWeight: FontWeight.w900,
+                                      color: Colors.white,
+                                      fontStyle: FontStyle.italic,
+                                      shadows: [
+                                        Shadow(
+                                          color: Colors.black,
+                                          blurRadius: 8,
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  if (match.displayStatus.isNotEmpty)
+                                    Text(
+                                      match.displayStatus,
+                                      style: const TextStyle(
+                                        fontSize: 10,
+                                        fontWeight: FontWeight.w900,
+                                        color: AppColors.primary,
+                                        letterSpacing: 0.5,
+                                      ),
+                                    ),
+                                ],
                               ),
                             ),
-                            _buildFeaturedTeam(match.awayTeam, false),
+                            _buildFeaturedTeam(context, match.awayTeam, false),
                           ],
                         ),
 
@@ -323,6 +365,33 @@ class FeaturedCarousel extends StatelessWidget {
                       ],
                     ),
                   ),
+                  if (match.status.toLowerCase().contains('finish') &&
+                      match.isPredictionAccurate)
+                    Positioned(
+                      top: 0,
+                      right: 0,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 10,
+                          vertical: 4,
+                        ),
+                        decoration: const BoxDecoration(
+                          color: AppColors.success,
+                          borderRadius: BorderRadius.only(
+                            topRight: Radius.circular(24),
+                            bottomLeft: Radius.circular(10),
+                          ),
+                        ),
+                        child: const Text(
+                          "ACCURATE",
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 8,
+                            fontWeight: FontWeight.w900,
+                          ),
+                        ),
+                      ),
+                    ),
                 ],
               ),
             ),
@@ -332,54 +401,71 @@ class FeaturedCarousel extends StatelessWidget {
     );
   }
 
-  Widget _buildFeaturedTeam(String teamName, bool isHome) {
+  Widget _buildFeaturedTeam(
+    BuildContext context,
+    String teamName,
+    bool isHome,
+  ) {
     return Expanded(
-      child: Column(
-        children: [
-          ClipRRect(
-            borderRadius: BorderRadius.circular(30),
-            child: BackdropFilter(
-              filter: ColorFilter.mode(
-                Colors.white.withValues(alpha: 0.1),
-                BlendMode.overlay,
+      child: GestureDetector(
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => TeamScreen(
+                teamName: teamName,
+                repository: context.read<DataRepository>(),
               ),
-              child: Container(
-                width: 56,
-                height: 56,
-                decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.1),
-                  shape: BoxShape.circle,
-                  border: Border.all(
-                    color: Colors.white.withValues(alpha: 0.2),
-                  ),
+            ),
+          );
+        },
+        child: Column(
+          children: [
+            ClipRRect(
+              borderRadius: BorderRadius.circular(30),
+              child: BackdropFilter(
+                filter: ColorFilter.mode(
+                  Colors.white.withValues(alpha: 0.1),
+                  BlendMode.overlay,
                 ),
-                child: Center(
-                  child: Text(
-                    teamName.substring(0, 1).toUpperCase(),
-                    style: const TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.w900,
-                      color: Colors.white,
+                child: Container(
+                  width: 56,
+                  height: 56,
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.1),
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: Colors.white.withValues(alpha: 0.2),
+                    ),
+                  ),
+                  child: Center(
+                    child: Text(
+                      teamName.substring(0, 1).toUpperCase(),
+                      style: const TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.w900,
+                        color: Colors.white,
+                      ),
                     ),
                   ),
                 ),
               ),
             ),
-          ),
-          const SizedBox(height: 6),
-          Text(
-            teamName.toUpperCase(),
-            textAlign: TextAlign.center,
-            style: const TextStyle(
-              fontSize: 9,
-              fontWeight: FontWeight.w900,
-              color: Colors.white,
-              letterSpacing: 0.5,
-              shadows: [Shadow(color: Colors.black87, blurRadius: 4)],
+            const SizedBox(height: 6),
+            Text(
+              teamName.toUpperCase(),
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                fontSize: 9,
+                fontWeight: FontWeight.w900,
+                color: Colors.white,
+                letterSpacing: 0.5,
+                shadows: [Shadow(color: Colors.black87, blurRadius: 4)],
+              ),
+              overflow: TextOverflow.ellipsis,
             ),
-            overflow: TextOverflow.ellipsis,
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

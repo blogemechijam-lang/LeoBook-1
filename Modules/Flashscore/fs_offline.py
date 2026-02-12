@@ -8,14 +8,19 @@ from playwright.async_api import Playwright
 from Data.Access.db_helpers import get_all_schedules, get_standings, save_prediction
 from Scripts.recommend_bets import get_recommendations
 from Core.Intelligence.model import RuleEngine
+from Core.Intelligence.rule_config import RuleConfig
+import csv
+import os
 
 NIGERIA_TZ = ZoneInfo("Africa/Lagos")
 
-async def run_flashscore_offline_repredict(playwright: Playwright):
+async def run_flashscore_offline_repredict(playwright: Playwright, custom_config: RuleConfig = None):
     """
     Offline reprediction mode: Uses stored CSV data.
+    If custom_config is provided, runs in "Backtest Mode" and saves to a separate file.
     """
-    print("\n   [Offline] Starting offline reprediction engine...")
+    mode_label = "BACKTEST" if custom_config else "OFFLINE"
+    print(f"\n   [{mode_label}] Starting reprediction engine...")
     
     all_schedules = get_all_schedules()
     if not all_schedules:
@@ -44,7 +49,11 @@ async def run_flashscore_offline_repredict(playwright: Playwright):
 
     print(f"    [Offline] Found {len(to_process)} future matches (> 1 hour away) to repredict.")
     
-    if not to_process:
+    # In BACKTEST mode, we process ALL historical matches to check accuracy
+    if custom_config:
+        print(f"    [Backtest] Running on all historical matches...")
+        to_process = [m for m in all_schedules if m.get('home_score') and m.get('away_score')]
+    elif not to_process:
         return
 
     # Sort historical matches once
@@ -56,6 +65,8 @@ async def run_flashscore_offline_repredict(playwright: Playwright):
 
     historical_matches = [m for m in all_schedules if m.get('match_status') != 'scheduled' and m.get('home_score') not in ('', 'N/A', None) and m.get('away_score') not in ('', 'N/A', None)]
     historical_matches.sort(key=lambda x: parse_date(x.get('date', '')), reverse=True)
+
+    print(f"    [{mode_label}] Processing {len(to_process)} matches...")
 
     total_repredicted = 0
     for m in to_process:
@@ -127,21 +138,60 @@ async def run_flashscore_offline_repredict(playwright: Playwright):
         # 4. Predict
         analysis_input = {"h2h_data": h2h_data, "standings": standings_data}
         try:
-            prediction = RuleEngine.analyze(analysis_input)
+            prediction = RuleEngine.analyze(analysis_input, config=custom_config)
             
             if prediction.get("type", "SKIP") != "SKIP":
                 match_data_for_save = m.copy()
                 match_data_for_save['id'] = m.get('fixture_id')
                 match_data_for_save['time'] = m.get('match_time')
                 
-                save_prediction(match_data_for_save, prediction)
+                if custom_config:
+                    # Save to custom CSV
+                    _save_custom_prediction(match_data_for_save, prediction, custom_config.name)
+                else:
+                    save_prediction(match_data_for_save, prediction)
+
                 total_repredicted += 1
-                if total_repredicted % 10 == 0:
-                    print(f"    [Offline] Repredicted {total_repredicted} matches...")
+                if total_repredicted % 50 == 0:
+                    print(f"    [{mode_label}] Processed {total_repredicted} matches...")
         except Exception as e:
             print(f"      [Offline Error] Failed predicting {match_label}: {e}")
 
-    print(f"\n--- Offline Reprediction Complete: {total_repredicted} matches repredicted. ---")
+    print(f"\n--- {mode_label} Complete: {total_repredicted} matches processed. ---")
     
-    print("\n   [Auto] Generating betting recommendations after offline update...")
-    get_recommendations(save_to_file=True)
+    if not custom_config:
+        print("\n   [Auto] Generating betting recommendations after offline update...")
+        get_recommendations(save_to_file=True)
+
+def _save_custom_prediction(match_data, prediction, config_name):
+    """Saves backtest results to a separate CSV."""
+    # Use consistent Data/Store path
+    filename = f"Data/Store/predictions_custom_{config_name}.csv"
+    os.makedirs("Data/Store", exist_ok=True)
+    
+    # Determine correctness if actual score exists
+    actual_score = f"{match_data.get('home_score')}-{match_data.get('away_score')}"
+    is_correct = "N/A"
+    
+    # Simple check for now (can expand to use evaluate_prediction)
+    if "win" in prediction['market_prediction'].lower():
+        # Implementation of simple check
+        pass
+        
+    row = {
+        'fixture_id': match_data.get('fixture_id'),
+        'date': match_data.get('date'),
+        'home_team': match_data.get('home_team'),
+        'away_team': match_data.get('away_team'),
+        'prediction': prediction['market_prediction'],
+        'confidence': prediction['confidence'],
+        'actual_score': actual_score,
+        'config_name': config_name
+    }
+    
+    file_exists = os.path.exists(filename)
+    with open(filename, 'a', newline='', encoding='utf-8') as f:
+        writer = csv.DictWriter(f, fieldnames=row.keys())
+        if not file_exists:
+            writer.writeheader()
+        writer.writerow(row)
