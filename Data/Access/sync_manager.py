@@ -1,6 +1,7 @@
 import csv
 import logging
 import asyncio
+import re
 from datetime import datetime
 from pathlib import Path
 from typing import Dict, List, Any, Optional, Set
@@ -182,7 +183,6 @@ class SyncManager:
         for i in range(0, len(ids), batch_size):
             batch_ids = ids[i:i + batch_size]
             try:
-                # filter=id.in.(...)
                 res = self.supabase.table(table_name).select("*").in_(key_field, batch_ids).execute()
                 for r in res.data:
                     upserted_rows[str(r[key_field])] = r
@@ -190,29 +190,25 @@ class SyncManager:
                 logger.error(f"      [x] Failed to pull batch: {e}")
 
         # Merge into local rows
-        # We need to preserve order or just append/update?
-        # Map approach is easiest.
         local_map = {str(row[key_field]): row for row in current_local_rows if row.get(key_field)}
         
         updated_count = 0
         for uid, remote_row in upserted_rows.items():
-            # Convert remote row to CSV format (strings)
-            # Handle None -> ''
             cleaned_remote = {}
             for k, v in remote_row.items():
                 if v is None:
                     cleaned_remote[k] = ''
                 elif isinstance(v, bool):
-                     cleaned_remote[k] = str(v).lower() # 'true'/'false'
+                     cleaned_remote[k] = str(v).lower()
                 else:
-                    cleaned_remote[k] = str(v)
-            
-            # Ensure we only keep fields that are in the CSV schema + last_updated
-            # Or extend schema? Better to stick to known schema.
-            # If CSV has fields remote doesn't, keep local? No, remote is truth.
-            
-            # We need to handle schema mismatch carefully.
-            # For now, merge: overlay remote on local or create new.
+                    val_str = str(v)
+                    # NORMALIZE DATE BACK TO CSV FORMAT (DD.MM.YYYY)
+                    if k in ['date', 'date_updated', 'last_extracted'] and re.match(r'^\d{4}-\d{2}-\d{2}', val_str):
+                         iso_date = val_str[:10]
+                         y, m, d = iso_date.split('-')
+                         cleaned_remote[k] = f"{d}.{m}.{y}"
+                    else:
+                        cleaned_remote[k] = val_str
             
             if uid in local_map:
                 local_map[uid].update(cleaned_remote)
@@ -267,7 +263,14 @@ class SyncManager:
                 if v == '' or v == 'N/A':
                     clean[k] = None
                 else:
-                    clean[k] = v
+                    val = v
+                    # NORMALIZE DATE TO ISO (YYYY-MM-DD) FOR SUPABASE
+                    if k in ['date', 'date_updated', 'last_extracted'] and isinstance(val, str):
+                        match = re.match(r'^(\d{2})\.(\d{2})\.(\d{4})$', val)
+                        if match:
+                            d, m, y = match.groups()
+                            val = f"{y}-{m}-{d}"
+                    clean[k] = val
             
             # Ensure last_updated is set if not present
             if 'last_updated' not in clean or not clean['last_updated']:
