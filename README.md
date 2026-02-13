@@ -3,7 +3,7 @@
 **Powered by**: Grok 4.1 & Gemini 3
 
 ## PROLOGUE
-Leo v5.0: The refined, autonomous betting ecosystem. This system represents the pinnacle of self-healing automation, combining multi-path AIGO recovery with strategic AI analysis to maintain continuous betting operations under dynamic UI conditions.
+Leo v5.0: The refined, autonomous betting ecosystem. This system represents the pinnacle of self-healing automation, powered by **AIGO (AI-Guided-Operation)**—a proprietary recovery framework that combines multi-path execution with strategic AI analysis to maintain continuous operations under dynamic UI conditions.
 
 A comprehensive AI-powered system that observes, analyzes, predicts, and executes betting strategies with advanced self-healing capabilities.
 
