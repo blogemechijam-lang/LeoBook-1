@@ -231,19 +231,26 @@ async def extract_match_enrichment(page, match_url: str, sel: Dict[str, str],
 
 async def process_match_task_isolated(browser: Browser, match: Dict, sel: Dict[str, str], extract_standings: bool) -> Dict:
     """Worker to enrich a single match within its own context."""
-    context = await browser.new_context(
-        viewport={'width': 1280, 'height': 720},
-        user_agent='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
-        ignore_https_errors=True
-    )
-    page = await context.new_page()
     try:
-        enriched = await extract_match_enrichment(page, match['match_link'], sel, extract_standings)
-        if enriched:
-            match.update(enriched)
-        return match
-    finally:
-        await context.close()
+        context = await browser.new_context(
+            viewport={'width': 1280, 'height': 720},
+            user_agent='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+            ignore_https_errors=True
+        )
+        try:
+            page = await context.new_page()
+            enriched = await extract_match_enrichment(page, match['match_link'], sel, extract_standings)
+            if enriched:
+                match.update(enriched)
+        except Exception as e:
+            # print(f"      [ISOLATION INFO] Failed to enrich {match.get('fixture_id')}: {str(e)[:100]}")
+            pass
+        finally:
+            await context.close()
+    except Exception as e:
+        print(f"      [ISOLATION CRITICAL] Context creation failed: {e}")
+    
+    return match
 
 
 async def enrich_batch(playwright: Playwright, matches: List[Dict], batch_num: int,

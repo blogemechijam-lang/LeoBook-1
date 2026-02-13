@@ -264,23 +264,35 @@ class SyncManager:
                     clean[k] = None
                 else:
                     val = v
-                    # NORMALIZE DATE TO ISO (YYYY-MM-DD) FOR SUPABASE
                     if k in ['date', 'date_updated', 'last_extracted'] and isinstance(val, str):
                         match = re.match(r'^(\d{2})\.(\d{2})\.(\d{4})$', val)
                         if match:
                             d, m, y = match.groups()
                             val = f"{y}-{m}-{d}"
+                    
+                    if isinstance(val, str):
+                        val = val.strip()
+                        
                     clean[k] = val
             
-            # Ensure last_updated is set if not present
-            if 'last_updated' not in clean or not clean['last_updated']:
-                clean['last_updated'] = datetime.utcnow().isoformat()
+            # Remove 'id' if it is null/empty so Supabase encounters no constraint violation (auto-increment)
+            if 'id' in clean and (clean['id'] is None or clean['id'] == ''):
+                del clean['id']
+
+            # Sanitize timestamp columns: strict regex check with end of string anchor
+            # ISO 8601 regex: YYYY-MM-DDTHH:MM:SS(.mmm)?(Z|+HH:MM)?
+            ts_regex = re.compile(r'^\d{4}-\d{2}-\d{2}[T ]\d{2}:\d{2}:\d{2}(\.\d+)?([+-]\d{2}:?\d{2}|Z)?$')
             
-            # Sanitize: reject URL values in timestamp/date columns
             for ts_col in ['last_updated', 'date_updated', 'last_extracted', 'created_at', 'updated_at']:
-                val = clean.get(ts_col)
-                if isinstance(val, str) and val.startswith('http'):
-                    clean[ts_col] = datetime.utcnow().isoformat()
+                if ts_col in clean:
+                    val = str(clean[ts_col]).strip()
+                    if not ts_regex.match(val):
+                        # print(f"    [SYNC WARN] Invalid timestamp for {ts_col}: {val}. Using now().")
+                        clean[ts_col] = datetime.utcnow().isoformat()
+            
+            # Ensure last_updated is present
+            if 'last_updated' not in clean:
+                clean['last_updated'] = datetime.utcnow().isoformat()
             
             cleaned_data.append(clean)
 

@@ -20,7 +20,6 @@ load_dotenv()
 from Core.System.lifecycle import (
     log_state, log_audit_state, setup_terminal_logging, parse_args, state
 )
-from Core.System.telegram_bridge import start_telegram_listener
 from Core.System.withdrawal_checker import (
     check_triggers, propose_withdrawal, calculate_proposed_amount, get_latest_win
 )
@@ -51,7 +50,6 @@ async def main():
 
     try:
         init_csvs()
-        asyncio.create_task(start_telegram_listener())
 
         async with async_playwright() as p:
             while True:

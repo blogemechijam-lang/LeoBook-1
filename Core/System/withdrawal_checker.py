@@ -6,8 +6,15 @@ import asyncio
 from datetime import datetime as dt
 from pathlib import Path
 from Core.System.lifecycle import state, log_audit_state, log_state
-from Core.System.telegram_bridge import pending_withdrawal, send_proposal_message, withdrawal_timeout_checker
 from Data.Access.db_helpers import log_audit_event
+
+# Local state for withdrawals (previously imported from telegram_bridge)
+pending_withdrawal = {
+    "active": False,
+    "amount": 0.0,
+    "proposed_at": None,
+    "approved": False
+}
 
 def calculate_proposed_amount(balance: float, latest_win: float) -> float:
     """v2.7 Calculation: Min(30% balance, 50% latest win)."""
@@ -41,11 +48,9 @@ async def propose_withdrawal(amount: float):
         "approved": False
     })
 
-    try:
-        await send_proposal_message(amount)
-        asyncio.create_task(withdrawal_timeout_checker())
-    except Exception:
-        pending_withdrawal["active"] = False
+    # Telegram Notification Disabled (v2.8)
+    print(f"   [Withdrawal] Proposal active: ₦{amount:.2f} (Waiting for Web/App approval)")
+    # Logic for web-based approval would go here (e.g. updating a DB flag)
 
 async def execute_withdrawal(amount: float):
     """Executes the withdrawal using an isolated browser context (v2.7)."""
@@ -67,8 +72,8 @@ async def execute_withdrawal(amount: float):
             success = await check_and_perform_withdrawal(page, state["current_balance"], last_win_amount=amount*2)
             
             if success:
-                log_state("Withdrawal", f"Executed ₦{amount:,.2f}", "Approved via Telegram")
-                log_audit_event("WITHDRAWAL_EXECUTED", f"Approved via Telegram: ₦{amount}", state["current_balance"], state["current_balance"]-amount, amount)
+                log_state("Withdrawal", f"Executed ₦{amount:,.2f}", "Automated/Web Approval")
+                log_audit_event("WITHDRAWAL_EXECUTED", f"Executed: ₦{amount}", state["current_balance"], state["current_balance"]-amount, amount)
                 state["last_withdrawal_time"] = dt.now()
             else:
                 print("   [Execute Error] Withdrawal process failed.")

@@ -5,30 +5,18 @@ import os
 from datetime import datetime as dt
 from pathlib import Path
 from Core.System.lifecycle import state
-from Core.System.telegram_bridge import send_proposal_message # Reusing for reports
-
 async def run_chapter_3_oversight():
     """
     Chapter 3: Chief Engineer Monitoring.
-    Runs health checks and sends an oversight report.
+    Runs health checks and returns status.
     """
     print("\n   [Chapter 3] Chief Engineer performing oversight...")
     
     health_status = perform_health_check()
-    report = generate_oversight_report(health_status)
+    # report = generate_oversight_report(health_status)
     
-    # Send report to Telegram if configured
-    try:
-        from Core.System.telegram_bridge import _app_instance, TELEGRAM_CHAT_ID
-        if _app_instance and TELEGRAM_CHAT_ID:
-            await _app_instance.bot.send_message(
-                chat_id=TELEGRAM_CHAT_ID, 
-                text=f"👨‍🔧 **Chief Engineer Report**\n\n{report}",
-                parse_mode='Markdown'
-            )
-            print("   [Chapter 3] Oversight report sent to Telegram.")
-    except Exception as e:
-        print(f"   [Chapter 3 Warning] Could not send oversight report: {e}")
+    # Telegram Disabled v2.8
+    # print("   [Chapter 3] Oversight report generated.")
     
     return health_status
 
