@@ -86,7 +86,7 @@ async def main():
                     # --- SYNC: PREDICTIONS TO CLOUD ---
                     log_state(chapter="Sync", action="Pushing Predictions to Supabase")
                     from Data.Access.sync_manager import run_predictions_sync
-                    run_predictions_sync()
+                    await run_predictions_sync()
 
                     # --- CHAPTER 1C/2A: ODDS & BOOKING ---
                     log_state(chapter="Chapter 2A", action="Automated Booking")

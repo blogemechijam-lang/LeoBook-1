@@ -18,6 +18,11 @@ TABLE_CONFIG = {
     'schedules': {'csv': 'schedules.csv', 'table': 'schedules', 'key': 'fixture_id'},
     'teams': {'csv': 'teams.csv', 'table': 'teams', 'key': 'team_id'},
     'region_league': {'csv': 'region_league.csv', 'table': 'region_league', 'key': 'rl_id'},
+    'standings': {'csv': 'standings.csv', 'table': 'standings', 'key': 'standings_key'},
+    'fb_matches': {'csv': 'fb_matches.csv', 'table': 'fb_matches', 'key': 'site_match_id'},
+    'profiles': {'csv': 'profiles.csv', 'table': 'profiles', 'key': 'id'},
+    'custom_rules': {'csv': 'custom_rules.csv', 'table': 'custom_rules', 'key': 'id'},
+    'rule_executions': {'csv': 'rule_executions.csv', 'table': 'rule_executions', 'key': 'id'},
 }
 
 class SyncManager:
@@ -276,3 +281,9 @@ class SyncManager:
             logger.info(f"    [SYNC] Upserted {len(cleaned_data)} rows to {table_name}.")
         except Exception as e:
             logger.error(f"    [x] Upsert failed for {table_name}: {e}")
+
+async def run_predictions_sync():
+    """Wrapper to sync predictions table."""
+    manager = SyncManager()
+    await manager._sync_table('predictions', TABLE_CONFIG['predictions'])
+

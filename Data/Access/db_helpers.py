@@ -26,6 +26,9 @@ TEAMS_CSV = os.path.join(DB_DIR, "teams.csv")
 REGION_LEAGUE_CSV = os.path.join(DB_DIR, "region_league.csv")
 FB_MATCHES_CSV = os.path.join(DB_DIR, "fb_matches.csv")
 AUDIT_LOG_CSV = os.path.join(DB_DIR, "audit_log.csv")
+PROFILES_CSV = os.path.join(DB_DIR, "profiles.csv")
+CUSTOM_RULES_CSV = os.path.join(DB_DIR, "custom_rules.csv")
+RULE_EXECUTIONS_CSV = os.path.join(DB_DIR, "rule_executions.csv")
 
 
 def init_csvs():
@@ -425,5 +428,15 @@ files_and_headers = {
     ],
     AUDIT_LOG_CSV: [
         'timestamp', 'event_type', 'description', 'balance_before', 'balance_after', 'stake', 'status'
+    ],
+    # User & Rule Engine Tables
+    os.path.join(DB_DIR, "profiles.csv"): [
+        'id', 'email', 'username', 'full_name', 'avatar_url', 'tier', 'credits', 'created_at', 'updated_at'
+    ],
+    os.path.join(DB_DIR, "custom_rules.csv"): [
+        'id', 'user_id', 'name', 'description', 'is_active', 'logic', 'priority', 'created_at', 'updated_at'
+    ],
+    os.path.join(DB_DIR, "rule_executions.csv"): [
+        'id', 'rule_id', 'fixture_id', 'user_id', 'result', 'executed_at'
     ]
 }
