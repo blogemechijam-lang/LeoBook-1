@@ -92,6 +92,108 @@ class PageAnalyzer:
             return True
 
     @staticmethod
+    async def identify_context(page) -> tuple[str, bool]:
+        """
+        Auto-detects page context. Returns (context_key, is_uncertain).
+        """
+        for context_key in PageAnalyzer.EXPECTED_CONTEXTS:
+            if await PageAnalyzer.verify_page_context(page, context_key):
+                return context_key, False
+        
+        # --- PHASE 0: VISUAL PROBE (ESCALATED AWARENESS) ---
+        print("    [Phase 0] Standard discovery failed. Triggering Visual Probe...")
+        return await PageAnalyzer.visual_probe_context(page)
+
+    @staticmethod
+    async def visual_probe_context(page) -> tuple[str, bool]:
+        """
+        Multimodal context identification with confidence retry logic.
+        Returns (context_key, is_uncertain).
+        V5: Retries once if confidence < 0.8 before defaulting to fb_global.
+        """
+        try:
+            from .api_manager import gemini_api_call_with_rotation
+            from .utils import clean_json_response
+            
+            screenshot_path = "Config/temp_probe.png"
+            await page.screenshot(path=screenshot_path)
+            
+            with open(screenshot_path, "rb") as f:
+                image_data = {"mime_type": "image/png", "data": f.read()}
+
+            title = await page.title()
+            
+            # V5: Attempt 1 - Standard probe
+            prompt_v1 = f"""
+            Identify the functional context of this web page.
+            Page Title: {title}
+            URL: {page.url}
+            
+            List of valid context keys: {list(PageAnalyzer.EXPECTED_CONTEXTS.keys())}
+            
+            Return ONLY a JSON object:
+            {{
+                "context_key": "selected_key",
+                "confidence_score": 0.0 to 1.0,
+                "reasoning": "Brief explanation"
+            }}
+            """
+            
+            response = await gemini_api_call_with_rotation([prompt_v1, image_data])
+            data = json.loads(clean_json_response(response.text))
+            
+            ctx = data.get("context_key", "fb_global")
+            conf = data.get("confidence_score", 1.0)
+            
+            # V5: Retry logic for low confidence
+            if conf < 0.8:
+                print(f"    [Phase 0 RETRY] Initial confidence {conf} too low. Retrying with focused prompt...")
+                
+                prompt_v2 = f"""
+                RETRY: The previous attempt had low confidence. Focus on PRIMARY NAVIGATION elements and CORE PAGE STRUCTURE.
+                
+                Page Title: {title}
+                URL: {page.url}
+                
+                Valid context keys: {list(PageAnalyzer.EXPECTED_CONTEXTS.keys())}
+                
+                Look for:
+                - Login/Logout buttons → likely fb_login_page or fb_home_page
+                - Match listings → likely fb_schedule_page
+                - Single match details → likely fb_match_page
+                
+                Return ONLY JSON:
+                {{
+                    "context_key": "selected_key",
+                    "confidence_score": 0.0 to 1.0,
+                    "reasoning": "Specific UI element that confirmed this"
+                }}
+                """
+                
+                retry_response = await gemini_api_call_with_rotation([prompt_v2, image_data])
+                retry_data = json.loads(clean_json_response(retry_response.text))
+                
+                ctx_retry = retry_data.get("context_key", "fb_global")
+                conf_retry = retry_data.get("confidence_score", 0.0)
+                
+                print(f"    [Phase 0 RETRY] Retry confidence: {conf_retry}, Context: {ctx_retry}")
+                
+                # Use retry result if it improved confidence
+                if conf_retry >= conf:
+                    ctx = ctx_retry
+                    conf = conf_retry
+            
+            is_uncertain = conf < 0.8
+            if is_uncertain:
+                print(f"    [Phase 0 WARNING] Final confidence ({conf}) still low for '{ctx}'. Flagging as UNCERTAIN.")
+                
+            return ctx, is_uncertain
+            
+        except Exception as e:
+            print(f"    [Visual Probe Error] Failed to classify state: {e}")
+            return "fb_global", True
+
+    @staticmethod
     async def discover_state_via_ai(page) -> Dict[str, Any]:
         """
         Autonomous State Discovery.

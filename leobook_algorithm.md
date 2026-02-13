@@ -122,11 +122,12 @@ This layer operates globally across all chapters to ensure the system never stop
 
 | Component | Responsibility | Key Hook |
 | :--- | :--- | :--- |
-| **Selector Manager** | Advanced retrieval. | [selector_manager.py](file:///c:/Users/Admin/Desktop/ProProjection/LeoBook/Core/Intelligence/selector_manager.py): `get_selector_auto()` |
-| **Visual Analyzer** | Screenshot processing. | [visual_analyzer.py](file:///c:/Users/Admin/Desktop/ProProjection/LeoBook/Core/Intelligence/visual_analyzer.py): `analyze_page_and_update_selectors()` |
-| **Healing AI** | Prompt engineering. | [prompts.py](file:///c:/Users/Admin/Desktop/ProProjection/LeoBook/Core/Intelligence/prompts.py): `get_recovery_system_prompt()` |
+| **AIGO Engine** | Ultra-hardened healing. | [aigo_engine.py](file:///c:/Users/Admin/Desktop/ProProjection/LeoBook/Core/Intelligence/aigo_engine.py): `invoke_aigo()` |
+| **Interaction Engine** | Multi-path execution. | [interaction_engine.py](file:///c:/Users/Admin/Desktop/ProProjection/LeoBook/Core/Intelligence/interaction_engine.py): `execute_smart_action()` |
+| **Selector Manager** | Advanced retrieval. | [selector_manager.py](file:///c:/Users/Admin/Desktop/ProProjection/LeoBook/Core/Intelligence/selector_manager.py): `get_selector_strict()` |
+| **Visual Analyzer** | Deep DOM discovery. | [visual_analyzer.py](file:///c:/Users/Admin/Desktop/ProProjection/LeoBook/Core/Intelligence/visual_analyzer.py): `analyze_page_and_update_selectors()` |
+| **Memory Manager** | Pattern reinforcement. | [memory_manager.py](file:///c:/Users/Admin/Desktop/ProProjection/LeoBook/Core/Intelligence/memory_manager.py): `store_memory()` |
 | **Popup Handler** | Overlay removal. | [popup_handler.py](file:///c:/Users/Admin/Desktop/ProProjection/LeoBook/Core/Intelligence/popup_handler.py): `fb_universal_popup_dismissal()` |
-| **Recovery** | Stuck state escape. | [recovery.py](file:///c:/Users/Admin/Desktop/ProProjection/LeoBook/Core/Intelligence/recovery.py): `attempt_visual_recovery()` |
 
 ---
 

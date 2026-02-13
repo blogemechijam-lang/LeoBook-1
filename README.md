@@ -12,17 +12,14 @@ The prime objective of this Agent is to handle all sports analysis and betting a
 OVERVIEW:
 Leo combines advanced data analysis, machine learning, and automated execution. The system features a hybrid AI architecture using xAI's Grok 4 and Google's Gemini for high-precision selector discovery, multimodal analysis, and complex UI mapping.
 
-- **Chapter 1C & 2A Navigation Robustness**: 
-  - Implemented mandatory **Scroll-Before-Click** strategy to ensure elements are viewable before interaction.
-  - Enhanced **Overlay Dismissal** with expanded selectors for tooltips and lazy-loaded headers.
-  - Added **failed_harvest Retry Logic** to recover and re-process matched fixtures that previously failed due to UI blockers.
-- **Outcome Synchronization**: Chapter 0 reviews now cross-sync results between prediction and match registries.
-
-CORE ARCHITECTURE:
-- **Dual-Browser System**: Persistent login sessions for Flashscore and Football.com.
-- **Chapter 1C/2A (Betting)**: Direct match navigation, dynamic market discovery, and real-time accumulator building.
-- **Self-Healing UI**: Automated selector discovery via Grok 4 and robust slip clearing with fatal escalation.
-- **Modular Data Layer**: Optimized CSV storage with absolute pathing and centralized audit trails.
+- **AIGO V5 Resilience**: 
+  - **Phase 0 Confidence Retry**: Validates visual discovery with local AI, retrying low-confidence probes before escalation.
+  - **Heatmap-Aware Healing**: Tracks failed selectors and directs AI to avoid broken patterns, accelerating recovery.
+  - **Intra-Cycle Redundancy**: Provides Primary (Selector) and Backup (Extraction/Action) paths simultaneously for zero-cycle-failure goal.
+- **Codebase Optimization**: 
+  - Removed 170+ lines of legacy recovery code (`recovery.py`, `visual_analysis.py`).
+  - Integrated AIGO into critical flows (Login, Betslip, Balance) for 100% self-healing.
+  - Centralized task tracking and implementation logs into brain artifacts.
 
 2. OBSERVE & DECIDE (Chapters 0, 1A & 1B):
    - **Chapter 0 (Review)**: Cross-syncs past outcomes and updates momentum weights.
