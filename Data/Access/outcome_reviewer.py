@@ -43,6 +43,7 @@ from .db_helpers import (
 from .csv_operations import upsert_entry, _read_csv, _write_csv
 from .sync_manager import SyncManager
 from Core.Intelligence.intelligence import get_selector_auto, get_selector
+from Core.Utils.constants import NAVIGATION_TIMEOUT
 
 
 def _load_schedule_db() -> Dict[str, Dict]:

@@ -396,7 +396,7 @@ async def resolve_metadata_gaps(df: pd.DataFrame, sync_manager: SyncManager) -> 
     
     # Fetch all schedules from Supabase (the source of truth)
     try:
-        remote_df = await sync_manager.supabase.table('schedules').select('*').execute()
+        remote_df = sync_manager.supabase.table('schedules').select('*').execute()
         if not remote_df.data:
             return df
         
