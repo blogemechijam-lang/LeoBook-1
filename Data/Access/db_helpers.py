@@ -15,6 +15,7 @@ from typing import Dict, Any, List, Optional
 import uuid
 
 from .csv_operations import _read_csv, _append_to_csv, _write_csv, upsert_entry
+append_to_csv = _append_to_csv # Alias for external use
 
 # --- Data Store Paths ---
 _current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -443,7 +444,7 @@ files_and_headers = {
         'booking_code', 'booking_url', 'status', 'last_updated'
     ],
     AUDIT_LOG_CSV: [
-        'timestamp', 'event_type', 'description', 'balance_before', 'balance_after', 'stake', 'status'
+        'id', 'timestamp', 'event_type', 'description', 'balance_before', 'balance_after', 'stake', 'status'
     ],
     # User & Rule Engine Tables
     os.path.join(DB_DIR, "profiles.csv"): [

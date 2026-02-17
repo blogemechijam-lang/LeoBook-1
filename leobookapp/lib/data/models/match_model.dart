@@ -19,6 +19,7 @@ class MatchModel {
 
   final String? homeCrestUrl;
   final String? awayCrestUrl;
+  final String? regionFlagUrl;
   final String? marketReliability;
   final double? xgHome;
   final double? xgAway;
@@ -45,6 +46,7 @@ class MatchModel {
     this.valueTag,
     this.homeCrestUrl,
     this.awayCrestUrl,
+    this.regionFlagUrl,
     this.marketReliability,
     this.xgHome,
     this.xgAway,
@@ -58,10 +60,8 @@ class MatchModel {
       return "AI model currently evaluating match metrics...";
     }
 
-    final tags = reasonTags!
-        .split('|')
-        .map((t) => t.trim().toLowerCase())
-        .toList();
+    final tags =
+        reasonTags!.split('|').map((t) => t.trim().toLowerCase()).toList();
     List<String> insights = [];
 
     // Map common tags to sentences
@@ -242,8 +242,8 @@ class MatchModel {
       prediction = predictionData['prediction'];
       confidence = predictionData['confidence'];
       odds = predictionData['odds']?.toString();
-      marketReliability = predictionData['market_reliability_score']
-          ?.toString();
+      marketReliability =
+          predictionData['market_reliability_score']?.toString();
       xgHome = double.tryParse(predictionData['xg_home']?.toString() ?? '');
       xgAway = double.tryParse(predictionData['xg_away']?.toString() ?? '');
       reasonTags = predictionData['reason']?.toString();
@@ -272,6 +272,7 @@ class MatchModel {
       isFeatured: isFeatured,
       homeCrestUrl: row['home_crest_url']?.toString(),
       awayCrestUrl: row['away_crest_url']?.toString(),
+      regionFlagUrl: row['region_flag_url']?.toString(),
       xgHome: xgHome,
       xgAway: xgAway,
       reasonTags: reasonTags,

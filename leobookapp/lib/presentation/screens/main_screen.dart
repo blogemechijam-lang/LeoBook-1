@@ -20,6 +20,7 @@ class MainScreen extends StatefulWidget {
 
 class _MainScreenState extends State<MainScreen> {
   int _currentIndex = 0;
+  bool _isSidebarExpanded = true;
 
   final List<Widget> _screens = [
     const HomeScreen(),
@@ -42,6 +43,9 @@ class _MainScreenState extends State<MainScreen> {
               children: [
                 NavigationSideBar(
                   currentIndex: _currentIndex,
+                  isExpanded: _isSidebarExpanded,
+                  onToggle: () =>
+                      setState(() => _isSidebarExpanded = !_isSidebarExpanded),
                   onIndexChanged: (index) {
                     setState(() => _currentIndex = index);
                     HapticFeedback.lightImpact();
@@ -54,7 +58,12 @@ class _MainScreenState extends State<MainScreen> {
                       Expanded(
                         child: IndexedStack(
                           index: _currentIndex,
-                          children: _screens,
+                          children: [
+                            HomeScreen(isSidebarExpanded: _isSidebarExpanded),
+                            const BacktestDashboard(),
+                            const TopPredictionsScreen(),
+                            const AccountScreen(),
+                          ],
                         ),
                       ),
                       const GlobalStatsFooter(),
@@ -98,9 +107,8 @@ class _MainScreenState extends State<MainScreen> {
                     elevation: 0,
                     type: BottomNavigationBarType.fixed,
                     selectedItemColor: AppColors.primary,
-                    unselectedItemColor: isDark
-                        ? Colors.white38
-                        : AppColors.textGrey,
+                    unselectedItemColor:
+                        isDark ? Colors.white38 : AppColors.textGrey,
                     showSelectedLabels: true,
                     showUnselectedLabels: false,
                     selectedLabelStyle: const TextStyle(

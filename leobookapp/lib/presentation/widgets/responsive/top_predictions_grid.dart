@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../core/constants/app_colors.dart';
+import '../../screens/top_predictions_screen.dart';
 
 class TopPredictionsGrid extends StatelessWidget {
   const TopPredictionsGrid({super.key});
@@ -18,9 +19,15 @@ class TopPredictionsGrid extends StatelessWidget {
               color: AppColors.primary,
             ),
             TextButton(
-              onPressed: () {},
+              onPressed: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) => const TopPredictionsScreen(),
+                  ),
+                );
+              },
               child: const Text(
-                "VIEW ALL MORE",
+                "VIEW ALL",
                 style: TextStyle(
                   fontSize: 10,
                   fontWeight: FontWeight.w900,
@@ -35,10 +42,10 @@ class TopPredictionsGrid extends StatelessWidget {
         GridView.count(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
-          crossAxisCount: 2,
-          crossAxisSpacing: 24,
-          mainAxisSpacing: 24,
-          childAspectRatio: 1.8,
+          crossAxisCount: 3,
+          crossAxisSpacing: 20,
+          mainAxisSpacing: 20,
+          childAspectRatio: 1.6,
           children: const [
             _PredictionCard(
               title: "Arsenal VS Liverpool",

@@ -5,6 +5,7 @@
 import os
 import sys
 import argparse
+import uuid
 from datetime import datetime as dt
 from Data.Access.db_helpers import init_csvs
 from Core.Utils.utils import Tee, LOG_DIR
@@ -46,6 +47,7 @@ def log_audit_state(chapter: str, action: str, details: str = ""):
     
     from Data.Access.db_helpers import append_to_csv
     append_to_csv("audit_log.csv", {
+        "id": str(uuid.uuid4()),
         "timestamp": timestamp,
         "event_type": "STATE",
         "description": f"{chapter} - {action} - {details}",

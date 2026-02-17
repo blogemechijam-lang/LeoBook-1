@@ -11,7 +11,8 @@ import '../widgets/footnote_section.dart';
 import '../widgets/responsive/desktop_home_content.dart';
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+  final bool isSidebarExpanded;
+  const HomeScreen({super.key, this.isSidebarExpanded = true});
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -46,7 +47,10 @@ class _HomeScreenState extends State<HomeScreen>
               return const Center(child: CircularProgressIndicator());
             } else if (state is HomeLoaded) {
               if (isDesktop) {
-                return DesktopHomeContent(state: state);
+                return DesktopHomeContent(
+                  state: state,
+                  isSidebarExpanded: widget.isSidebarExpanded,
+                );
               }
 
               return RefreshIndicator(
@@ -85,9 +89,8 @@ class _HomeScreenState extends State<HomeScreen>
                             indicatorColor: AppColors.primary,
                             indicatorWeight: 3,
                             labelColor: AppColors.primary,
-                            unselectedLabelColor: isDark
-                                ? Colors.white60
-                                : AppColors.textGrey,
+                            unselectedLabelColor:
+                                isDark ? Colors.white60 : AppColors.textGrey,
                             labelStyle: const TextStyle(
                               fontSize: 12,
                               fontWeight: FontWeight.w900,
@@ -227,7 +230,8 @@ class _StickyTabBarDelegate extends SliverPersistentHeaderDelegate {
   _StickyTabBarDelegate(this._tabBar, this.isDark);
 
   @override
-  double get minExtent => _tabBar.preferredSize.height + 1; // +1 for bottom border
+  double get minExtent =>
+      _tabBar.preferredSize.height + 1; // +1 for bottom border
   @override
   double get maxExtent => _tabBar.preferredSize.height + 1;
 
@@ -242,9 +246,8 @@ class _StickyTabBarDelegate extends SliverPersistentHeaderDelegate {
         color: isDark ? AppColors.backgroundDark : AppColors.backgroundLight,
         border: Border(
           bottom: BorderSide(
-            color: isDark
-                ? Colors.white10
-                : Colors.black.withValues(alpha: 0.05),
+            color:
+                isDark ? Colors.white10 : Colors.black.withValues(alpha: 0.05),
             width: 1,
           ),
         ),

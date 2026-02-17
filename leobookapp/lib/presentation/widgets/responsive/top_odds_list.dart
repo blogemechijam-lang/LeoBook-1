@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../core/constants/app_colors.dart';
+import '../../screens/top_odds_screen.dart';
 
 class TopOddsList extends StatelessWidget {
   const TopOddsList({super.key});
@@ -9,7 +10,7 @@ class TopOddsList extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Row(
+        Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             _SectionHeader(
@@ -17,13 +18,22 @@ class TopOddsList extends StatelessWidget {
               icon: Icons.local_fire_department_rounded,
               color: Color(0xFFEAB308), // Fire Orange/Yellow
             ),
-            Text(
-              "VIEW ALL ODDS",
-              style: TextStyle(
-                fontSize: 10,
-                fontWeight: FontWeight.w900,
-                color: AppColors.primary,
-                letterSpacing: 1.5,
+            GestureDetector(
+              onTap: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) => const TopOddsScreen(),
+                  ),
+                );
+              },
+              child: const Text(
+                "VIEW ALL ODDS",
+                style: TextStyle(
+                  fontSize: 10,
+                  fontWeight: FontWeight.w900,
+                  color: AppColors.primary,
+                  letterSpacing: 1.5,
+                ),
               ),
             ),
           ],

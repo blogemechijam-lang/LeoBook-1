@@ -1,1 +1,29 @@
 id,timestamp,event_type,description,balance_before,balance_after,stake,status
+21452d30-7418-482c-a538-94042195f438,2026-02-17 00:02:10,CYCLE_START,Cycle #1 initiated.,,,,success
+dbb2be6c-b5fa-4d18-bf7b-2c33955f3608,2026-02-16T21:29:40+00:00,CYCLE_START,Cycle #1 initiated.,None,None,None,success
+2cbd0582-217b-476d-9c12-727ee5fb28a1,2026-02-16T22:27:57+00:00,CYCLE_START,Cycle #1 initiated.,None,None,None,success
+2be062eb-2fda-40b3-b8b4-19543037e6c4,2026-02-17 00:18:48,CYCLE_START,Cycle #1 initiated.,,,,success
+af894938-9e3e-4f2d-8813-68a1e4cc59a7,2026-02-17 00:23:27,PROLOGUE_P1,"Failed: {'message': 'invalid input syntax for type uuid: ""success""', 'code': '22P02', 'hint': None, 'details': None}",,,,failed
+8c7d79c2-8912-4388-85e8-7e2784c42b06,2026-02-17 00:27:25,PROLOGUE_P2,"Failed: {'message': 'invalid input syntax for type uuid: ""failed""', 'code': '22P02', 'hint': None, 'details': None}",,,,failed
+c975d376-c83a-4b41-bdd3-df9a6ac3235b,2026-02-17 00:31:22,SYSTEM_SYNC,"Full Chapter Sync (Prologue Final): 10 passed, 1 failed. Errors: audit_log: {'message': 'invalid input syntax for type uuid: ""failed""', 'code': '22P02', 'hint': None, 'details': None}",,,,partial_failure
+92105c62-af0b-4578-8a9e-2788ce00e64c,2026-02-17 00:31:22,PROLOGUE_P3,Accuracy generated and Prologue sync completed.,,,,success
+a3c88fdb-cec2-4c88-9133-82d8c830f7ea,2026-02-17 00:35:56,CH1_P1,Flashscore extraction and analysis completed.,,,,success
+c1e66e26-d359-45d3-8910-58460cdafb39,2026-02-17 00:37:32,CH1_P2,Odds harvesting and URL resolution completed.,,,,success
+3737dc00-1d3d-4dac-aa5c-f4be5ff36982,2026-02-17 00:41:15,SYSTEM_SYNC,"Full Chapter Sync (Chapter 1 Final): 10 passed, 1 failed. Errors: audit_log: {'message': 'invalid input syntax for type uuid: ""failed""', 'code': '22P02', 'hint': None, 'details': None}",,,,partial_failure
+845f4a71-c005-4fc1-9039-77ef80dcc941,2026-02-17 00:41:15,CH1_P3_SYNC,Sync parity issues detected.,,,,partial_failure
+50c5bbd7-e7dd-4475-83cc-da508ac3901b,2026-02-17 00:41:20,CH1_P3,Final sync and recommendations completed.,,,,success
+e0fab3ae-9791-4b99-b22d-46a0c48f4ce5,2026-02-17 00:41:20,CH2_P1,Automated booking phase completed.,,,,success
+6f393611-8518-4eb2-9ae9-608000fb8701,2026-02-17 00:41:43,CH2_P2,Withdrawal check completed. Balance: 0.0,,,,success
+befe5df3-1281-471b-9171-8f708889c481,2026-02-17 00:41:44,OVERSIGHT_REPORT,"═══ Chief Engineer Oversight Report ═══
+Cycle Count: #1
+Uptime: 0:22:55.829833
+Current Balance: ₦0.00
+Booked: 0
+Failed: 0
+
+Health Check:
+⚠️ Account balance is zero or unknown.
+⚠️ Low prediction volume today: 0 (expected ≥5).",,,,success
+1344e6d4-702b-44eb-93b9-e18f027ed9f1,2026-02-17 00:41:44,CH3,Chief Engineer oversight completed.,,,,success
+b0c24aef-e1d7-4823-99df-d836838665e0,2026-02-17 00:41:44,CYCLE_COMPLETE,Cycle #1 finished.,,,,success
+54898b3b-f3b4-4383-9bac-68d69e5e2dc8,2026-02-17 03:48:09,CYCLE_START,Cycle #1 initiated.,,,,success

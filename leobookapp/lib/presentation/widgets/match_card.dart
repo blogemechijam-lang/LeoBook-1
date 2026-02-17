@@ -17,9 +17,19 @@ class MatchCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final isFinished =
-        match.status.toLowerCase().contains('finished') ||
+    final isFinished = match.status.toLowerCase().contains('finished') ||
         match.status.toUpperCase() == 'FT';
+
+    // Parse League String "REGION: League"
+    String region = "WORLD";
+    String leagueName = match.league ?? "SOCCER";
+    if (leagueName.contains(':')) {
+      final parts = leagueName.split(':');
+      if (parts.length >= 2) {
+        region = parts[0].trim();
+        leagueName = parts[1].trim();
+      }
+    }
 
     return GlassContainer(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
@@ -27,7 +37,7 @@ class MatchCard extends StatelessWidget {
       borderRadius: 20,
       borderColor: (match.isLive || match.isStartingSoon)
           ? AppColors.liveRed.withValues(alpha: 0.3)
-          : null,
+          : AppColors.primary.withValues(alpha: 0.3),
       onTap: () {
         Navigator.push(
           context,
@@ -37,8 +47,10 @@ class MatchCard extends StatelessWidget {
         );
       },
       child: Stack(
+        clipBehavior: Clip.none,
         children: [
           Column(
+            mainAxisSize: MainAxisSize.min,
             children: [
               GestureDetector(
                 onTap: () {
@@ -54,20 +66,65 @@ class MatchCard extends StatelessWidget {
                 },
                 child: Column(
                   children: [
+                    // Region + Flag Row
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Text(
-                          (match.league ?? "SOCCER").toUpperCase(),
-                          style: TextStyle(
-                            fontSize: 10,
-                            fontWeight: FontWeight.w900,
+                        if (match.regionFlagUrl != null &&
+                            match.regionFlagUrl!.isNotEmpty)
+                          CachedNetworkImage(
+                            imageUrl: match.regionFlagUrl!,
+                            width: 14,
+                            height: 10,
+                            fit: BoxFit.cover,
+                            placeholder: (_, __) => Icon(
+                              Icons.public,
+                              size: 12,
+                              color: AppColors.textGrey.withValues(alpha: 0.8),
+                            ),
+                            errorWidget: (_, __, ___) => Icon(
+                              Icons.public,
+                              size: 12,
+                              color: AppColors.textGrey.withValues(alpha: 0.8),
+                            ),
+                          )
+                        else
+                          Icon(
+                            Icons.public,
+                            size: 12,
                             color: AppColors.textGrey.withValues(alpha: 0.8),
-                            letterSpacing: 1.2,
+                          ),
+                        const SizedBox(width: 6),
+                        Flexible(
+                          child: Text(
+                            region.toUpperCase(),
+                            style: TextStyle(
+                              fontSize: 10,
+                              fontWeight: FontWeight.w900,
+                              color: AppColors.textGrey.withValues(alpha: 0.8),
+                              letterSpacing: 1.2,
+                            ),
+                            overflow: TextOverflow.ellipsis,
                           ),
                         ),
                       ],
                     ),
+                    const SizedBox(height: 4),
+                    // League Name
+                    Text(
+                      leagueName.toUpperCase(),
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w900,
+                        color: Colors.white, // Pop out league name
+                        letterSpacing: 0.5,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: 4),
+                    // Date & Time
                     Text(
                       "${match.date} • ${match.time}${match.displayStatus.isEmpty ? '' : ' • ${match.displayStatus}'}",
                       style: TextStyle(
@@ -98,8 +155,8 @@ class MatchCard extends StatelessWidget {
                   color: match.isLive
                       ? AppColors.liveRed.withValues(alpha: 0.06)
                       : (isDark
-                            ? Colors.white.withValues(alpha: 0.04)
-                            : Colors.black.withValues(alpha: 0.03)),
+                          ? Colors.white.withValues(alpha: 0.04)
+                          : Colors.black.withValues(alpha: 0.03)),
                   borderRadius: BorderRadius.circular(14),
                   border: match.isLive
                       ? Border.all(
@@ -110,50 +167,54 @@ class MatchCard extends StatelessWidget {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          match.isLive
-                              ? "IN-PLAY PREDICTION"
-                              : "LEO PREDICTION",
-                          style: TextStyle(
-                            fontSize: 9,
-                            fontWeight: FontWeight.w900,
-                            color: match.isLive
-                                ? AppColors.liveRed
-                                : AppColors.textGrey,
-                            letterSpacing: 0.5,
-                          ),
-                        ),
-                        const SizedBox(height: 2),
-                        Text(
-                          match.prediction ?? "N/A",
-                          style: TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.bold,
-                            color: isFinished
-                                ? AppColors.success
-                                : AppColors.primary,
-                            decoration:
-                                isFinished &&
-                                    !(match.prediction?.contains('Accurate') ??
-                                        true)
-                                ? TextDecoration.lineThrough
-                                : null,
-                          ),
-                        ),
-                        if (match.marketReliability != null)
+                    Flexible(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
                           Text(
-                            "RELIABILITY: ${match.marketReliability}%",
+                            match.isLive
+                                ? "IN-PLAY PREDICTION"
+                                : "LEO PREDICTION",
                             style: TextStyle(
                               fontSize: 9,
-                              fontWeight: FontWeight.bold,
-                              color: AppColors.success.withValues(alpha: 0.7),
+                              fontWeight: FontWeight.w900,
+                              color: match.isLive
+                                  ? AppColors.liveRed
+                                  : AppColors.textGrey,
+                              letterSpacing: 0.5,
                             ),
                           ),
-                      ],
+                          const SizedBox(height: 2),
+                          Text(
+                            match.prediction ?? "N/A",
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w900,
+                              color: isFinished
+                                  ? AppColors.success
+                                  : AppColors.primary,
+                              decoration: isFinished &&
+                                      !(match.prediction
+                                              ?.contains('Accurate') ??
+                                          true)
+                                  ? TextDecoration.lineThrough
+                                  : null,
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          if (match.marketReliability != null)
+                            Text(
+                              "RELIABILITY: ${match.marketReliability}%",
+                              style: TextStyle(
+                                fontSize: 9,
+                                fontWeight: FontWeight.bold,
+                                color: AppColors.success.withValues(alpha: 0.7),
+                              ),
+                            ),
+                        ],
+                      ),
                     ),
+                    const SizedBox(width: 8), // Gap
                     if (match.odds != null)
                       Container(
                         padding: const EdgeInsets.symmetric(
@@ -233,8 +294,7 @@ class MatchCard extends StatelessWidget {
         Expanded(child: _buildTeamLogoCol(context, match.homeTeam, isDark)),
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 12),
-          child:
-              match.isLive ||
+          child: match.isLive ||
                   (match.homeScore != null && match.awayScore != null)
               ? Column(
                   mainAxisSize: MainAxisSize.min,
@@ -463,9 +523,8 @@ class MatchCard extends StatelessWidget {
   }
 
   Widget _buildTeamLogoCol(BuildContext context, String teamName, bool isDark) {
-    final crestUrl = (teamName == match.homeTeam)
-        ? match.homeCrestUrl
-        : match.awayCrestUrl;
+    final crestUrl =
+        (teamName == match.homeTeam) ? match.homeCrestUrl : match.awayCrestUrl;
     return GestureDetector(
       onTap: () {
         Navigator.push(

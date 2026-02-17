@@ -4,17 +4,23 @@ import '../../../core/constants/app_colors.dart';
 class NavigationSideBar extends StatelessWidget {
   final int currentIndex;
   final ValueChanged<int> onIndexChanged;
+  final bool isExpanded;
+  final VoidCallback onToggle;
 
   const NavigationSideBar({
     super.key,
     required this.currentIndex,
     required this.onIndexChanged,
+    required this.isExpanded,
+    required this.onToggle,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: 256,
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 300),
+      curve: Curves.easeInOutCubic,
+      width: isExpanded ? 256 : 72,
       height: double.infinity,
       decoration: const BoxDecoration(
         color: AppColors.surfaceDark,
@@ -33,40 +39,64 @@ class NavigationSideBar extends StatelessWidget {
                     icon: Icons.home_rounded,
                     label: "HOME",
                     isActive: currentIndex == 0,
+                    isExpanded: isExpanded,
                     onTap: () => onIndexChanged(0),
                   ),
                   _NavItem(
                     icon: Icons.gavel_rounded,
                     label: "RULES",
                     isActive: currentIndex == 1,
+                    isExpanded: isExpanded,
                     onTap: () => onIndexChanged(1),
                   ),
                   _NavItem(
                     icon: Icons.emoji_events_rounded,
                     label: "TOP",
                     isActive: currentIndex == 2,
+                    isExpanded: isExpanded,
                     onTap: () => onIndexChanged(2),
                   ),
                   _NavItem(
                     icon: Icons.person_rounded,
                     label: "PROFILE",
                     isActive: currentIndex == 3,
+                    isExpanded: isExpanded,
                     onTap: () => onIndexChanged(3),
                   ),
                 ],
               ),
             ),
           ),
-          _buildProCard(),
+          _buildToggleBtn(),
+          const SizedBox(height: 16),
+          if (isExpanded) _buildProCard(),
+          const SizedBox(height: 16),
         ],
+      ),
+    );
+  }
+
+  Widget _buildToggleBtn() {
+    return IconButton(
+      onPressed: onToggle,
+      icon: Icon(
+        isExpanded
+            ? Icons.keyboard_double_arrow_left
+            : Icons.keyboard_double_arrow_right,
+        color: Colors.white54,
       ),
     );
   }
 
   Widget _buildLogo() {
     return Padding(
-      padding: const EdgeInsets.all(24.0),
+      padding: EdgeInsets.symmetric(
+        horizontal: isExpanded ? 24.0 : 8.0,
+        vertical: isExpanded ? 24.0 : 12.0,
+      ),
       child: Row(
+        mainAxisAlignment:
+            isExpanded ? MainAxisAlignment.start : MainAxisAlignment.center,
         children: [
           Container(
             padding: const EdgeInsets.all(8),
@@ -80,17 +110,22 @@ class NavigationSideBar extends StatelessWidget {
               size: 24,
             ),
           ),
-          const SizedBox(width: 12),
-          const Text(
-            "LEOBOOK",
-            style: TextStyle(
-              fontSize: 24,
-              fontWeight: FontWeight.w900,
-              color: Colors.white,
-              fontStyle: FontStyle.italic,
-              letterSpacing: -1,
+          if (isExpanded) ...[
+            const SizedBox(width: 12),
+            const Flexible(
+              child: Text(
+                "LEOBOOK",
+                style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.w900,
+                  color: Colors.white,
+                  fontStyle: FontStyle.italic,
+                  letterSpacing: -1,
+                ),
+                overflow: TextOverflow.ellipsis,
+              ),
             ),
-          ),
+          ],
         ],
       ),
     );
@@ -144,12 +179,14 @@ class _NavItem extends StatefulWidget {
   final IconData icon;
   final String label;
   final bool isActive;
+  final bool isExpanded;
   final VoidCallback onTap;
 
   const _NavItem({
     required this.icon,
     required this.label,
     required this.isActive,
+    required this.isExpanded,
     required this.onTap,
   });
 
@@ -161,6 +198,7 @@ class _NavItemState extends State<_NavItem> {
   bool _isHovered = false;
 
   @override
+  @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 4),
@@ -171,58 +209,45 @@ class _NavItemState extends State<_NavItem> {
           onTap: widget.onTap,
           child: AnimatedContainer(
             duration: const Duration(milliseconds: 200),
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            padding: EdgeInsets.symmetric(
+              horizontal: widget.isExpanded ? 16 : 0,
+              vertical: 12,
+            ),
             decoration: BoxDecoration(
               color: widget.isActive
-                  ? AppColors.primary.withValues(alpha: 0.12)
-                  : _isHovered
-                  ? Colors.white.withValues(alpha: 0.04)
-                  : Colors.transparent,
-              borderRadius: BorderRadius.circular(16),
+                  ? AppColors.primary.withValues(alpha: 0.15)
+                  : (_isHovered
+                      ? Colors.white.withValues(alpha: 0.05)
+                      : Colors.transparent),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: widget.isActive
+                    ? AppColors.primary.withValues(alpha: 0.5)
+                    : Colors.transparent,
+              ),
             ),
-            child: Stack(
-              clipBehavior: Clip.none,
+            child: Row(
+              mainAxisAlignment: widget.isExpanded
+                  ? MainAxisAlignment.start
+                  : MainAxisAlignment.center,
               children: [
-                if (widget.isActive)
-                  Positioned(
-                    left: -16,
-                    top: 8,
-                    bottom: 8,
-                    child: Container(
-                      width: 4,
-                      decoration: const BoxDecoration(
-                        color: AppColors.primary,
-                        borderRadius: BorderRadius.horizontal(
-                          right: Radius.circular(4),
-                        ),
-                      ),
+                Icon(
+                  widget.icon,
+                  color: widget.isActive ? AppColors.primary : Colors.white54,
+                  size: 20,
+                ),
+                if (widget.isExpanded) ...[
+                  const SizedBox(width: 12),
+                  Text(
+                    widget.label,
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w700,
+                      color: widget.isActive ? Colors.white : Colors.white54,
+                      letterSpacing: 1.0,
                     ),
                   ),
-                Row(
-                  children: [
-                    Icon(
-                      widget.icon,
-                      color: widget.isActive
-                          ? AppColors.primary
-                          : AppColors.textGrey,
-                      size: 22,
-                    ),
-                    const SizedBox(width: 16),
-                    Text(
-                      widget.label,
-                      style: TextStyle(
-                        fontSize: 13,
-                        fontWeight: widget.isActive
-                            ? FontWeight.w900
-                            : FontWeight.w600,
-                        letterSpacing: 1.2,
-                        color: widget.isActive
-                            ? Colors.white
-                            : AppColors.textGrey,
-                      ),
-                    ),
-                  ],
-                ),
+                ],
               ],
             ),
           ),

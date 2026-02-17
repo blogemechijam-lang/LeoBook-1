@@ -3,15 +3,23 @@ import 'top_predictions_grid.dart';
 import 'category_bar.dart';
 import 'accuracy_report_card.dart';
 import 'top_odds_list.dart';
+import 'side_ruler.dart';
 import '../../../logic/cubit/home_cubit.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/utils/match_sorter.dart';
 import '../match_card.dart';
+import '../footnote_section.dart';
+import 'package:leobookapp/data/models/match_model.dart';
 
 class DesktopHomeContent extends StatefulWidget {
   final HomeLoaded state;
+  final bool isSidebarExpanded;
 
-  const DesktopHomeContent({super.key, required this.state});
+  const DesktopHomeContent({
+    super.key,
+    required this.state,
+    required this.isSidebarExpanded,
+  });
 
   @override
   State<DesktopHomeContent> createState() => _DesktopHomeContentState();
@@ -20,85 +28,198 @@ class DesktopHomeContent extends StatefulWidget {
 class _DesktopHomeContentState extends State<DesktopHomeContent>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
+  int _visibleMatchCount = 12;
+
+  // Match counts for tab labels
+  int _allCount = 0;
+  int _finishedCount = 0;
+  int _scheduledCount = 0;
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 3, vsync: this);
+    _tabController.addListener(_handleTabChange);
+    _computeCounts();
+  }
+
+  @override
+  void didUpdateWidget(covariant DesktopHomeContent oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.state != widget.state) {
+      _computeCounts();
+    }
+  }
+
+  void _computeCounts() {
+    final matches = widget.state.filteredMatches.cast<MatchModel>();
+    _allCount = matches.length;
+    _finishedCount =
+        MatchSorter.getSortedMatches(matches, MatchTabType.finished)
+            .whereType<MatchModel>()
+            .length;
+    _scheduledCount =
+        MatchSorter.getSortedMatches(matches, MatchTabType.scheduled)
+            .whereType<MatchModel>()
+            .length;
+  }
+
+  void _handleTabChange() {
+    if (_tabController.indexIsChanging) {
+      if (_visibleMatchCount != 12) {
+        setState(() => _visibleMatchCount = 12);
+      } else {
+        setState(() {});
+      }
+    }
   }
 
   @override
   void dispose() {
+    _tabController.removeListener(_handleTabChange);
     _tabController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 32),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const CategoryBar(),
-          const SizedBox(height: 8),
-          const TopPredictionsGrid(),
-          const SizedBox(height: 48),
-          const AccuracyReportCard(),
-          const SizedBox(height: 48),
-          const TopOddsList(),
-          const SizedBox(height: 48),
-          _buildTabsSection(),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildTabsSection() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        TabBar(
-          controller: _tabController,
-          isScrollable: true,
-          labelPadding: const EdgeInsets.only(right: 32),
-          indicatorColor: AppColors.primary,
-          indicatorWeight: 4,
-          dividerColor: Colors.white10,
-          labelColor: Colors.white,
-          unselectedLabelColor: AppColors.textGrey,
-          labelStyle: const TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.w900,
-            letterSpacing: 1.5,
+    return CustomScrollView(
+      slivers: [
+        SliverPadding(
+          padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 32),
+          sliver: SliverList(
+            delegate: SliverChildListDelegate([
+              const CategoryBar(),
+              const SizedBox(height: 8),
+              const TopPredictionsGrid(),
+              const SizedBox(height: 48),
+              const AccuracyReportCard(),
+              const SizedBox(height: 48),
+              const TopOddsList(),
+              const SizedBox(height: 48),
+            ]),
           ),
-          tabs: const [
-            Tab(text: "ALL PREDICTIONS"),
-            Tab(text: "FINISHED"),
-            Tab(text: "SCHEDULED"),
-          ],
         ),
-        const SizedBox(height: 24),
-        SizedBox(
-          height: 600, // Large enough for the list
-          child: TabBarView(
-            controller: _tabController,
-            children: [
-              _buildMatchGrid(MatchTabType.all),
-              _buildMatchGrid(MatchTabType.finished),
-              _buildMatchGrid(MatchTabType.scheduled),
-            ],
+        SliverPersistentHeader(
+          pinned: true,
+          delegate: _StickyTabBarDelegate(
+            child: Container(
+              color: Theme.of(context).scaffoldBackgroundColor,
+              padding: const EdgeInsets.symmetric(horizontal: 40),
+              alignment: Alignment.centerLeft,
+              child: _buildTabBar(),
+            ),
           ),
+        ),
+        SliverPadding(
+          padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 24),
+          sliver: SliverToBoxAdapter(
+            child: Builder(
+              builder: (context) {
+                final index = _tabController.index;
+                MatchTabType type;
+                switch (index) {
+                  case 1:
+                    type = MatchTabType.finished;
+                    break;
+                  case 2:
+                    type = MatchTabType.scheduled;
+                    break;
+                  default:
+                    type = MatchTabType.all;
+                }
+                return _buildMatchGridWithRuler(type);
+              },
+            ),
+          ),
+        ),
+        // Footer
+        const SliverToBoxAdapter(
+          child: FootnoteSection(),
         ),
       ],
     );
   }
 
+  TabBar _buildTabBar() {
+    return TabBar(
+      controller: _tabController,
+      isScrollable: true,
+      labelPadding: const EdgeInsets.only(right: 32),
+      indicatorColor: AppColors.primary,
+      indicatorWeight: 4,
+      dividerColor: Colors.white10,
+      labelColor: Colors.white,
+      unselectedLabelColor: AppColors.textGrey,
+      labelStyle: const TextStyle(
+        fontSize: 14,
+        fontWeight: FontWeight.w900,
+        letterSpacing: 1.5,
+      ),
+      tabs: [
+        Tab(text: "ALL PREDICTIONS ($_allCount)"),
+        Tab(text: "FINISHED ($_finishedCount)"),
+        Tab(text: "SCHEDULED ($_scheduledCount)"),
+      ],
+    );
+  }
+
+  // ---------- Match Grid with Side Ruler ----------
+
+  Widget _buildMatchGridWithRuler(MatchTabType type) {
+    final grid = _buildMatchGrid(type);
+    final ruler = _buildSideRuler(type);
+
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Expanded(child: grid),
+        if (ruler != null) ...[
+          const SizedBox(width: 12),
+          ruler,
+        ],
+      ],
+    );
+  }
+
+  Widget? _buildSideRuler(MatchTabType type) {
+    switch (type) {
+      case MatchTabType.all:
+        final leagueNames = widget.state.filteredMatches
+            .map((m) => m.league ?? 'Other')
+            .toSet()
+            .toList()
+          ..sort();
+        final labels = SideRuler.alphabeticalLabels(leagueNames);
+        if (labels.isEmpty) return null;
+        return SideRuler(
+          labels: labels,
+          onLabelTapped: (_) {
+            // Scroll feedback — future: implement precise scroll-to-section
+          },
+        );
+
+      case MatchTabType.finished:
+        final labels = SideRuler.finishedTimeLabels();
+        return SideRuler(
+          labels: labels,
+          onLabelTapped: (_) {},
+        );
+
+      case MatchTabType.scheduled:
+        final labels = SideRuler.scheduledTimeLabels();
+        return SideRuler(
+          labels: labels,
+          onLabelTapped: (_) {},
+        );
+    }
+  }
+
   Widget _buildMatchGrid(MatchTabType type) {
-    final matches = MatchSorter.getSortedMatches(
+    var matches = MatchSorter.getSortedMatches(
       widget.state.filteredMatches.cast(),
       type,
-    );
+    ).whereType<MatchModel>().toList();
 
     if (matches.isEmpty) {
       return const Center(
@@ -109,34 +230,79 @@ class _DesktopHomeContentState extends State<DesktopHomeContent>
       );
     }
 
-    // On desktop, we can use a grid for the "All Predictions" section too if we want,
-    // but the screenshot shows a list-like structure with specific leagues.
-    // I'll use a responsive grid that shows 1 column on smaller desktop and 2 on wide.
-    return GridView.builder(
-      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: MediaQuery.of(context).size.width > 1600 ? 3 : 2,
-        crossAxisSpacing: 20,
-        mainAxisSpacing: 20,
-        childAspectRatio: 1.8,
-      ),
-      itemCount: matches.length,
-      itemBuilder: (context, index) {
-        final item = matches[index];
-        if (item is MatchGroupHeader) {
-          return Center(
-            child: Text(
-              item.title.toUpperCase(),
-              style: const TextStyle(
-                fontSize: 12,
-                fontWeight: FontWeight.w900,
-                color: AppColors.textGrey,
-                letterSpacing: 1.5,
+    final totalMatches = matches.length;
+    final displayMatches = matches.take(_visibleMatchCount).toList();
+    final hasMore = totalMatches > _visibleMatchCount;
+
+    return Column(
+      children: [
+        GridView.builder(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: widget.isSidebarExpanded ? 2 : 3,
+            crossAxisSpacing: 20,
+            mainAxisSpacing: 20,
+            mainAxisExtent: 350,
+          ),
+          itemCount: displayMatches.length,
+          itemBuilder: (context, index) {
+            return MatchCard(match: displayMatches[index]);
+          },
+        ),
+        if (hasMore) ...[
+          const SizedBox(height: 32),
+          Center(
+            child: TextButton(
+              onPressed: () {
+                setState(() => _visibleMatchCount += 12);
+              },
+              style: TextButton.styleFrom(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                backgroundColor: Colors.white.withValues(alpha: 0.05),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(30),
+                  side: BorderSide(color: Colors.white.withValues(alpha: 0.1)),
+                ),
+              ),
+              child: const Text(
+                "VIEW MORE MATCHES",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: 1.2,
+                ),
               ),
             ),
-          );
-        }
-        return MatchCard(match: item);
-      },
+          ),
+        ],
+        const SizedBox(height: 40),
+      ],
     );
   }
+}
+
+class _StickyTabBarDelegate extends SliverPersistentHeaderDelegate {
+  final Widget child;
+
+  _StickyTabBarDelegate({required this.child});
+
+  @override
+  double get minExtent => 50.0;
+
+  @override
+  double get maxExtent => 50.0;
+
+  @override
+  Widget build(
+    BuildContext context,
+    double shrinkOffset,
+    bool overlapsContent,
+  ) {
+    return child;
+  }
+
+  @override
+  bool shouldRebuild(_StickyTabBarDelegate oldDelegate) => false;
 }

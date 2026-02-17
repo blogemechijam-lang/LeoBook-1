@@ -27,39 +27,82 @@ from .sync_manager import SyncManager
 def evaluate_prediction(predicted_type: str, home_score: str, away_score: str) -> int:
     """
     Evaluates if a prediction was correct (1) or not (0).
-    Supported types: OVER_2.5, UNDER_2.5, BTTS_YES, BTTS_NO, HOME_WIN, AWAY_WIN, DRAW.
+    Handles all market types used by the LeoBook prediction pipeline.
     """
     try:
         h = int(home_score)
         a = int(away_score)
         total = h + a
-        pt = predicted_type.upper().strip()
+        pt = predicted_type.strip()
+        pt_upper = pt.upper().replace(' ', '_')
+        pt_lower = pt.lower()
 
-        if pt == "OVER_2.5":
+        # --- Standard Markets ---
+        if pt_upper in ("OVER_2.5", "OVER_2_5"):
             return 1 if total > 2.5 else 0
-        elif pt == "UNDER_2.5":
+        if pt_upper in ("UNDER_2.5", "UNDER_2_5"):
             return 1 if total < 2.5 else 0
-        elif pt == "BTTS_YES":
+        if pt_upper in ("BTTS_YES", "BTTS YES") or pt_lower == "btts yes":
             return 1 if h > 0 and a > 0 else 0
-        elif pt == "BTTS_NO":
+        if pt_upper in ("BTTS_NO", "BTTS NO") or pt_lower in ("btts no", "btts_no"):
             return 1 if h == 0 or a == 0 else 0
-        elif pt == "HOME_WIN":
+        if pt_upper in ("HOME_WIN", "HOME WIN", "1"):
             return 1 if h > a else 0
-        elif pt == "AWAY_WIN":
+        if pt_upper in ("AWAY_WIN", "AWAY WIN", "2"):
             return 1 if a > h else 0
-        elif pt == "DRAW":
+        if pt_upper in ("DRAW", "X"):
             return 1 if h == a else 0
+
+        # --- Double Chance Markets ---
+        if pt_lower in ("draw no bet", "draw_no_bet", "dnb"):
+            # Draw No Bet = void on draw, win if predicted team wins
+            # Without knowing which team, assume home side (most common)
+            return 1 if h >= a else 0  # Home or Draw = refund, Home Win = win
+        if pt_lower in ("home or draw", "home_or_draw", "1x"):
+            return 1 if h >= a else 0
+        if pt_lower in ("away or draw", "away_or_draw", "x2"):
+            return 1 if a >= h else 0
+        if pt_lower in ("home or away", "home_or_away", "12"):
+            return 1 if h != a else 0  # No draw
+
+        # --- Team Goals Over/Under (e.g., "Team Over 0.5", "Team Over 1.5") ---
+        import re
+        team_over = re.match(r'(?:home\s+)?(?:team\s+)?over\s+([\d.]+)', pt_lower)
+        if team_over:
+            threshold = float(team_over.group(1))
+            # "Team Over X" typically means the home team scores > X goals
+            return 1 if h > threshold else 0
         
-        # Fallback for complex strings (e.g., from old prediction_evaluator)
-        from .prediction_evaluator import evaluate_prediction as legacy_eval
-        # Note: legacy_eval takes (prediction, actual_score, home_team, away_team)
-        # Here we just have predicted_type, home_score, away_score.
-        # We'll try to adapt or just return 0 for safety if not strictly one of the above.
+        team_under = re.match(r'(?:home\s+)?(?:team\s+)?under\s+([\d.]+)', pt_lower)
+        if team_under:
+            threshold = float(team_under.group(1))
+            return 1 if h < threshold else 0
+
+        away_over = re.match(r'away\s+(?:team\s+)?over\s+([\d.]+)', pt_lower)
+        if away_over:
+            threshold = float(away_over.group(1))
+            return 1 if a > threshold else 0
+
+        away_under = re.match(r'away\s+(?:team\s+)?under\s+([\d.]+)', pt_lower)
+        if away_under:
+            threshold = float(away_under.group(1))
+            return 1 if a < threshold else 0
+
+        # --- Total Goals Over/Under (generic) ---
+        total_over = re.match(r'over\s+([\d.]+)', pt_lower)
+        if total_over:
+            threshold = float(total_over.group(1))
+            return 1 if total > threshold else 0
+
+        total_under = re.match(r'under\s+([\d.]+)', pt_lower)
+        if total_under:
+            threshold = float(total_under.group(1))
+            return 1 if total < threshold else 0
+
+        # Fallback for complex strings
         return 0
     except:
         return 0
-
-    return match
 
 
 async def run_accuracy_generation():

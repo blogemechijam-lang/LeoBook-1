@@ -4,18 +4,25 @@ import '../../../core/constants/app_colors.dart';
 class LeoDatePicker extends StatefulWidget {
   final DateTime initialDate;
   final Function(DateTime) onDateSelected;
+  final DateTime? lastDate;
 
   const LeoDatePicker({
     super.key,
     required this.initialDate,
     required this.onDateSelected,
+    this.lastDate,
   });
 
-  static Future<DateTime?> show(BuildContext context, DateTime current) {
+  static Future<DateTime?> show(
+    BuildContext context,
+    DateTime current, {
+    DateTime? lastDate,
+  }) {
     return showDialog<DateTime>(
       context: context,
       builder: (context) => LeoDatePicker(
         initialDate: current,
+        lastDate: lastDate,
         onDateSelected: (date) => Navigator.of(context).pop(date),
       ),
     );
@@ -193,9 +200,11 @@ class _LeoDatePickerState extends State<LeoDatePicker> {
 
         final date = DateTime(_focusedDate.year, _focusedDate.month, day);
         final isSelected = DateUtils.isSameDay(date, _selectedDate);
+        final isDisabled =
+            widget.lastDate != null && date.isAfter(widget.lastDate!);
 
         return GestureDetector(
-          onTap: () => setState(() => _selectedDate = date),
+          onTap: isDisabled ? null : () => setState(() => _selectedDate = date),
           child: AnimatedContainer(
             duration: const Duration(milliseconds: 200),
             decoration: BoxDecoration(
@@ -208,9 +217,11 @@ class _LeoDatePickerState extends State<LeoDatePicker> {
                 style: TextStyle(
                   fontSize: 12,
                   fontWeight: isSelected ? FontWeight.w900 : FontWeight.w600,
-                  color: isSelected
-                      ? Colors.white
-                      : Colors.white.withValues(alpha: 0.8),
+                  color: isDisabled
+                      ? Colors.white.withValues(alpha: 0.2)
+                      : isSelected
+                          ? Colors.white
+                          : Colors.white.withValues(alpha: 0.8),
                 ),
               ),
             ),

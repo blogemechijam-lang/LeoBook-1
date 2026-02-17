@@ -43,6 +43,17 @@ class FootnoteSection extends StatelessWidget {
               ),
             ],
           ),
+          const SizedBox(height: 6),
+          Text(
+            "Materialless LLC",
+            style: TextStyle(
+              fontSize: 11,
+              fontWeight: FontWeight.w500,
+              color:
+                  isDark ? Colors.white.withValues(alpha: 0.4) : Colors.black45,
+              letterSpacing: 0.5,
+            ),
+          ),
           const SizedBox(height: 32),
 
           // Footer Links Grid
@@ -80,7 +91,7 @@ class FootnoteSection extends StatelessWidget {
 
           // Copyright
           Text(
-            "© 2025 LEOBOOK SPORTS. ALL RIGHTS RESERVED.",
+            "© 2026 LEOBOOK SPORTS. ALL RIGHTS RESERVED.",
             style: TextStyle(
               fontSize: 10,
               fontWeight: FontWeight.w600,
