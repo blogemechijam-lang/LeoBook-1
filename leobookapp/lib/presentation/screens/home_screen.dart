@@ -119,31 +119,29 @@ class _HomeScreenState extends State<HomeScreen>
                     ),
                     const SliverToBoxAdapter(child: SizedBox(height: 16)),
                     SliverToBoxAdapter(child: NewsFeed(news: state.news)),
-                    SliverPadding(
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      sliver: SliverPersistentHeader(
-                        pinned: true,
-                        delegate: _StickyTabBarDelegate(
-                          TabBar(
-                            controller: _tabController,
-                            indicatorColor: AppColors.primary,
-                            indicatorWeight: 3,
-                            labelColor: AppColors.primary,
-                            unselectedLabelColor:
-                                isDark ? Colors.white60 : AppColors.textGrey,
-                            labelStyle: const TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w900,
-                              letterSpacing: 1.0,
-                            ),
-                            tabs: const [
-                              Tab(text: "ALL"),
-                              Tab(text: "FINISHED"),
-                              Tab(text: "SCHEDULED"),
-                            ],
+                    const SliverToBoxAdapter(child: SizedBox(height: 16)),
+                    SliverPersistentHeader(
+                      pinned: true,
+                      delegate: _StickyTabBarDelegate(
+                        TabBar(
+                          controller: _tabController,
+                          indicatorColor: AppColors.primary,
+                          indicatorWeight: 3,
+                          labelColor: AppColors.primary,
+                          unselectedLabelColor:
+                              isDark ? Colors.white60 : AppColors.textGrey,
+                          labelStyle: const TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w900,
+                            letterSpacing: 1.0,
                           ),
-                          isDark,
+                          tabs: const [
+                            Tab(text: "ALL"),
+                            Tab(text: "FINISHED"),
+                            Tab(text: "SCHEDULED"),
+                          ],
                         ),
+                        isDark,
                       ),
                     ),
                     SliverFillRemaining(
@@ -215,51 +213,79 @@ class _HomeScreenState extends State<HomeScreen>
       physics: const NeverScrollableScrollPhysics(),
       itemCount: sortedItems.length + 1, // +1 for footnote
       itemBuilder: (context, index) {
-        if (index == sortedItems.length) {
-          return const FootnoteSection();
-        }
+        final isFooter = index == sortedItems.length;
 
-        final item = sortedItems[index];
-
-        if (item is MatchGroupHeader) {
-          return Padding(
-            padding: const EdgeInsets.fromLTRB(24, 24, 24, 8),
-            child: Row(
-              children: [
-                Container(
-                  width: 4,
-                  height: 14,
-                  decoration: BoxDecoration(
-                    color: AppColors.primary,
-                    borderRadius: BorderRadius.circular(2),
-                  ),
-                ),
-                const SizedBox(width: 8),
-                Text(
-                  item.title.toUpperCase(),
-                  style: TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w900,
-                    color: isDark ? Colors.white70 : AppColors.textDark,
-                    letterSpacing: 1.0,
-                  ),
-                ),
-                const Spacer(),
-                Container(
-                  height: 1,
-                  width: 100,
+        return Stack(
+          children: [
+            // Guide line segment
+            if (!isFooter)
+              Positioned(
+                left: 24 + 1.5,
+                top: 0,
+                bottom: 0,
+                child: Container(
+                  width: 1,
                   color: isDark
-                      ? Colors.white10
+                      ? Colors.white.withValues(alpha: 0.1)
                       : Colors.black.withValues(alpha: 0.05),
                 ),
-              ],
-            ),
-          );
-        } else {
-          return MatchCard(match: item);
-        }
+              ),
+
+            if (isFooter)
+              const FootnoteSection()
+            else
+              _buildItem(sortedItems[index], isDark),
+          ],
+        );
       },
     );
+  }
+
+  Widget _buildItem(dynamic item, bool isDark) {
+    if (item is MatchGroupHeader) {
+      return Padding(
+        padding: const EdgeInsets.fromLTRB(24, 24, 24, 8),
+        child: Row(
+          children: [
+            Container(
+              width: 4,
+              height: 14,
+              decoration: BoxDecoration(
+                color: AppColors.primary,
+                borderRadius: BorderRadius.circular(2),
+                boxShadow: [
+                  BoxShadow(
+                    color: AppColors.primary.withValues(alpha: 0.4),
+                    blurRadius: 4,
+                    spreadRadius: 0,
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(width: 8),
+            Text(
+              item.title.toUpperCase(),
+              style: TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w900,
+                color: isDark ? Colors.white70 : AppColors.textDark,
+                letterSpacing: 1.0,
+              ),
+            ),
+            const Spacer(),
+            Container(
+              height: 1,
+              width: 100,
+              color: isDark
+                  ? Colors.white10
+                  : Colors.black.withValues(alpha: 0.05),
+            ),
+          ],
+        ),
+      );
+    } else {
+      return MatchCard(match: item);
+    }
   }
 }
 
@@ -281,18 +307,36 @@ class _StickyTabBarDelegate extends SliverPersistentHeaderDelegate {
     double shrinkOffset,
     bool overlapsContent,
   ) {
-    return Container(
-      decoration: BoxDecoration(
-        color: isDark ? AppColors.backgroundDark : AppColors.backgroundLight,
-        border: Border(
-          bottom: BorderSide(
-            color:
-                isDark ? Colors.white10 : Colors.black.withValues(alpha: 0.05),
+    return Stack(
+      children: [
+        // Sideruler start
+        Positioned(
+          left: 24 + 1.5,
+          top: 0,
+          bottom: 0,
+          child: Container(
             width: 1,
+            color: isDark
+                ? Colors.white.withValues(alpha: 0.1)
+                : Colors.black.withValues(alpha: 0.05),
           ),
         ),
-      ),
-      child: _tabBar,
+        Container(
+          decoration: BoxDecoration(
+            color:
+                isDark ? AppColors.backgroundDark : AppColors.backgroundLight,
+            border: Border(
+              bottom: BorderSide(
+                color: isDark
+                    ? Colors.white10
+                    : Colors.black.withValues(alpha: 0.05),
+                width: 1,
+              ),
+            ),
+          ),
+          child: _tabBar,
+        ),
+      ],
     );
   }
 

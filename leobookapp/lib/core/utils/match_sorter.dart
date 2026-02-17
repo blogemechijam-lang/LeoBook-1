@@ -9,18 +9,18 @@ class MatchSorter {
   ) {
     switch (type) {
       case MatchTabType.all:
-        return _groupAllMatches(matches);
+        return _groupByLeague(matches);
       case MatchTabType.finished:
-        return _sortFinishedMatches(matches);
+        return _groupByTime(_filterFinishedMatches(matches), descending: true);
       case MatchTabType.scheduled:
-        return _sortScheduledMatches(matches);
+        return _groupByTime(_filterScheduledMatches(matches),
+            descending: false);
     }
   }
 
-  static List<dynamic> _groupAllMatches(List<MatchModel> matches) {
+  static List<dynamic> _groupByLeague(List<MatchModel> matches) {
     if (matches.isEmpty) return [];
 
-    // Group by Region/League
     final Map<String, List<MatchModel>> groups = {};
     for (var match in matches) {
       final key = match.league?.trim() ?? "Other";
@@ -30,12 +30,10 @@ class MatchSorter {
       groups[key]!.add(match);
     }
 
-    // Sort Keys Alphabetically
     final sortedKeys = groups.keys.toList()..sort();
 
     final List<dynamic> result = [];
     for (var key in sortedKeys) {
-      // Sort matches within group: Time -> Alphabetical (Home Team)
       final groupMatches = groups[key]!;
       groupMatches.sort((a, b) {
         int timeComp = a.time.compareTo(b.time);
@@ -49,7 +47,51 @@ class MatchSorter {
     return result;
   }
 
-  static List<MatchModel> _sortFinishedMatches(List<MatchModel> matches) {
+  static List<dynamic> _groupByTime(List<MatchModel> matches,
+      {required bool descending}) {
+    if (matches.isEmpty) return [];
+
+    // Group by Hour (HH:00)
+    final Map<String, List<MatchModel>> groups = {};
+    for (var match in matches) {
+      // Assuming match.time is "HH:mm"
+      final hour = match.time.split(':')[0];
+      final key = "$hour:00";
+      if (!groups.containsKey(key)) {
+        groups[key] = [];
+      }
+      groups[key]!.add(match);
+    }
+
+    final sortedKeys = groups.keys.toList();
+    if (descending) {
+      sortedKeys.sort((a, b) => b.compareTo(a));
+    } else {
+      sortedKeys.sort((a, b) => a.compareTo(b));
+    }
+
+    final List<dynamic> result = [];
+    for (var key in sortedKeys) {
+      final groupMatches = groups[key]!;
+      groupMatches.sort((a, b) {
+        if (descending) {
+          int timeComp = b.time.compareTo(a.time);
+          if (timeComp != 0) return timeComp;
+          return a.homeTeam.compareTo(b.homeTeam);
+        } else {
+          int timeComp = a.time.compareTo(b.time);
+          if (timeComp != 0) return timeComp;
+          return a.homeTeam.compareTo(b.homeTeam);
+        }
+      });
+
+      result.add(MatchGroupHeader(title: key));
+      result.addAll(groupMatches);
+    }
+    return result;
+  }
+
+  static List<MatchModel> _filterFinishedMatches(List<MatchModel> matches) {
     return matches
         .where(
           (m) =>
@@ -57,16 +99,10 @@ class MatchSorter {
               m.status.toLowerCase().contains('ft') ||
               m.status.toLowerCase().contains('full time'),
         )
-        .toList()
-      ..sort((a, b) {
-        // Latest first -> Date DESC -> Time DESC
-        int dateComp = b.date.compareTo(a.date);
-        if (dateComp != 0) return dateComp;
-        return b.time.compareTo(a.time);
-      });
+        .toList();
   }
 
-  static List<MatchModel> _sortScheduledMatches(List<MatchModel> matches) {
+  static List<MatchModel> _filterScheduledMatches(List<MatchModel> matches) {
     return matches
         .where(
           (m) =>
@@ -74,13 +110,7 @@ class MatchSorter {
               !m.status.toLowerCase().contains('finish') &&
               !m.status.toLowerCase().contains('ft'),
         )
-        .toList()
-      ..sort((a, b) {
-        // Earliest first -> Date ASC -> Time ASC
-        int dateComp = a.date.compareTo(b.date);
-        if (dateComp != 0) return dateComp;
-        return a.time.compareTo(b.time);
-      });
+        .toList();
   }
 }
 

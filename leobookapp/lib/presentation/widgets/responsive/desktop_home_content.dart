@@ -119,7 +119,7 @@ class _DesktopHomeContentState extends State<DesktopHomeContent>
             ),
             SliverPadding(
               padding: const EdgeInsets.only(
-                  left: 40, right: 80, top: 24, bottom: 24),
+                  left: 40, right: 40, top: 24, bottom: 24),
               sliver: SliverToBoxAdapter(
                 child: Builder(
                   builder: (context) {
@@ -135,7 +135,19 @@ class _DesktopHomeContentState extends State<DesktopHomeContent>
                       default:
                         type = MatchTabType.all;
                     }
-                    return _buildMatchGrid(type);
+
+                    return Row(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        Expanded(child: _buildMatchGroupedList(type)),
+                        const SizedBox(width: 32),
+                        SizedBox(
+                          width: 32,
+                          child:
+                              _buildSideRuler(type) ?? const SizedBox.shrink(),
+                        ),
+                      ],
+                    );
                   },
                 ),
               ),
@@ -145,32 +157,6 @@ class _DesktopHomeContentState extends State<DesktopHomeContent>
               child: FootnoteSection(),
             ),
           ],
-        ),
-        // Side Ruler - Positioned over the view but aligned to the right
-        Positioned(
-          top: 100, // Aligned closer to the TabBar area
-          bottom: 80, // Aligned above the Footer
-          right: 20,
-          child: Center(
-            child: Builder(
-              builder: (context) {
-                final index = _tabController.index;
-                MatchTabType type;
-                switch (index) {
-                  case 1:
-                    type = MatchTabType.finished;
-                    break;
-                  case 2:
-                    type = MatchTabType.scheduled;
-                    break;
-                  default:
-                    type = MatchTabType.all;
-                }
-                final ruler = _buildSideRuler(type);
-                return ruler ?? const SizedBox.shrink();
-              },
-            ),
-          ),
         ),
       ],
     );
@@ -199,58 +185,15 @@ class _DesktopHomeContentState extends State<DesktopHomeContent>
     );
   }
 
-  // ---------- Side Ruler ----------
+  // ---------- Grouped Match List ----------
 
-  Widget? _buildSideRuler(MatchTabType type) {
-    switch (type) {
-      case MatchTabType.all:
-        final leagueNames = widget.state.filteredMatches
-            .map((m) => m.league ?? 'Other')
-            .toSet()
-            .toList()
-          ..sort();
-        final labels = SideRuler.alphabeticalLabels(leagueNames);
-        if (labels.isEmpty) return null;
-        return SideRuler(
-          labels: labels,
-          onLabelTapped: (idx) => _scrollToSection(idx, labels[idx], type),
-        );
-
-      case MatchTabType.finished:
-        final labels = SideRuler.finishedTimeLabels();
-        return SideRuler(
-          labels: labels,
-          onLabelTapped: (idx) => _scrollToSection(idx, labels[idx], type),
-        );
-
-      case MatchTabType.scheduled:
-        final labels = SideRuler.scheduledTimeLabels();
-        return SideRuler(
-          labels: labels,
-          onLabelTapped: (idx) => _scrollToSection(idx, labels[idx], type),
-        );
-    }
-  }
-
-  void _scrollToSection(int index, String label, MatchTabType type) {
-    // Basic logic: Jump to a position relative to match count.
-    // In a production app, we'd use GlobalKeys per section or a FixedExtentScrollController.
-    // For now, we perform a smart scroll to the match grid area.
-    final targetOffset = 800.0 + (index * 200.0); // Rough estimate
-    _scrollController.animateTo(
-      targetOffset,
-      duration: const Duration(milliseconds: 500),
-      curve: Curves.easeInOut,
-    );
-  }
-
-  Widget _buildMatchGrid(MatchTabType type) {
-    var matches = MatchSorter.getSortedMatches(
+  Widget _buildMatchGroupedList(MatchTabType type) {
+    final items = MatchSorter.getSortedMatches(
       widget.state.filteredMatches.cast(),
       type,
-    ).whereType<MatchModel>().toList();
+    );
 
-    if (matches.isEmpty) {
+    if (items.isEmpty) {
       return const Center(
         child: Text(
           "No matches found for this category",
@@ -259,55 +202,118 @@ class _DesktopHomeContentState extends State<DesktopHomeContent>
       );
     }
 
-    final totalMatches = matches.length;
-    final displayMatches = matches.take(_visibleMatchCount).toList();
-    final hasMore = totalMatches > _visibleMatchCount;
+    final List<Widget> children = [];
+    List<MatchModel> currentGroupMatches = [];
+
+    void flushGroup() {
+      if (currentGroupMatches.isNotEmpty) {
+        children.add(
+          GridView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: widget.isSidebarExpanded ? 3 : 4,
+              crossAxisSpacing: 20,
+              mainAxisSpacing: 20,
+              mainAxisExtent: 350,
+            ),
+            itemCount: currentGroupMatches.length,
+            itemBuilder: (context, idx) =>
+                MatchCard(match: currentGroupMatches[idx]),
+          ),
+        );
+        children.add(const SizedBox(height: 32));
+        currentGroupMatches = [];
+      }
+    }
+
+    for (final item in items) {
+      if (item is MatchGroupHeader) {
+        flushGroup();
+        children.add(_buildSectionHeader(item.title));
+      } else if (item is MatchModel) {
+        currentGroupMatches.add(item);
+      }
+    }
+    flushGroup();
 
     return Column(
-      children: [
-        GridView.builder(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: widget.isSidebarExpanded ? 3 : 4,
-            crossAxisSpacing: 20,
-            mainAxisSpacing: 20,
-            mainAxisExtent: 350,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: children,
+    );
+  }
+
+  Widget _buildSectionHeader(String title) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 16, top: 24),
+      child: Row(
+        children: [
+          Container(
+            width: 4,
+            height: 16,
+            decoration: BoxDecoration(
+              color: AppColors.primary,
+              borderRadius: BorderRadius.circular(2),
+            ),
           ),
-          itemCount: displayMatches.length,
-          itemBuilder: (context, index) {
-            return MatchCard(match: displayMatches[index]);
-          },
-        ),
-        if (hasMore) ...[
-          const SizedBox(height: 32),
-          Center(
-            child: TextButton(
-              onPressed: () {
-                setState(() => _visibleMatchCount += 12);
-              },
-              style: TextButton.styleFrom(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
-                backgroundColor: Colors.white.withValues(alpha: 0.05),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(30),
-                  side: BorderSide(color: Colors.white.withValues(alpha: 0.1)),
-                ),
-              ),
-              child: const Text(
-                "VIEW MORE MATCHES",
-                style: TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                  letterSpacing: 1.2,
-                ),
-              ),
+          const SizedBox(width: 8),
+          Text(
+            title.toUpperCase(),
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 14,
+              fontWeight: FontWeight.bold,
+              letterSpacing: 1.2,
+            ),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Container(
+              height: 1,
+              color: Colors.white10,
             ),
           ),
         ],
-        const SizedBox(height: 40),
-      ],
+      ),
+    );
+  }
+
+  // ---------- Side Ruler ----------
+
+  Widget? _buildSideRuler(MatchTabType type) {
+    List<String> labels;
+    switch (type) {
+      case MatchTabType.all:
+        final leagueNames = widget.state.filteredMatches
+            .map((m) => m.league ?? 'Other')
+            .toSet()
+            .toList()
+          ..sort();
+        labels = SideRuler.alphabeticalLabels(leagueNames);
+        break;
+      case MatchTabType.finished:
+        labels = SideRuler.finishedTimeLabels();
+        break;
+      case MatchTabType.scheduled:
+        labels = SideRuler.scheduledTimeLabels();
+        break;
+    }
+
+    if (labels.isEmpty) return null;
+
+    return SideRuler(
+      labels: labels,
+      onLabelTapped: (idx) => _scrollToSection(idx, labels[idx], type),
+    );
+  }
+
+  void _scrollToSection(int index, String label, MatchTabType type) {
+    // Basic jumping logic
+    final targetOffset = 800.0 + (index * 300.0);
+    _scrollController.animateTo(
+      targetOffset,
+      duration: const Duration(milliseconds: 500),
+      curve: Curves.easeInOut,
     );
   }
 }

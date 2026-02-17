@@ -4,6 +4,8 @@ import json
 import time
 import requests
 import re
+import unicodedata
+import uuid
 from collections import defaultdict
 from supabase import create_client
 from dotenv import load_dotenv
@@ -40,9 +42,61 @@ if not SUPABASE_URL or not SUPABASE_KEY:
 supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
 
 def normalize_for_search(name: str) -> str:
-    """Standard normalization for search term generation."""
+    """Standard normalization for search term generation (NFKD for accents)."""
     if not name: return ""
-    return re.sub(r'[^a-z0-9\s]', '', name.lower().strip())
+    # Normalize unicode characters to decompose accents
+    nfkd_form = unicodedata.normalize('NFKD', name)
+    # Filter out non-ASCII characters (accents)
+    only_ascii = "".join([c for c in nfkd_form if not unicodedata.combining(c)])
+    # Remove non-alphanumeric and lower
+    return re.sub(r'[^a-z0-9\s]', '', only_ascii.lower().strip())
+
+def generate_deterministic_id(name: str, context: str = "") -> str:
+    """Generates a deterministic ID using UUIDv5 as a fallback for slugs."""
+    namespace = uuid.NAMESPACE_DNS
+    unique_string = f"leobook-{context}-{normalize_for_search(name)}"
+    return str(uuid.uuid5(namespace, unique_string))
+
+def extract_json_with_salvage(text: str) -> list:
+    """
+    Attempts to extract JSON from text even if malformed or truncated.
+    Returns a list of salvaged objects.
+    """
+    if not text: return []
+    
+    # 1. Try standard regex for JSON block
+    match = re.search(r'\[\s*\{.*\}\s*\]', text, re.DOTALL)
+    if match:
+        try:
+            return json.loads(match.group())
+        except:
+            pass
+            
+    # 2. Salvage individual objects if the array is broken
+    objects = []
+    # Find potential JSON objects: {...}
+    potential_objects = re.findall(r'\{[^{}]*\}', text)
+    for obj_str in potential_objects:
+        try:
+            obj = json.loads(obj_str)
+            if isinstance(obj, dict) and "input_name" in obj:
+                objects.append(obj)
+        except:
+            continue
+    
+    # 3. If still empty, try to fix common truncation issues (missing closing bracket)
+    if not objects and "[" in text:
+        try:
+            # Append missing brackets/braces to see if it parses
+            salvaged = text.strip()
+            if not salvaged.endswith("]"):
+                if not salvaged.endswith("}"): salvaged += "}"
+                salvaged += "]"
+            return json.loads(salvaged)
+        except:
+            pass
+            
+    return objects
 
 def query_grok_for_metadata_with_retry(items, item_type="team", retries=3):
     """
@@ -56,6 +110,33 @@ def query_grok_for_metadata_with_retry(items, item_type="team", retries=3):
             time.sleep(5 * (attempt + 1)) # Exponential backoff
     print(f"  [Error] Grok API failed after {retries} attempts.")
     return []
+    """
+    Tries to find an existing league ID using exact match or slug matching.
+    Returns (rl_id, is_new)
+    """
+    # 1. Exact Name Match
+    for rl_id, data in existing_leagues_map.items():
+        if data.get('league') == league_name:
+            return rl_id, False
+            
+    # 2. Slug Match (Name + Country for uniqueness)
+    slug_base = normalize_for_search(league_name).replace(" ", "-")
+    country_slug = normalize_for_search(country).replace(" ", "-") if country else "intl"
+    full_slug = f"{country_slug}-{slug_base}"
+    
+    if full_slug in existing_leagues_map:
+        return full_slug, False
+        
+    if slug_base in existing_leagues_map:
+         return slug_base, False
+
+    # 3. UUID Fallback if names are extremely common or context is missing
+    det_id = generate_deterministic_id(league_name, context=country or "intl")
+    if det_id in existing_leagues_map:
+        return det_id, False
+
+    # 4. Create New ID (prefer full slug if possible, else UUID)
+    return full_slug if len(full_slug) < 100 else det_id, True
 
 def query_grok_for_metadata(items, item_type="team"):
     """
@@ -135,26 +216,40 @@ Return ONLY the JSON array — no explanations, no markdown.
         return []
         
     content = resp.json()["choices"][0]["message"]["content"].strip()
-    # Clean markdown if present
-    if content.startswith("```json"):
-        content = content[7:-3].strip()
-    elif content.startswith("```"):
-        content = content[3:-3].strip()
-        
-    try:
-        return json.loads(content)
-    except json.JSONDecodeError:
-        print("Warning: Grok response was not valid JSON:\n", content[:300], "...")
+    
+    # Salvage data from potential malformed JSON
+    data = extract_json_with_salvage(content)
+    if not data:
+        print("Warning: Grok response yielded no valid JSON:\n", content[:300], "...")
         return []
 
+    # Basic key validation
+    validated_data = []
+    for item in data:
+        if isinstance(item, dict) and "input_name" in item:
+            validated_data.append(item)
+        else:
+            print(f"  [Warning] Skipping irrelevant Grok item: {item}")
+    return validated_data
+
+def batch_upsert(table_name: str, data: list, chunk_size: int = 1000):
+    """Upserts data to Supabase in chunks to avoid payload limits."""
+    for i in range(0, len(data), chunk_size):
+        chunk = data[i:i + chunk_size]
+        try:
+            supabase.table(table_name).upsert(chunk).execute()
+        except Exception as e:
+            print(f"  [Error] Batch upsert to {table_name} failed (chunk starting at {i}): {e}")
+            # Individual fallback if batch fails
+            if len(chunk) > 1:
+                print("  [Info] Retrying chunk items individually...")
+                for item in chunk:
+                    try:
+                        supabase.table(table_name).upsert(item).execute()
+                    except Exception as e2:
+                        print(f"  [Error] Individual upsert failed: {e2}")
+
 def update_csv_file(file_path, data_map, key_field, headers):
-    """
-    Updates a local CSV file with enriched data.
-    data_map: dict of key -> dict of fields to update
-    """
-    if not os.path.exists(file_path):
-        print(f"Warning: CSV file {file_path} not found. Skipping update.")
-        return
 
     temp_file = file_path + ".tmp"
     updated_count = 0
@@ -241,29 +336,14 @@ def main():
     league_updates = {}
     team_updates = {}
 
-    # Load existing region_league IDs for matching
-    existing_rl_ids = set()
+    # Load existing region_league data for matching
+    existing_leagues = {}
     if os.path.exists(REGION_LEAGUE_CSV):
         with open(REGION_LEAGUE_CSV, mode='r', encoding='utf-8') as f:
             r = csv.DictReader(f)
             for row in r:
                 if row.get("rl_id"):
-                    existing_rl_ids.add(row["rl_id"])
-    
-    def find_best_rl_id(name):
-        # 1. Exact match
-        if name in existing_rl_ids: return name
-        
-        # 2. Slugify match
-        slug = re.sub(r'[\s]+', '-', re.sub(r'[^a-z0-9\s-]', '', name.lower().strip()))
-        if slug in existing_rl_ids: return slug
-
-        # 3. Try to match just the league part if "Region - League" format
-        if " - " in name:
-            part_slug = re.sub(r'[\s]+', '-', re.sub(r'[^a-z0-9\s-]', '', name.split(" - ")[-1].lower().strip()))
-            if part_slug in existing_rl_ids: return part_slug
-            
-        return name # Fallback to input name
+                    existing_leagues[row["rl_id"]] = row
 
     # ───────────────────────────────────────────────
     # Enrich and Upsert Leagues
@@ -278,9 +358,10 @@ def main():
         for item in results:
             input_name = item.get("input_name")
             official_name = item.get("official_name") or input_name
+            country = item.get("country")
             
-            # Determine correct ID for CSV sync
-            rl_id_key = find_best_rl_id(input_name)
+            # Determine correct ID for CSV sync (using country context)
+            rl_id_key, is_new = find_best_match_league(input_name, country, existing_leagues)
 
             # Build search terms
             search_terms = {normalize_for_search(input_name), normalize_for_search(official_name)}
@@ -306,20 +387,14 @@ def main():
             # Prepare CSV update data using the matched ID
             league_updates[rl_id_key] = upsert_data
 
-            # Upsert using region_league/input_name logic
-            try:
-                # Primary key for region_league is rl_id
-                supabase.table("region_league").upsert(
-                    {**upsert_data, "rl_id": rl_id_key}
-                ).execute()
-            except Exception as e:
-                # Ignore empty response error (PGRST204)
-                if "JSONDecodeError" in str(e) or "204" in str(e):
-                    pass
-                else:
-                    print(f"  [Error] Upsert failed for region_league {input_name}: {e}")
-                
-                
+            # Prepare for batch upsert
+            league_updates[rl_id_key] = {**upsert_data, "rl_id": rl_id_key}
+
+        # Batched Upsert to Supabase
+        if league_updates:
+            print(f"  [Supabase] Batch upserting {len(league_updates)} leagues...")
+            batch_upsert("region_league", list(league_updates.values()))
+
         time.sleep(SLEEP_BETWEEN_BATCHES) # Wait between batches
 
         # INCREMENTAL UPDATE: Update Region League CSV after each batch
@@ -374,23 +449,13 @@ def main():
             # Prepare CSV update data
             team_updates[tid] = upsert_data
 
-            try:
-                supabase.table("teams").upsert(upsert_data).execute()
-            except Exception as e:
-                # Handle missing column error (e.g. stadium) -> retry without stadium
-                if "stadium" in str(e) or "column" in str(e):
-                    print(f"  [Warning] Upsert failed due to schema mismatch (likely missing 'stadium'). Retrying without stadium...")
-                    try:
-                        data_no_stadium = upsert_data.copy()
-                        data_no_stadium.pop("stadium", None)
-                        supabase.table("teams").upsert(data_no_stadium).execute()
-                    except Exception as e2:
-                        print(f"  [Error] Retry failed for team {tid}: {e2}")
-                # Ignore empty response error
-                elif "JSONDecodeError" in str(e) or "204" in str(e):
-                    pass
-                else:
-                    print(f"  [Error] Upsert failed for team {tid}: {e}")
+            # Prepare for batch upsert
+            team_updates[tid] = upsert_data
+
+        # Batched Upsert to Supabase
+        if team_updates:
+            print(f"  [Supabase] Batch upserting {len(team_updates)} teams...")
+            batch_upsert("teams", list(team_updates.values()))
                 
         time.sleep(SLEEP_BETWEEN_BATCHES) # Wait between batches
 

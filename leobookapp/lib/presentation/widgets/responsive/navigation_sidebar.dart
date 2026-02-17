@@ -26,52 +26,60 @@ class NavigationSideBar extends StatelessWidget {
         color: AppColors.surfaceDark,
         border: Border(right: BorderSide(color: Colors.white10)),
       ),
-      child: Column(
-        children: [
-          _buildLogo(),
-          const SizedBox(height: 32),
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 12),
-              child: Column(
-                children: [
-                  _NavItem(
-                    icon: Icons.home_rounded,
-                    label: "HOME",
-                    isActive: currentIndex == 0,
-                    isExpanded: isExpanded,
-                    onTap: () => onIndexChanged(0),
+      child: SingleChildScrollView(
+        child: ConstrainedBox(
+          constraints:
+              BoxConstraints(minHeight: MediaQuery.of(context).size.height),
+          child: IntrinsicHeight(
+            child: Column(
+              children: [
+                _buildLogo(),
+                const SizedBox(height: 32),
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 12),
+                    child: Column(
+                      children: [
+                        _NavItem(
+                          icon: Icons.home_rounded,
+                          label: "HOME",
+                          isActive: currentIndex == 0,
+                          isExpanded: isExpanded,
+                          onTap: () => onIndexChanged(0),
+                        ),
+                        _NavItem(
+                          icon: Icons.gavel_rounded,
+                          label: "RULES",
+                          isActive: currentIndex == 1,
+                          isExpanded: isExpanded,
+                          onTap: () => onIndexChanged(1),
+                        ),
+                        _NavItem(
+                          icon: Icons.emoji_events_rounded,
+                          label: "TOP",
+                          isActive: currentIndex == 2,
+                          isExpanded: isExpanded,
+                          onTap: () => onIndexChanged(2),
+                        ),
+                        _NavItem(
+                          icon: Icons.person_rounded,
+                          label: "PROFILE",
+                          isActive: currentIndex == 3,
+                          isExpanded: isExpanded,
+                          onTap: () => onIndexChanged(3),
+                        ),
+                      ],
+                    ),
                   ),
-                  _NavItem(
-                    icon: Icons.gavel_rounded,
-                    label: "RULES",
-                    isActive: currentIndex == 1,
-                    isExpanded: isExpanded,
-                    onTap: () => onIndexChanged(1),
-                  ),
-                  _NavItem(
-                    icon: Icons.emoji_events_rounded,
-                    label: "TOP",
-                    isActive: currentIndex == 2,
-                    isExpanded: isExpanded,
-                    onTap: () => onIndexChanged(2),
-                  ),
-                  _NavItem(
-                    icon: Icons.person_rounded,
-                    label: "PROFILE",
-                    isActive: currentIndex == 3,
-                    isExpanded: isExpanded,
-                    onTap: () => onIndexChanged(3),
-                  ),
-                ],
-              ),
+                ),
+                _buildToggleBtn(),
+                const SizedBox(height: 16),
+                if (isExpanded) _buildProCard(),
+                const SizedBox(height: 16),
+              ],
             ),
           ),
-          _buildToggleBtn(),
-          const SizedBox(height: 16),
-          if (isExpanded) _buildProCard(),
-          const SizedBox(height: 16),
-        ],
+        ),
       ),
     );
   }
@@ -91,7 +99,7 @@ class NavigationSideBar extends StatelessWidget {
   Widget _buildLogo() {
     return Padding(
       padding: EdgeInsets.symmetric(
-        horizontal: isExpanded ? 24.0 : 8.0,
+        horizontal: isExpanded ? 16.0 : 8.0,
         vertical: isExpanded ? 24.0 : 12.0,
       ),
       child: Row(
@@ -133,9 +141,9 @@ class NavigationSideBar extends StatelessWidget {
 
   Widget _buildProCard() {
     return Padding(
-      padding: const EdgeInsets.all(24.0),
+      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 24.0),
       child: Container(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
           color: AppColors.backgroundDark,
           borderRadius: BorderRadius.circular(20),
