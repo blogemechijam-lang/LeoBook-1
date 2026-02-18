@@ -9,13 +9,10 @@ import 'package:leobookapp/presentation/screens/home_screen.dart';
 import 'package:leobookapp/presentation/screens/account_screen.dart';
 import 'package:leobookapp/presentation/screens/rule_engine/backtest_dashboard.dart';
 import 'package:leobookapp/presentation/screens/top_predictions_screen.dart';
-import 'package:leobookapp/presentation/widgets/responsive/navigation_sidebar.dart';
 import 'package:leobookapp/presentation/widgets/responsive/desktop_header.dart';
 import 'package:leobookapp/logic/cubit/search_cubit.dart';
 import 'package:leobookapp/logic/cubit/home_cubit.dart';
 import 'package:leobookapp/data/models/match_model.dart';
-
-import '../widgets/responsive/global_stats_footer.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -26,14 +23,6 @@ class MainScreen extends StatefulWidget {
 
 class _MainScreenState extends State<MainScreen> {
   int _currentIndex = 0;
-  bool _isSidebarExpanded = true;
-
-  final List<Widget> _screens = [
-    const HomeScreen(),
-    const BacktestDashboard(),
-    const TopPredictionsScreen(),
-    const AccountScreen(),
-  ];
 
   @override
   Widget build(BuildContext context) {
@@ -43,173 +32,138 @@ class _MainScreenState extends State<MainScreen> {
       builder: (context, constraints) {
         final isDesktop = constraints.maxWidth > 1024;
 
-        if (isDesktop) {
-          return Scaffold(
-            body: Row(
-              children: [
-                NavigationSideBar(
-                  currentIndex: _currentIndex,
-                  isExpanded: _isSidebarExpanded,
-                  onToggle: () =>
-                      setState(() => _isSidebarExpanded = !_isSidebarExpanded),
-                  onIndexChanged: (index) {
-                    setState(() => _currentIndex = index);
-                    HapticFeedback.lightImpact();
-                  },
-                ),
-                Expanded(
-                  child: BlocBuilder<HomeCubit, HomeState>(
-                    builder: (context, state) {
-                      if (state is HomeLoaded) {
-                        return BlocProvider<SearchCubit>(
-                          create: (context) => SearchCubit(
-                            allMatches: state.allMatches.cast<MatchModel>(),
-                            allRecommendations: state.filteredRecommendations,
-                          ),
-                          child: Column(
-                            children: [
-                              const DesktopHeader(),
-                              Expanded(
-                                child: IndexedStack(
-                                  index: _currentIndex,
-                                  children: [
-                                    HomeScreen(
-                                        isSidebarExpanded: _isSidebarExpanded),
-                                    const BacktestDashboard(),
-                                    const TopPredictionsScreen(),
-                                    const AccountScreen(),
-                                  ],
-                                ),
-                              ),
-                              const GlobalStatsFooter(),
-                            ],
-                          ),
-                        );
-                      }
-                      return Column(
-                        children: [
-                          const DesktopHeader(),
-                          Expanded(
-                            child: IndexedStack(
-                              index: _currentIndex,
-                              children: [
-                                HomeScreen(
-                                    isSidebarExpanded: _isSidebarExpanded),
-                                const BacktestDashboard(),
-                                const TopPredictionsScreen(),
-                                const AccountScreen(),
-                              ],
-                            ),
-                          ),
-                          const GlobalStatsFooter(),
-                        ],
-                      );
-                    },
-                  ),
-                ),
-              ],
-            ),
-          );
-        }
-
-        // ─── Mobile / Tablet: Floating Glass Bottom Nav ───
         return BlocBuilder<HomeCubit, HomeState>(
           builder: (context, state) {
-            Widget scaffoldBody =
-                IndexedStack(index: _currentIndex, children: _screens);
+            Widget bodyArea;
 
             if (state is HomeLoaded) {
-              scaffoldBody = BlocProvider<SearchCubit>(
+              final content = Column(
+                children: [
+                  if (isDesktop) const DesktopHeader(),
+                  Expanded(
+                    child: IndexedStack(
+                      index: _currentIndex,
+                      children: [
+                        const HomeScreen(),
+                        const BacktestDashboard(),
+                        const TopPredictionsScreen(),
+                        const AccountScreen(),
+                      ],
+                    ),
+                  ),
+                ],
+              );
+
+              bodyArea = BlocProvider<SearchCubit>(
                 create: (context) => SearchCubit(
                   allMatches: state.allMatches.cast<MatchModel>(),
                   allRecommendations: state.filteredRecommendations,
                 ),
-                child: scaffoldBody,
+                child: content,
+              );
+            } else {
+              bodyArea = Column(
+                children: [
+                  if (isDesktop) const DesktopHeader(),
+                  Expanded(
+                    child: IndexedStack(
+                      index: _currentIndex,
+                      children: [
+                        const HomeScreen(),
+                        const BacktestDashboard(),
+                        const TopPredictionsScreen(),
+                        const AccountScreen(),
+                      ],
+                    ),
+                  ),
+                ],
               );
             }
 
             return Scaffold(
               extendBody: true,
-              body: scaffoldBody,
-              bottomNavigationBar: Container(
-                color: Colors.transparent,
-                margin: Responsive.bottomNavMargin(context),
-                child: ClipRRect(
-                  borderRadius:
-                      BorderRadius.circular(Responsive.sp(context, 18)),
-                  child: BackdropFilter(
-                    filter: ImageFilter.blur(
-                      sigmaX: LiquidGlassTheme.blurRadiusMedium,
-                      sigmaY: LiquidGlassTheme.blurRadiusMedium,
-                    ),
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: isDark
-                            ? AppColors.cardDark.withValues(alpha: 0.35)
-                            : Colors.white.withValues(alpha: 0.35),
+              body: bodyArea,
+              bottomNavigationBar: isDesktop
+                  ? null
+                  : Container(
+                      color: Colors.transparent,
+                      margin: Responsive.bottomNavMargin(context),
+                      child: ClipRRect(
                         borderRadius:
                             BorderRadius.circular(Responsive.sp(context, 18)),
-                        border: Border.all(
-                          color: LiquidGlassTheme.glassBorder(
-                            Theme.of(context).brightness,
+                        child: BackdropFilter(
+                          filter: ImageFilter.blur(
+                            sigmaX: LiquidGlassTheme.blurRadiusMedium,
+                            sigmaY: LiquidGlassTheme.blurRadiusMedium,
                           ),
-                          width: 0.5,
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: isDark
+                                  ? AppColors.cardDark.withValues(alpha: 0.35)
+                                  : Colors.white.withValues(alpha: 0.35),
+                              borderRadius: BorderRadius.circular(
+                                  Responsive.sp(context, 18)),
+                              border: Border.all(
+                                color: LiquidGlassTheme.glassBorder(
+                                  Theme.of(context).brightness,
+                                ),
+                                width: 0.5,
+                              ),
+                            ),
+                            child: BottomNavigationBar(
+                              currentIndex: _currentIndex,
+                              onTap: (index) {
+                                setState(() => _currentIndex = index);
+                                HapticFeedback.lightImpact();
+                              },
+                              backgroundColor: Colors.transparent,
+                              elevation: 0,
+                              type: BottomNavigationBarType.fixed,
+                              showSelectedLabels: true,
+                              showUnselectedLabels: true,
+                              selectedFontSize: Responsive.sp(context, 7),
+                              unselectedFontSize: Responsive.sp(context, 7),
+                              selectedLabelStyle: TextStyle(
+                                fontSize: Responsive.sp(context, 7),
+                                fontWeight: FontWeight.w900,
+                                letterSpacing: 0.5,
+                              ),
+                              unselectedLabelStyle: TextStyle(
+                                fontSize: Responsive.sp(context, 7),
+                                color: Colors
+                                    .transparent, // Hidden but occupies space
+                              ),
+                              items: [
+                                _buildNavItem(
+                                  Icons.home_rounded,
+                                  Icons.home_outlined,
+                                  0,
+                                  "HOME",
+                                ),
+                                _buildNavItem(
+                                  Icons.science_rounded,
+                                  Icons.science_outlined,
+                                  1,
+                                  "RULES",
+                                ),
+                                _buildNavItem(
+                                  Icons.emoji_events_rounded,
+                                  Icons.emoji_events_outlined,
+                                  2,
+                                  "TOP",
+                                ),
+                                _buildNavItem(
+                                  Icons.person_rounded,
+                                  Icons.person_outline_rounded,
+                                  3,
+                                  "PROFILE",
+                                ),
+                              ],
+                            ),
+                          ),
                         ),
-                      ),
-                      child: BottomNavigationBar(
-                        currentIndex: _currentIndex,
-                        onTap: (index) {
-                          setState(() => _currentIndex = index);
-                          HapticFeedback.lightImpact();
-                        },
-                        backgroundColor: Colors.transparent,
-                        elevation: 0,
-                        type: BottomNavigationBarType.fixed,
-                        showSelectedLabels: true,
-                        showUnselectedLabels: true,
-                        selectedFontSize: Responsive.sp(context, 7),
-                        unselectedFontSize: Responsive.sp(context, 7),
-                        selectedLabelStyle: TextStyle(
-                          fontSize: Responsive.sp(context, 7),
-                          fontWeight: FontWeight.w900,
-                          letterSpacing: 0.5,
-                        ),
-                        unselectedLabelStyle: TextStyle(
-                          fontSize: Responsive.sp(context, 7),
-                          color:
-                              Colors.transparent, // Hidden but occupies space
-                        ),
-                        items: [
-                          _buildNavItem(
-                            Icons.home_rounded,
-                            Icons.home_outlined,
-                            0,
-                            "HOME",
-                          ),
-                          _buildNavItem(
-                            Icons.science_rounded,
-                            Icons.science_outlined,
-                            1,
-                            "RULES",
-                          ),
-                          _buildNavItem(
-                            Icons.emoji_events_rounded,
-                            Icons.emoji_events_outlined,
-                            2,
-                            "TOP",
-                          ),
-                          _buildNavItem(
-                            Icons.person_rounded,
-                            Icons.person_outline_rounded,
-                            3,
-                            "PROFILE",
-                          ),
-                        ],
                       ),
                     ),
-                  ),
-                ),
-              ),
             );
           },
         );

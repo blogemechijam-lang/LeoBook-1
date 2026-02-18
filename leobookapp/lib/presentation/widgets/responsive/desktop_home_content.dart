@@ -1,7 +1,7 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'top_predictions_grid.dart';
 import 'category_bar.dart';
+import '../featured_carousel.dart';
 import 'accuracy_report_card.dart';
 import 'top_odds_list.dart';
 import '../../../logic/cubit/home_cubit.dart';
@@ -9,18 +9,16 @@ import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/responsive_constants.dart';
 import '../../../core/utils/match_sorter.dart';
 import 'package:leobookapp/presentation/widgets/match_card.dart';
-import '../footnote_section.dart';
 import 'package:leobookapp/data/models/match_model.dart';
 import '../../../core/theme/liquid_glass_theme.dart';
+import '../footnote_section.dart';
 
 class DesktopHomeContent extends StatefulWidget {
   final HomeLoaded state;
-  final bool isSidebarExpanded;
 
   const DesktopHomeContent({
     super.key,
     required this.state,
-    required this.isSidebarExpanded,
   });
 
   @override
@@ -32,7 +30,6 @@ class _DesktopHomeContentState extends State<DesktopHomeContent>
   late TabController _tabController;
   late ScrollController _scrollController;
   final GlobalKey _tabBarKey = GlobalKey();
-  final GlobalKey _footerKey = GlobalKey();
   final Map<String, GlobalKey> _sectionKeys = {};
   int _visibleMatchCount = 12;
 
@@ -118,7 +115,11 @@ class _DesktopHomeContentState extends State<DesktopHomeContent>
                   hPad, 0, hPad, Responsive.dp(context, 20)),
               sliver: SliverList(
                 delegate: SliverChildListDelegate([
-                  const TopPredictionsGrid(),
+                  FeaturedCarousel(
+                    matches: widget.state.featuredMatches,
+                    recommendations: widget.state.filteredRecommendations,
+                    allMatches: widget.state.allMatches,
+                  ),
                   SizedBox(height: Responsive.dp(context, 24)),
                   const AccuracyReportCard(),
                   SizedBox(height: Responsive.dp(context, 24)),
@@ -170,8 +171,8 @@ class _DesktopHomeContentState extends State<DesktopHomeContent>
                 ),
               ),
             ),
-            SliverToBoxAdapter(
-              child: FootnoteSection(key: _footerKey),
+            const SliverToBoxAdapter(
+              child: FootnoteSection(),
             ),
           ],
         ),
@@ -230,7 +231,7 @@ class _DesktopHomeContentState extends State<DesktopHomeContent>
         children.add(
           LayoutBuilder(
             builder: (context, constraints) {
-              final crossAxisCount = widget.isSidebarExpanded ? 3 : 4;
+              const crossAxisCount = 4;
               final spacing = Responsive.dp(context, 12);
               final itemWidth =
                   (constraints.maxWidth - (spacing * (crossAxisCount - 1))) /

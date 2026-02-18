@@ -178,54 +178,25 @@ class DataRepository {
     }
   }
 
-  // --- Realtime Streams (Broadcast Style) ---
+  // --- Realtime Streams (Postgres Changes Style) ---
 
   Stream<List<MatchModel>> watchLiveScores() {
-    final controller = StreamController<List<MatchModel>>();
-    final channel = _supabase.channel('public.live_scores');
-
-    channel
-        .onBroadcast(
-          event: '*',
-          callback: (payload, [_]) async {
-            final response = await _supabase.from('live_scores').select();
-            final matches = (response as List)
-                .map((row) => MatchModel.fromCsv(row))
-                .toList();
-            if (!controller.isClosed) controller.add(matches);
-          },
-        )
-        .subscribe();
-
-    controller.onCancel = () => channel.unsubscribe();
-    return controller.stream;
+    return _supabase.from('live_scores').stream(primaryKey: ['fixture_id']).map(
+        (rows) => rows.map((row) => MatchModel.fromCsv(row)).toList());
   }
 
   Stream<List<MatchModel>> watchPredictions({DateTime? date}) {
-    final controller = StreamController<List<MatchModel>>();
-    final channel = _supabase.channel('public.predictions');
+    var query =
+        _supabase.from('predictions').stream(primaryKey: ['fixture_id']);
 
-    channel
-        .onBroadcast(
-          event: '*',
-          callback: (payload, [_]) async {
-            var query = _supabase.from('predictions').select();
-            if (date != null) {
-              final dateStr =
-                  "${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}";
-              query = query.eq('date', dateStr);
-            }
-            final response =
-                await query.order('date', ascending: false).limit(200);
-            final matches = (response as List)
-                .map((row) => MatchModel.fromCsv(row, row))
-                .toList();
-            if (!controller.isClosed) controller.add(matches);
-          },
-        )
-        .subscribe();
-
-    controller.onCancel = () => channel.unsubscribe();
-    return controller.stream;
+    return query.map((rows) {
+      var matches = rows.map((row) => MatchModel.fromCsv(row, row)).toList();
+      if (date != null) {
+        final dateStr =
+            "${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}";
+        matches = matches.where((m) => m.date == dateStr).toList();
+      }
+      return matches;
+    });
   }
 }

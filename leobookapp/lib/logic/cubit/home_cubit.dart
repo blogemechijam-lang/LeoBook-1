@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:leobookapp/data/models/match_model.dart';
 import 'package:leobookapp/data/repositories/data_repository.dart';
@@ -137,11 +138,15 @@ class HomeCubit extends Cubit<HomeState> {
           .watchPredictions(date: selectionDate)
           .listen((updatedMatches) {
         _handleRealtimeUpdate(updatedMatches);
+      }, onError: (e) {
+        debugPrint("Predictions Stream Error: $e");
       });
 
       _liveScoresSub?.cancel();
       _liveScoresSub = _dataRepository.watchLiveScores().listen((liveUpdates) {
         _handleRealtimeUpdate(liveUpdates);
+      }, onError: (e) {
+        debugPrint("LiveScores Stream Error: $e");
       });
     } catch (e) {
       emit(HomeError("Failed to load dashboard: $e"));
@@ -274,6 +279,8 @@ class HomeCubit extends Cubit<HomeState> {
       _predictionsSub =
           _dataRepository.watchPredictions(date: date).listen((updatedMatches) {
         _handleRealtimeUpdate(updatedMatches);
+      }, onError: (e) {
+        debugPrint("Predictions Stream (Update) Error: $e");
       });
     }
   }
@@ -471,6 +478,7 @@ class HomeCubit extends Cubit<HomeState> {
   @override
   Future<void> close() {
     _predictionsSub?.cancel();
+    _liveScoresSub?.cancel();
     return super.close();
   }
 }

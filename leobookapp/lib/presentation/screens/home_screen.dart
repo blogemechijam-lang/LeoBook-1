@@ -9,17 +9,16 @@ import 'package:leobookapp/core/animations/liquid_glass_animations.dart';
 import '../widgets/match_card.dart';
 import '../widgets/featured_carousel.dart';
 import '../widgets/news_feed.dart';
-import '../widgets/footnote_section.dart';
 import '../widgets/responsive/desktop_home_content.dart';
 import '../widgets/responsive/category_bar.dart';
-import '../widgets/responsive/top_predictions_grid.dart';
+import '../widgets/responsive/top_odds_list.dart';
 import '../../logic/cubit/search_cubit.dart';
 import 'search_screen.dart';
 import '../../core/theme/liquid_glass_theme.dart';
+import '../widgets/footnote_section.dart';
 
 class HomeScreen extends StatefulWidget {
-  final bool isSidebarExpanded;
-  const HomeScreen({super.key, this.isSidebarExpanded = true});
+  const HomeScreen({super.key});
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -57,7 +56,6 @@ class _HomeScreenState extends State<HomeScreen>
             if (isDesktop) {
               return DesktopHomeContent(
                 state: state,
-                isSidebarExpanded: widget.isSidebarExpanded,
               );
             }
 
@@ -73,63 +71,93 @@ class _HomeScreenState extends State<HomeScreen>
                     SliverPersistentHeader(
                       pinned: true,
                       delegate: _CategoryHeaderDelegate(
-                        child: Row(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            const Expanded(child: CategoryBar()),
-                            SizedBox(width: Responsive.sp(context, 6)),
-                            GestureDetector(
-                              onTap: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (_) => BlocProvider.value(
-                                      value: context.read<SearchCubit>(),
-                                      child: const SearchScreen(),
+                            // Top Row: App Name + Search (Padded)
+                            Padding(
+                              padding: EdgeInsets.symmetric(horizontal: hp),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    "LEOBOOK",
+                                    style: TextStyle(
+                                      fontSize: Responsive.sp(context, 12),
+                                      fontWeight: FontWeight.w900,
+                                      color: isDark
+                                          ? Colors.white
+                                          : AppColors.textDark,
+                                      letterSpacing: 2.0,
                                     ),
                                   ),
-                                );
-                              },
-                              child: Container(
-                                padding:
-                                    EdgeInsets.all(Responsive.sp(context, 7)),
-                                decoration: BoxDecoration(
-                                  color: isDark
-                                      ? Colors.white.withValues(alpha: 0.05)
-                                      : Colors.black.withValues(alpha: 0.05),
-                                  borderRadius: BorderRadius.circular(
-                                      Responsive.sp(context, 8)),
-                                ),
-                                child: Icon(
-                                  Icons.search_rounded,
-                                  color:
-                                      isDark ? Colors.white70 : Colors.black54,
-                                  size: Responsive.sp(context, 16),
-                                ),
+                                  GestureDetector(
+                                    onTap: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (_) => BlocProvider.value(
+                                            value: context.read<SearchCubit>(),
+                                            child: const SearchScreen(),
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                    child: Container(
+                                      padding: EdgeInsets.all(
+                                          Responsive.sp(context, 6)),
+                                      decoration: BoxDecoration(
+                                        color: isDark
+                                            ? Colors.white
+                                                .withValues(alpha: 0.05)
+                                            : Colors.black
+                                                .withValues(alpha: 0.05),
+                                        borderRadius: BorderRadius.circular(
+                                            Responsive.sp(context, 8)),
+                                      ),
+                                      child: Icon(
+                                        Icons.search_rounded,
+                                        color: isDark
+                                            ? Colors.white70
+                                            : Colors.black54,
+                                        size: Responsive.sp(context, 15),
+                                      ),
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
+                            SizedBox(height: Responsive.sp(context, 4)),
+                            // Bottom Row: Category Bar (Edge-to-Edge)
+                            const CategoryBar(),
                           ],
                         ),
-                        hp: hp,
                         isDark: isDark,
                       ),
                     ),
                     SliverPadding(
                       padding: EdgeInsets.symmetric(horizontal: hp),
-                      sliver: const SliverToBoxAdapter(
-                        child: TopPredictionsGrid(),
+                      sliver: SliverToBoxAdapter(
+                        child: FeaturedCarousel(
+                          matches: state.featuredMatches,
+                          recommendations: state.filteredRecommendations,
+                          allMatches: state.allMatches,
+                        ),
                       ),
                     ),
-                    SliverToBoxAdapter(
-                        child: SizedBox(height: Responsive.sp(context, 10))),
-                    SliverToBoxAdapter(
-                      child: FeaturedCarousel(
-                        matches: state.featuredMatches,
-                        recommendations: state.filteredRecommendations,
-                        allMatches: state.allMatches,
+                    SliverPadding(
+                      padding: EdgeInsets.symmetric(horizontal: hp),
+                      sliver: SliverToBoxAdapter(
+                        child: Column(
+                          children: [
+                            SizedBox(height: Responsive.sp(context, 10)),
+                            const TopOddsList(),
+                            SizedBox(height: Responsive.sp(context, 10)),
+                          ],
+                        ),
                       ),
                     ),
-                    SliverToBoxAdapter(
-                        child: SizedBox(height: Responsive.sp(context, 6))),
                     SliverToBoxAdapter(child: NewsFeed(news: state.news)),
                     SliverToBoxAdapter(
                         child: SizedBox(height: Responsive.sp(context, 6))),
@@ -144,7 +172,7 @@ class _HomeScreenState extends State<HomeScreen>
                           unselectedLabelColor:
                               isDark ? Colors.white60 : AppColors.textGrey,
                           labelStyle: TextStyle(
-                            fontSize: Responsive.sp(context, 9),
+                            fontSize: Responsive.sp(context, 10),
                             fontWeight: FontWeight.w900,
                             letterSpacing: 0.8,
                           ),
@@ -152,6 +180,7 @@ class _HomeScreenState extends State<HomeScreen>
                             fontSize: Responsive.sp(context, 8),
                             fontWeight: FontWeight.w700,
                           ),
+                          dividerColor: Colors.transparent,
                           labelPadding: EdgeInsets.symmetric(
                               horizontal: Responsive.sp(context, 4)),
                           tabs: const [
@@ -165,8 +194,10 @@ class _HomeScreenState extends State<HomeScreen>
                       ),
                     ),
                     SliverFillRemaining(
+                      hasScrollBody: true,
                       child: TabBarView(
                         controller: _tabController,
+                        physics: const AlwaysScrollableScrollPhysics(),
                         children: [
                           _buildMatchList(
                             state.filteredMatches,
@@ -190,6 +221,12 @@ class _HomeScreenState extends State<HomeScreen>
                           ),
                         ],
                       ),
+                    ),
+                    SliverToBoxAdapter(
+                      child: SizedBox(height: Responsive.sp(context, 20)),
+                    ),
+                    const SliverToBoxAdapter(
+                      child: FootnoteSection(),
                     ),
                   ],
                 ),
@@ -238,28 +275,22 @@ class _HomeScreenState extends State<HomeScreen>
 
     return ListView.builder(
       physics: liquidScrollPhysics,
-      itemCount: sortedItems.length + 1,
+      itemCount: sortedItems.length,
       itemBuilder: (context, index) {
-        final isFooter = index == sortedItems.length;
-
         return Stack(
           children: [
-            if (!isFooter)
-              Positioned(
-                left: guideLine + 1,
-                top: 0,
-                bottom: 0,
-                child: Container(
-                  width: 0.5,
-                  color: isDark
-                      ? Colors.white.withValues(alpha: 0.08)
-                      : Colors.black.withValues(alpha: 0.04),
-                ),
+            Positioned(
+              left: guideLine + 1,
+              top: 0,
+              bottom: 0,
+              child: Container(
+                width: 0.5,
+                color: isDark
+                    ? Colors.white.withValues(alpha: 0.08)
+                    : Colors.black.withValues(alpha: 0.04),
               ),
-            if (isFooter)
-              const FootnoteSection()
-            else
-              _buildItem(sortedItems[index], isDark),
+            ),
+            _buildItem(sortedItems[index], isDark),
           ],
         );
       },
@@ -337,46 +368,51 @@ class _StickyTabBarDelegate extends SliverPersistentHeaderDelegate {
     double shrinkOffset,
     bool overlapsContent,
   ) {
-    final guideLine = Responsive.sp(context, 14);
-    return Stack(
-      children: [
-        Positioned(
-          left: guideLine + 1,
-          top: 0,
-          bottom: 0,
-          child: Container(
-            width: 0.5,
-            color: isDark
-                ? Colors.white.withValues(alpha: 0.08)
-                : Colors.black.withValues(alpha: 0.04),
-          ),
-        ),
-        ClipRect(
-          child: BackdropFilter(
-            filter: ImageFilter.blur(
-              sigmaX: LiquidGlassTheme.blurRadiusMedium,
-              sigmaY: LiquidGlassTheme.blurRadiusMedium,
+    final hp = Responsive.horizontalPadding(context);
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: hp),
+      color: Colors.transparent,
+      child: Stack(
+        children: [
+          ClipRRect(
+            borderRadius: BorderRadius.vertical(
+              top: Radius.circular(Responsive.sp(context, 16)),
             ),
-            child: Container(
-              decoration: BoxDecoration(
-                color: (isDark
-                        ? AppColors.backgroundDark
-                        : AppColors.backgroundLight)
-                    .withValues(alpha: 0.35),
-                border: Border(
-                  bottom: BorderSide(
-                    color: isDark
-                        ? Colors.white10
-                        : Colors.black.withValues(alpha: 0.04),
-                    width: 0.5,
+            child: BackdropFilter(
+              filter: ImageFilter.blur(
+                sigmaX: LiquidGlassTheme.blurRadiusMedium,
+                sigmaY: LiquidGlassTheme.blurRadiusMedium,
+              ),
+              child: Container(
+                decoration: BoxDecoration(
+                  color: (isDark
+                          ? AppColors.backgroundDark
+                          : AppColors.backgroundLight)
+                      .withValues(alpha: 0.5),
+                  borderRadius: BorderRadius.vertical(
+                    top: Radius.circular(Responsive.sp(context, 16)),
+                  ),
+                  border: Border(
+                    top: BorderSide(
+                      color: Colors.white.withValues(alpha: 0.1),
+                      width: 0.5,
+                    ),
+                    left: BorderSide(
+                      color: Colors.white.withValues(alpha: 0.1),
+                      width: 0.5,
+                    ),
+                    right: BorderSide(
+                      color: Colors.white.withValues(alpha: 0.1),
+                      width: 0.5,
+                    ),
                   ),
                 ),
+                child: _tabBar,
               ),
-              child: _tabBar,
             ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
@@ -388,19 +424,17 @@ class _StickyTabBarDelegate extends SliverPersistentHeaderDelegate {
 
 class _CategoryHeaderDelegate extends SliverPersistentHeaderDelegate {
   final Widget child;
-  final double hp;
   final bool isDark;
 
   _CategoryHeaderDelegate({
     required this.child,
-    required this.hp,
     required this.isDark,
   });
 
   @override
-  double get minExtent => 48; // Fixed height optimized for compact UI
+  double get minExtent => 100.0; // Adjusted for padding and spacing
   @override
-  double get maxExtent => 48;
+  double get maxExtent => 100.0;
 
   // We rewrite to use context in the builder
   @override
@@ -416,9 +450,9 @@ class _CategoryHeaderDelegate extends SliverPersistentHeaderDelegate {
           sigmaY: LiquidGlassTheme.blurRadiusMedium,
         ),
         child: Container(
-          padding: EdgeInsets.symmetric(
-            horizontal: hp,
-            vertical: Responsive.sp(context, 4),
+          padding: EdgeInsets.only(
+            top: MediaQuery.paddingOf(context).top + Responsive.sp(context, 8),
+            bottom: Responsive.sp(context, 4),
           ),
           decoration: BoxDecoration(
             color:
@@ -441,6 +475,6 @@ class _CategoryHeaderDelegate extends SliverPersistentHeaderDelegate {
 
   @override
   bool shouldRebuild(_CategoryHeaderDelegate oldDelegate) {
-    return isDark != oldDelegate.isDark || hp != oldDelegate.hp;
+    return isDark != oldDelegate.isDark;
   }
 }
