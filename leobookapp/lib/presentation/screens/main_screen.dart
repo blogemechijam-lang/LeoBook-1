@@ -112,6 +112,7 @@ class _MainScreenState extends State<MainScreen> {
           );
         }
 
+        // ─── Mobile / Tablet: Floating Glass Bottom Nav ───
         return BlocBuilder<HomeCubit, HomeState>(
           builder: (context, state) {
             Widget scaffoldBody =
@@ -127,7 +128,6 @@ class _MainScreenState extends State<MainScreen> {
               );
             }
 
-            final screenWidth = constraints.maxWidth;
             return Scaffold(
               extendBody: true,
               body: SafeArea(
@@ -136,26 +136,27 @@ class _MainScreenState extends State<MainScreen> {
               ),
               bottomNavigationBar: Container(
                 color: Colors.transparent,
-                margin: Responsive.bottomNavMargin(screenWidth),
+                margin: Responsive.bottomNavMargin(context),
                 child: ClipRRect(
                   borderRadius:
-                      BorderRadius.circular(LiquidGlassTheme.borderRadiusLarge),
+                      BorderRadius.circular(Responsive.sp(context, 18)),
                   child: BackdropFilter(
                     filter: ImageFilter.blur(
-                      sigmaX: LiquidGlassTheme.blurRadius,
-                      sigmaY: LiquidGlassTheme.blurRadius,
+                      sigmaX: LiquidGlassTheme.blurRadiusMedium,
+                      sigmaY: LiquidGlassTheme.blurRadiusMedium,
                     ),
                     child: Container(
                       decoration: BoxDecoration(
                         color: isDark
-                            ? AppColors.cardDark.withValues(alpha: 0.85)
-                            : Colors.white.withValues(alpha: 0.85),
-                        borderRadius: BorderRadius.circular(
-                            LiquidGlassTheme.borderRadiusLarge),
+                            ? AppColors.cardDark.withValues(alpha: 0.65)
+                            : Colors.white.withValues(alpha: 0.65),
+                        borderRadius:
+                            BorderRadius.circular(Responsive.sp(context, 18)),
                         border: Border.all(
                           color: LiquidGlassTheme.glassBorder(
                             Theme.of(context).brightness,
                           ),
+                          width: 0.5,
                         ),
                       ),
                       child: BottomNavigationBar(
@@ -172,10 +173,13 @@ class _MainScreenState extends State<MainScreen> {
                             isDark ? Colors.white38 : AppColors.textGrey,
                         showSelectedLabels: true,
                         showUnselectedLabels: false,
-                        selectedLabelStyle: const TextStyle(
-                          fontSize: 10,
+                        selectedLabelStyle: TextStyle(
+                          fontSize: Responsive.sp(context, 7),
                           fontWeight: FontWeight.w900,
                           letterSpacing: 0.5,
+                        ),
+                        unselectedLabelStyle: TextStyle(
+                          fontSize: Responsive.sp(context, 6),
                         ),
                         items: [
                           _buildNavItem(
@@ -222,24 +226,25 @@ class _MainScreenState extends State<MainScreen> {
     String label,
   ) {
     final isSelected = _currentIndex == index;
+    final iconSize = Responsive.sp(context, 16);
     return BottomNavigationBarItem(
       icon: AnimatedScale(
         scale: isSelected ? 1.0 : 0.85,
         duration: const Duration(milliseconds: 200),
         curve: Curves.easeOutCubic,
-        child: Icon(inactiveIcon, size: 22),
+        child: Icon(inactiveIcon, size: iconSize),
       ),
       activeIcon: AnimatedScale(
         scale: 1.0,
         duration: const Duration(milliseconds: 200),
         curve: Curves.easeOutCubic,
         child: Container(
-          padding: const EdgeInsets.all(10),
+          padding: EdgeInsets.all(Responsive.sp(context, 5)),
           decoration: BoxDecoration(
             color: AppColors.primary.withValues(alpha: 0.12),
             shape: BoxShape.circle,
           ),
-          child: Icon(activeIcon, size: 22),
+          child: Icon(activeIcon, size: iconSize),
         ),
       ),
       label: label,

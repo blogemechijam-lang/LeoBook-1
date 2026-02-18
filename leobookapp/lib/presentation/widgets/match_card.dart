@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:leobookapp/data/models/match_model.dart';
 import 'package:leobookapp/core/constants/app_colors.dart';
+import 'package:leobookapp/core/constants/responsive_constants.dart';
 import 'package:leobookapp/data/repositories/data_repository.dart';
 import '../screens/match_details_screen.dart';
 import '../screens/team_screen.dart';
@@ -25,6 +26,7 @@ class MatchCard extends StatelessWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final isFinished = match.status.toLowerCase().contains('finished') ||
         match.status.toUpperCase() == 'FT';
+    final w = MediaQuery.sizeOf(context).width;
 
     // Parse League String "REGION: League"
     String region = "WORLD";
@@ -38,12 +40,15 @@ class MatchCard extends StatelessWidget {
     }
 
     return GlassContainer(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-      padding: const EdgeInsets.all(16),
-      borderRadius: 20,
+      margin: EdgeInsets.symmetric(
+        horizontal: w * 0.03,
+        vertical: w * 0.01,
+      ),
+      padding: EdgeInsets.all(Responsive.sp(context, 10)),
+      borderRadius: Responsive.sp(context, 10),
       borderColor: (match.isLive || match.isStartingSoon)
           ? AppColors.liveRed.withValues(alpha: 0.3)
-          : AppColors.primary.withValues(alpha: 0.3),
+          : AppColors.primary.withValues(alpha: 0.2),
       onTap: () {
         Navigator.push(
           context,
@@ -81,18 +86,18 @@ class MatchCard extends StatelessWidget {
                               match.regionFlagUrl!.isNotEmpty)
                             CachedNetworkImage(
                               imageUrl: match.regionFlagUrl!,
-                              width: 14,
-                              height: 10,
+                              width: Responsive.sp(context, 10),
+                              height: Responsive.sp(context, 7),
                               fit: BoxFit.cover,
                               placeholder: (_, __) => Icon(
                                 Icons.public,
-                                size: 12,
+                                size: Responsive.sp(context, 8),
                                 color:
                                     AppColors.textGrey.withValues(alpha: 0.8),
                               ),
                               errorWidget: (_, __, ___) => Icon(
                                 Icons.public,
-                                size: 12,
+                                size: Responsive.sp(context, 8),
                                 color:
                                     AppColors.textGrey.withValues(alpha: 0.8),
                               ),
@@ -100,45 +105,45 @@ class MatchCard extends StatelessWidget {
                           else
                             Icon(
                               Icons.public,
-                              size: 12,
+                              size: Responsive.sp(context, 8),
                               color: AppColors.textGrey.withValues(alpha: 0.8),
                             ),
-                          const SizedBox(width: 6),
+                          SizedBox(width: Responsive.sp(context, 3)),
                           Flexible(
                             child: Text(
                               region.toUpperCase(),
                               style: TextStyle(
-                                fontSize: 10,
+                                fontSize: Responsive.sp(context, 7),
                                 fontWeight: FontWeight.w900,
                                 color:
                                     AppColors.textGrey.withValues(alpha: 0.8),
-                                letterSpacing: 1.2,
+                                letterSpacing: 1.0,
                               ),
                               overflow: TextOverflow.ellipsis,
                             ),
                           ),
                         ],
                       ),
-                      const SizedBox(height: 4),
+                      SizedBox(height: Responsive.sp(context, 2)),
                       // League Name
                       Text(
                         leagueName.toUpperCase(),
                         textAlign: TextAlign.center,
-                        style: const TextStyle(
-                          fontSize: 12,
+                        style: TextStyle(
+                          fontSize: Responsive.sp(context, 8),
                           fontWeight: FontWeight.w900,
-                          color: Colors.white, // Pop out league name
-                          letterSpacing: 0.5,
+                          color: Colors.white,
+                          letterSpacing: 0.3,
                         ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
-                      const SizedBox(height: 4),
+                      SizedBox(height: Responsive.sp(context, 2)),
                       // Date & Time
                       Text(
                         "${match.date} • ${match.time}${match.displayStatus.isEmpty ? '' : ' • ${match.displayStatus}'}",
                         style: TextStyle(
-                          fontSize: 10,
+                          fontSize: Responsive.sp(context, 7),
                           fontWeight: FontWeight.bold,
                           color: match.isLive
                               ? AppColors.liveRed
@@ -149,20 +154,17 @@ class MatchCard extends StatelessWidget {
                   ),
                 )
               else ...[
-                // If header is hidden, still show Date & Time but maybe more central/compact?
-                // Actually, the user ONLY asked to remove Region Flag, Region Name, League Name.
-                // If I remove them, I should probably still show Date/Time so users know when it is.
                 Text(
                   "${match.date} • ${match.time}${match.displayStatus.isEmpty ? '' : ' • ${match.displayStatus}'}",
                   style: TextStyle(
-                    fontSize: 10,
+                    fontSize: Responsive.sp(context, 7),
                     fontWeight: FontWeight.bold,
                     color:
                         match.isLive ? AppColors.liveRed : AppColors.textGrey,
                   ),
                 ),
               ],
-              const SizedBox(height: 12),
+              SizedBox(height: Responsive.sp(context, 6)),
 
               // Teams Comparison / Result
               if (isFinished)
@@ -170,24 +172,26 @@ class MatchCard extends StatelessWidget {
               else
                 _buildActiveLayout(context, isDark),
 
-              const SizedBox(height: 12),
+              SizedBox(height: Responsive.sp(context, 6)),
 
               // Prediction Section
               Container(
-                padding: const EdgeInsets.all(12),
+                padding: EdgeInsets.all(Responsive.sp(context, 7)),
                 decoration: BoxDecoration(
                   color: match.isLive
                       ? AppColors.liveRed.withValues(alpha: 0.08)
                       : (isDark
-                          ? Colors.white.withValues(alpha: 0.06)
-                          : Colors.black.withValues(alpha: 0.04)),
-                  borderRadius: BorderRadius.circular(14),
+                          ? Colors.white.withValues(alpha: 0.05)
+                          : Colors.black.withValues(alpha: 0.03)),
+                  borderRadius:
+                      BorderRadius.circular(Responsive.sp(context, 8)),
                   border: Border.all(
                     color: match.isLive
-                        ? AppColors.liveRed.withValues(alpha: 0.2)
+                        ? AppColors.liveRed.withValues(alpha: 0.15)
                         : (isDark
-                            ? Colors.white.withValues(alpha: 0.08)
-                            : Colors.black.withValues(alpha: 0.06)),
+                            ? Colors.white.withValues(alpha: 0.06)
+                            : Colors.black.withValues(alpha: 0.04)),
+                    width: 0.5,
                   ),
                 ),
                 child: Row(
@@ -202,19 +206,19 @@ class MatchCard extends StatelessWidget {
                                 ? "IN-PLAY PREDICTION"
                                 : "LEO PREDICTION",
                             style: TextStyle(
-                              fontSize: 9,
+                              fontSize: Responsive.sp(context, 6),
                               fontWeight: FontWeight.w900,
                               color: match.isLive
                                   ? AppColors.liveRed
                                   : AppColors.textGrey,
-                              letterSpacing: 0.5,
+                              letterSpacing: 0.3,
                             ),
                           ),
-                          const SizedBox(height: 2),
+                          SizedBox(height: Responsive.sp(context, 1)),
                           Text(
                             match.prediction ?? "N/A",
                             style: TextStyle(
-                              fontSize: 14,
+                              fontSize: Responsive.sp(context, 9),
                               fontWeight: FontWeight.w900,
                               color: isFinished
                                   ? AppColors.success
@@ -232,7 +236,7 @@ class MatchCard extends StatelessWidget {
                             Text(
                               "RELIABILITY: ${match.marketReliability}%",
                               style: TextStyle(
-                                fontSize: 9,
+                                fontSize: Responsive.sp(context, 6),
                                 fontWeight: FontWeight.bold,
                                 color: AppColors.success.withValues(alpha: 0.7),
                               ),
@@ -240,28 +244,30 @@ class MatchCard extends StatelessWidget {
                         ],
                       ),
                     ),
-                    const SizedBox(width: 8), // Gap
+                    SizedBox(width: Responsive.sp(context, 4)),
                     if (match.odds != null)
                       Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 8,
+                        padding: EdgeInsets.symmetric(
+                          horizontal: Responsive.sp(context, 8),
+                          vertical: Responsive.sp(context, 3),
                         ),
                         decoration: BoxDecoration(
                           color: isFinished
-                              ? Colors.white.withValues(alpha: 0.08)
-                              : AppColors.primary.withValues(alpha: 0.15),
-                          borderRadius: BorderRadius.circular(12),
+                              ? Colors.white.withValues(alpha: 0.06)
+                              : AppColors.primary.withValues(alpha: 0.12),
+                          borderRadius:
+                              BorderRadius.circular(Responsive.sp(context, 6)),
                           border: Border.all(
                             color: isFinished
-                                ? Colors.white.withValues(alpha: 0.1)
-                                : AppColors.primary.withValues(alpha: 0.3),
+                                ? Colors.white.withValues(alpha: 0.08)
+                                : AppColors.primary.withValues(alpha: 0.25),
+                            width: 0.5,
                           ),
                         ),
                         child: Text(
                           match.odds!,
                           style: TextStyle(
-                            fontSize: 14,
+                            fontSize: Responsive.sp(context, 10),
                             fontWeight: FontWeight.w900,
                             color: isFinished
                                 ? AppColors.textGrey
@@ -287,22 +293,22 @@ class MatchCard extends StatelessWidget {
               top: 0,
               right: 0,
               child: Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 10,
-                  vertical: 4,
+                padding: EdgeInsets.symmetric(
+                  horizontal: Responsive.sp(context, 6),
+                  vertical: Responsive.sp(context, 2),
                 ),
-                decoration: const BoxDecoration(
+                decoration: BoxDecoration(
                   color: AppColors.success,
                   borderRadius: BorderRadius.only(
-                    topRight: Radius.circular(20),
-                    bottomLeft: Radius.circular(10),
+                    topRight: Radius.circular(Responsive.sp(context, 10)),
+                    bottomLeft: Radius.circular(Responsive.sp(context, 6)),
                   ),
                 ),
-                child: const Text(
+                child: Text(
                   "ACCURATE",
                   style: TextStyle(
                     color: Colors.white,
-                    fontSize: 8,
+                    fontSize: Responsive.sp(context, 6),
                     fontWeight: FontWeight.w900,
                   ),
                 ),
@@ -319,7 +325,7 @@ class MatchCard extends StatelessWidget {
       children: [
         Expanded(child: _buildTeamLogoCol(context, match.homeTeam, isDark)),
         Container(
-          padding: const EdgeInsets.symmetric(horizontal: 12),
+          padding: EdgeInsets.symmetric(horizontal: Responsive.sp(context, 6)),
           child: match.isLive ||
                   (match.homeScore != null && match.awayScore != null)
               ? Column(
@@ -331,50 +337,51 @@ class MatchCard extends StatelessWidget {
                         Text(
                           match.homeScore ?? "0",
                           style: TextStyle(
-                            fontSize: 24,
+                            fontSize: Responsive.sp(context, 16),
                             fontWeight: FontWeight.w900,
                             color: isDark ? Colors.white : AppColors.textDark,
                           ),
                         ),
-                        const Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 4.0),
+                        Padding(
+                          padding: EdgeInsets.symmetric(
+                              horizontal: Responsive.sp(context, 2)),
                           child: Text(
                             "-",
                             style: TextStyle(
                               color: AppColors.textGrey,
-                              fontSize: 18,
+                              fontSize: Responsive.sp(context, 12),
                             ),
                           ),
                         ),
                         Text(
                           match.awayScore ?? "0",
                           style: TextStyle(
-                            fontSize: 24,
+                            fontSize: Responsive.sp(context, 16),
                             fontWeight: FontWeight.w900,
                             color: isDark ? Colors.white : AppColors.textDark,
                           ),
                         ),
                       ],
                     ),
-                    const SizedBox(height: 2),
+                    SizedBox(height: Responsive.sp(context, 1)),
                     if (match.displayStatus.isNotEmpty)
                       Text(
                         match.displayStatus,
                         style: TextStyle(
-                          fontSize: 8,
+                          fontSize: Responsive.sp(context, 6),
                           fontWeight: FontWeight.bold,
                           color: match.isLive
                               ? AppColors.liveRed
                               : AppColors.primary,
-                          letterSpacing: 0.5,
+                          letterSpacing: 0.3,
                         ),
                       ),
                   ],
                 )
-              : const Text(
+              : Text(
                   "VS",
                   style: TextStyle(
-                    fontSize: 13,
+                    fontSize: Responsive.sp(context, 9),
                     fontWeight: FontWeight.w900,
                     fontStyle: FontStyle.italic,
                     color: AppColors.textGrey,
@@ -400,7 +407,7 @@ class MatchCard extends StatelessWidget {
                 isDark,
                 match.homeCrestUrl,
               ),
-              const SizedBox(height: 8),
+              SizedBox(height: Responsive.sp(context, 4)),
               _buildFinishedRow(
                 context,
                 match.awayTeam,
@@ -412,43 +419,43 @@ class MatchCard extends StatelessWidget {
           ),
         ),
         Container(
-          width: 1,
-          height: 40,
-          margin: const EdgeInsets.only(left: 16),
+          width: 0.5,
+          height: Responsive.sp(context, 24),
+          margin: EdgeInsets.only(left: Responsive.sp(context, 8)),
           color: isDark
               ? Colors.white.withValues(alpha: 0.05)
-              : Colors.black.withValues(alpha: 0.05),
+              : Colors.black.withValues(alpha: 0.04),
         ),
         Container(
-          padding: const EdgeInsets.only(left: 16),
+          padding: EdgeInsets.only(left: Responsive.sp(context, 8)),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
-              const Text(
+              Text(
                 "RESULT",
                 style: TextStyle(
-                  fontSize: 9,
+                  fontSize: Responsive.sp(context, 6),
                   fontWeight: FontWeight.w900,
                   color: AppColors.textGrey,
                 ),
               ),
-              const SizedBox(height: 4),
+              SizedBox(height: Responsive.sp(context, 2)),
               Text(
                 "FT",
                 style: TextStyle(
-                  fontSize: 16,
+                  fontSize: Responsive.sp(context, 11),
                   fontWeight: FontWeight.w900,
                   color: isDark ? Colors.white : AppColors.textDark,
                 ),
               ),
-              const SizedBox(height: 2),
+              SizedBox(height: Responsive.sp(context, 1)),
               Text(
                 match.displayStatus,
                 style: TextStyle(
-                  fontSize: 8,
+                  fontSize: Responsive.sp(context, 6),
                   fontWeight: FontWeight.bold,
                   color: AppColors.primary,
-                  letterSpacing: 0.5,
+                  letterSpacing: 0.3,
                 ),
               ),
             ],
@@ -465,6 +472,7 @@ class MatchCard extends StatelessWidget {
     bool isDark,
     String? crestUrl,
   ) {
+    final logoSize = Responsive.sp(context, 16);
     return GestureDetector(
       onTap: () {
         Navigator.push(
@@ -480,8 +488,8 @@ class MatchCard extends StatelessWidget {
       child: Row(
         children: [
           Container(
-            width: 24,
-            height: 24,
+            width: logoSize,
+            height: logoSize,
             decoration: BoxDecoration(
               color: isDark
                   ? Colors.white.withValues(alpha: 0.05)
@@ -496,8 +504,8 @@ class MatchCard extends StatelessWidget {
                       placeholder: (context, url) => Center(
                         child: Text(
                           teamName.substring(0, 1).toUpperCase(),
-                          style: const TextStyle(
-                            fontSize: 8,
+                          style: TextStyle(
+                            fontSize: Responsive.sp(context, 5),
                             color: AppColors.textGrey,
                           ),
                         ),
@@ -505,8 +513,8 @@ class MatchCard extends StatelessWidget {
                       errorWidget: (context, url, error) => Center(
                         child: Text(
                           teamName.substring(0, 1).toUpperCase(),
-                          style: const TextStyle(
-                            fontSize: 8,
+                          style: TextStyle(
+                            fontSize: Responsive.sp(context, 5),
                             color: AppColors.textGrey,
                           ),
                         ),
@@ -516,7 +524,7 @@ class MatchCard extends StatelessWidget {
                       child: Text(
                         teamName.substring(0, 1).toUpperCase(),
                         style: TextStyle(
-                          fontSize: 10,
+                          fontSize: Responsive.sp(context, 6),
                           fontWeight: FontWeight.bold,
                           color: AppColors.textGrey,
                         ),
@@ -524,12 +532,12 @@ class MatchCard extends StatelessWidget {
                     ),
             ),
           ),
-          const SizedBox(width: 8),
+          SizedBox(width: Responsive.sp(context, 4)),
           Expanded(
             child: Text(
               teamName,
               style: TextStyle(
-                fontSize: 13,
+                fontSize: Responsive.sp(context, 9),
                 fontWeight: FontWeight.w700,
                 color: isDark ? Colors.white : AppColors.textDark,
               ),
@@ -538,7 +546,7 @@ class MatchCard extends StatelessWidget {
           Text(
             score,
             style: TextStyle(
-              fontSize: 16,
+              fontSize: Responsive.sp(context, 11),
               fontWeight: FontWeight.w900,
               color: isDark ? Colors.white : AppColors.textDark,
             ),
@@ -565,15 +573,15 @@ class MatchCard extends StatelessWidget {
       },
       child: Column(
         children: [
-          _buildTeamLogo(teamName, isDark, crestUrl),
-          const SizedBox(height: 8),
+          _buildTeamLogo(context, teamName, isDark, crestUrl),
+          SizedBox(height: Responsive.sp(context, 4)),
           Text(
             teamName,
             textAlign: TextAlign.center,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
             style: TextStyle(
-              fontSize: 12,
+              fontSize: Responsive.sp(context, 8),
               fontWeight: FontWeight.w800,
               color: isDark ? Colors.white : AppColors.textDark,
             ),
@@ -583,19 +591,22 @@ class MatchCard extends StatelessWidget {
     );
   }
 
-  Widget _buildTeamLogo(String teamName, bool isDark, String? crestUrl) {
+  Widget _buildTeamLogo(
+      BuildContext context, String teamName, bool isDark, String? crestUrl) {
+    final logoSize = Responsive.sp(context, 28);
     return Container(
-      width: 56,
-      height: 56,
+      width: logoSize,
+      height: logoSize,
       decoration: BoxDecoration(
         color: isDark
-            ? Colors.white.withValues(alpha: 0.06)
-            : Colors.black.withValues(alpha: 0.04),
+            ? Colors.white.withValues(alpha: 0.05)
+            : Colors.black.withValues(alpha: 0.03),
         shape: BoxShape.circle,
         border: Border.all(
           color: isDark
-              ? Colors.white.withValues(alpha: 0.08)
-              : Colors.black.withValues(alpha: 0.06),
+              ? Colors.white.withValues(alpha: 0.06)
+              : Colors.black.withValues(alpha: 0.04),
+          width: 0.5,
         ),
       ),
       child: ClipOval(
@@ -607,7 +618,7 @@ class MatchCard extends StatelessWidget {
                   child: Text(
                     teamName.substring(0, 1).toUpperCase(),
                     style: TextStyle(
-                      fontSize: 16,
+                      fontSize: Responsive.sp(context, 10),
                       fontWeight: FontWeight.w900,
                       color: AppColors.textGrey.withValues(alpha: 0.3),
                     ),
@@ -617,7 +628,7 @@ class MatchCard extends StatelessWidget {
                   child: Text(
                     teamName.substring(0, 1).toUpperCase(),
                     style: TextStyle(
-                      fontSize: 16,
+                      fontSize: Responsive.sp(context, 10),
                       fontWeight: FontWeight.w900,
                       color: AppColors.textGrey.withValues(alpha: 0.3),
                     ),
@@ -628,7 +639,7 @@ class MatchCard extends StatelessWidget {
                 child: Text(
                   teamName.substring(0, 1).toUpperCase(),
                   style: TextStyle(
-                    fontSize: 20,
+                    fontSize: Responsive.sp(context, 12),
                     fontWeight: FontWeight.w900,
                     color: AppColors.textGrey.withValues(alpha: 0.5),
                   ),
@@ -673,19 +684,22 @@ class _LiveBadgeState extends State<_LiveBadge>
     return FadeTransition(
       opacity: _animation,
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-        decoration: const BoxDecoration(
+        padding: EdgeInsets.symmetric(
+          horizontal: Responsive.sp(context, 5),
+          vertical: Responsive.sp(context, 1.5),
+        ),
+        decoration: BoxDecoration(
           color: AppColors.liveRed,
           borderRadius: BorderRadius.only(
-            topRight: Radius.circular(20),
-            bottomLeft: Radius.circular(10),
+            topRight: Radius.circular(Responsive.sp(context, 10)),
+            bottomLeft: Radius.circular(Responsive.sp(context, 6)),
           ),
         ),
         child: Text(
           "LIVE ${widget.minute ?? ''}".toUpperCase(),
-          style: const TextStyle(
+          style: TextStyle(
             color: Colors.white,
-            fontSize: 8,
+            fontSize: Responsive.sp(context, 6),
             fontWeight: FontWeight.w900,
           ),
         ),

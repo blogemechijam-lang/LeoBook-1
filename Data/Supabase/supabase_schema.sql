@@ -99,8 +99,9 @@ CREATE TABLE IF NOT EXISTS public.region_league (
     league TEXT,
     league_crest TEXT,
     league_url TEXT,
-    league_url TEXT,
     date_updated TEXT,
+    country TEXT,
+    logo_url TEXT,
     other_names JSONB DEFAULT '[]',
     abbreviations JSONB DEFAULT '[]',
     search_terms TEXT[] DEFAULT ARRAY[]::TEXT[],
@@ -120,6 +121,8 @@ CREATE TABLE IF NOT EXISTS public.teams (
     rl_ids TEXT,
     team_crest TEXT,
     team_url TEXT,
+    country TEXT,
+    city TEXT,
     other_names JSONB DEFAULT '[]',
     abbreviations JSONB DEFAULT '[]',
     search_terms TEXT[] DEFAULT ARRAY[]::TEXT[],
@@ -375,3 +378,9 @@ ALTER TABLE public.predictions ADD COLUMN IF NOT EXISTS outcome_correct TEXT;
 ALTER TABLE public.predictions ADD COLUMN IF NOT EXISTS actual_score TEXT;
 ALTER TABLE public.predictions ADD COLUMN IF NOT EXISTS home_score TEXT;
 ALTER TABLE public.predictions ADD COLUMN IF NOT EXISTS away_score TEXT;
+
+-- MIGRATION: Search Dictionary enrichment columns
+ALTER TABLE public.region_league ADD COLUMN IF NOT EXISTS country TEXT;
+ALTER TABLE public.region_league ADD COLUMN IF NOT EXISTS logo_url TEXT;
+ALTER TABLE public.teams ADD COLUMN IF NOT EXISTS country TEXT;
+ALTER TABLE public.teams ADD COLUMN IF NOT EXISTS city TEXT;

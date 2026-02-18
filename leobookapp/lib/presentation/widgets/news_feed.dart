@@ -13,51 +13,50 @@ class NewsFeed extends StatelessWidget {
   Widget build(BuildContext context) {
     if (news.isEmpty) return const SizedBox.shrink();
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final w = MediaQuery.sizeOf(context).width;
+    final cardW = Responsive.cardWidth(w, minWidth: 160, maxWidth: 260);
+    final listH = cardW * 0.85;
 
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final cardW = Responsive.cardWidth(constraints.maxWidth,
-            minWidth: 240, maxWidth: 320);
-        final listH = cardW * 0.9; // Proportional to card width
-
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Padding(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
-              child: Row(
-                children: [
-                  Icon(Icons.newspaper, color: AppColors.primary, size: 18),
-                  const SizedBox(width: 8),
-                  Text(
-                    "LATEST UPDATES",
-                    style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w700,
-                      letterSpacing: 1.0,
-                      color: isDark
-                          ? Colors.white.withValues(alpha: 0.7)
-                          : AppColors.textDark,
-                    ),
-                  ),
-                ],
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: EdgeInsets.symmetric(
+            horizontal: Responsive.sp(context, 10),
+            vertical: Responsive.sp(context, 6),
+          ),
+          child: Row(
+            children: [
+              Icon(Icons.newspaper,
+                  color: AppColors.primary, size: Responsive.sp(context, 14)),
+              SizedBox(width: Responsive.sp(context, 5)),
+              Text(
+                "LATEST UPDATES",
+                style: TextStyle(
+                  fontSize: Responsive.sp(context, 9),
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: 0.8,
+                  color: isDark
+                      ? Colors.white.withValues(alpha: 0.7)
+                      : AppColors.textDark,
+                ),
               ),
-            ),
-            SizedBox(
-              height: listH,
-              child: ListView.builder(
-                scrollDirection: Axis.horizontal,
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                itemCount: news.length,
-                itemBuilder: (context, index) {
-                  return _buildNewsCard(context, news[index], isDark, cardW);
-                },
-              ),
-            ),
-          ],
-        );
-      },
+            ],
+          ),
+        ),
+        SizedBox(
+          height: listH,
+          child: ListView.builder(
+            scrollDirection: Axis.horizontal,
+            padding:
+                EdgeInsets.symmetric(horizontal: Responsive.sp(context, 10)),
+            itemCount: news.length,
+            itemBuilder: (context, index) {
+              return _buildNewsCard(context, news[index], isDark, cardW);
+            },
+          ),
+        ),
+      ],
     );
   }
 
@@ -72,23 +71,23 @@ class NewsFeed extends StatelessWidget {
       },
       child: Container(
         width: cardWidth,
-        margin: const EdgeInsets.only(right: 14),
+        margin: EdgeInsets.only(right: Responsive.sp(context, 8)),
         decoration: BoxDecoration(
           color: isDark
               ? Colors.white.withValues(alpha: 0.06)
               : Colors.white.withValues(alpha: 0.85),
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(Responsive.sp(context, 12)),
           border: Border.all(
             color: isDark
                 ? Colors.white.withValues(alpha: 0.08)
                 : Colors.black.withValues(alpha: 0.06),
+            width: 0.5,
           ),
         ),
         clipBehavior: Clip.antiAlias,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Image Container — ratio-based, never clips
             AspectRatio(
               aspectRatio: 16 / 9,
               child: Container(
@@ -98,13 +97,13 @@ class NewsFeed extends StatelessWidget {
                 child: Icon(
                   Icons.image_outlined,
                   color: isDark ? Colors.white12 : Colors.black12,
-                  size: 36,
+                  size: Responsive.sp(context, 22),
                 ),
               ),
             ),
             Expanded(
               child: Padding(
-                padding: const EdgeInsets.all(12.0),
+                padding: EdgeInsets.all(Responsive.sp(context, 8)),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -114,36 +113,36 @@ class NewsFeed extends StatelessWidget {
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                         style: TextStyle(
-                          fontSize: 13,
+                          fontSize: Responsive.sp(context, 9),
                           fontWeight: FontWeight.w700,
                           height: 1.3,
                           color: isDark ? Colors.white : AppColors.textDark,
                         ),
                       ),
                     ),
-                    const SizedBox(height: 8),
+                    SizedBox(height: Responsive.sp(context, 4)),
                     Row(
                       children: [
                         Text(
                           item.source.toUpperCase(),
                           style: TextStyle(
-                            fontSize: 9,
+                            fontSize: Responsive.sp(context, 7),
                             fontWeight: FontWeight.w700,
                             color: AppColors.primary,
-                            letterSpacing: 0.5,
+                            letterSpacing: 0.3,
                           ),
                         ),
                         const Spacer(),
                         Icon(
                           Icons.access_time_filled,
-                          size: 10,
+                          size: Responsive.sp(context, 7),
                           color: AppColors.textGrey.withValues(alpha: 0.5),
                         ),
-                        const SizedBox(width: 4),
+                        SizedBox(width: Responsive.sp(context, 2)),
                         Text(
                           item.timeAgo.toUpperCase(),
                           style: TextStyle(
-                            fontSize: 9,
+                            fontSize: Responsive.sp(context, 7),
                             fontWeight: FontWeight.w600,
                             color: AppColors.textGrey.withValues(alpha: 0.5),
                           ),

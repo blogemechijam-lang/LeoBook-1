@@ -3,7 +3,7 @@
 **Developer**: Matterialless LLC
 **Chief Engineer**: Emenike Chinenye James
 **Powered by**: Grok 4.1 & Gemini 3
-**Architecture**: Clean Architecture v2.9 (Orchestrator → Module → Data)
+**Architecture**: Clean Architecture v3.0 (Orchestrator → Module → Data)
 
 ---
 
@@ -14,7 +14,7 @@ LeoBook is an **autonomous sports prediction and betting system** with two halve
 | Component | Tech | Purpose |
 |-----------|------|---------|
 | `Leo.py` | Python 3.12 + Playwright | Data extraction, AI prediction, odds harvesting, automated bet placement, withdrawal management |
-| `leobookapp/` | Flutter/Dart | Cross-platform app displaying predictions, accuracy reports, and recommendations |
+| `leobookapp/` | Flutter/Dart | Elite, cross-platform dashboard with "Telegram-grade" UI density and real-time streaming |
 
 Leo.py is a **pure orchestrator** — zero business logic. All logic lives in the modules it imports. It runs in an infinite cycle (default every 6 hours).
 
@@ -30,7 +30,7 @@ Leo.py (Orchestrator)
 ├── Chapter 1: Flashscore Extraction → AI Prediction → Odds Harvesting → Recommendations
 ├── Chapter 2: Automated Bet Placement → Withdrawal Management
 ├── Chapter 3: Chief Engineer Oversight & Health Check
-└── Live Streamer: Parallel 60s LIVE score streaming → status propagation
+└── Live Streamer: Parallel 60s LIVE score streaming → status propagation (CSV Handshake)
 ```
 
 ### Core Modules
@@ -38,10 +38,11 @@ Leo.py (Orchestrator)
 - **`Core/Intelligence/`** — AI prediction engine (ML model, rule engine, learning engine, AIGO self-healing)
 - **`Core/Browser/`** — Playwright automation and data extractors (H2H, standings, league pages)
 - **`Core/System/`** — Lifecycle, monitoring, withdrawal checker
-- **`Modules/Flashscore/`** — Schedule extraction, match processing, offline reprediction, **live score streaming**
+- **`Modules/Flashscore/`** — Schedule extraction, match processing, offline reprediction, **live score streaming (v2.1 fix)**
 - **`Modules/FootballCom/`** — Betting platform automation (login, navigation, odds, booking, bet placement)
 - **`Data/Access/`** — CSV CRUD, Supabase sync, outcome review, accuracy calculation
 - **`Scripts/`** — Enrichment pipeline, recommendation engine, maintenance utilities
+- **`leobookapp/`** — **UI v3.0 (Liquid Glass + Proportional Scaling)**
 
 ### AIGO (AI-Guided Operation) — Self-Healing Framework (v5.0)
 
@@ -80,7 +81,7 @@ LeoBook/
 ├── Data/
 │   ├── Access/             # Data access layer (11 files)
 │   ├── Store/              # CSV/JSON data stores (19 files)
-│   └── Supabase/           # Cloud schema + migrations (2 files)
+│   └── Supabase/           # Cloud schema + migrations (3 files)
 ├── Config/
 │   └── knowledge.json      # CSS selector knowledge base (32 KB)
 ├── leobookapp/             # Flutter frontend (56 Dart files)
@@ -89,18 +90,16 @@ LeoBook/
 
 ---
 
-## LeoBook App (Flutter)
+## LeoBook App (Flutter v3.0)
 
-Elite, cross-platform betting dashboard with:
+The v3.0 rebuild introduces a **Telegram-inspired high-density aesthetic** optimized for maximum velocity and visual clarity.
 
-- **Supabase Backend** — Cloud-native data for instant global access
-- **Brand Enrichment** — Team crests, region flags, league URLs
-- **Offline Caching** — `shared_preferences` persistence for offline viewing
-- **Responsive Design** — `LayoutBuilder` breakpoints, proportional scaling, `Responsive` constants
-- **Material 3** — Dynamic color theming with dark mode
-- **Liquid Glass UI** — Premium frosted-glass containers, blur effects, performance toggle
-- **4-Tab Match System** — ALL | LIVE | FINISHED | SCHEDULED with mutually exclusive 2.5hr time rule
-- **Live Accuracy Tags** — Fed by `outcome_correct` column from predictions pipeline
+- **Telegram Design Aesthetic** — 80% size reduction for high-density information, increased glass translucency (60% fill), and micro-radii (14dp).
+- **Proportional Scaling System** — Custom `Responsive` utility ensures perfect parity between mobile and web without hardcoded pixel values.
+- **Supabase Backend** — Cloud-native data for instant global access.
+- **Liquid Glass UI** — Premium frosted-glass containers with optimized BackdropFilter performance.
+- **4-Tab Match System** — ALL | LIVE | FINISHED | SCHEDULED with automatic 2.5hr status propagation from live streamer.
+- **Live Accuracy Tags** — Real-time performance indicators fed by the backend review pipeline.
 
 ---
 

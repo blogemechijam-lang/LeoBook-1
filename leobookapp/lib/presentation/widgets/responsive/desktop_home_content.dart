@@ -34,7 +34,6 @@ class _DesktopHomeContentState extends State<DesktopHomeContent>
   final Map<String, GlobalKey> _sectionKeys = {};
   int _visibleMatchCount = 12;
 
-  // Match counts for tab labels
   int _allCount = 0;
   int _liveCount = 0;
   int _finishedCount = 0;
@@ -93,89 +92,88 @@ class _DesktopHomeContentState extends State<DesktopHomeContent>
 
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final hPad = Responsive.horizontalPadding(constraints.maxWidth);
+    final hPad = Responsive.horizontalPadding(context);
 
-        return Stack(
-          children: [
-            CustomScrollView(
-              controller: _scrollController,
-              slivers: [
-                SliverPersistentHeader(
-                  pinned: true,
-                  delegate: _PinnedHeaderDelegate(
-                    height: 92,
-                    child: Container(
-                      color: Theme.of(context).scaffoldBackgroundColor,
-                      padding: EdgeInsets.symmetric(horizontal: hPad),
-                      alignment: Alignment.centerLeft,
-                      child: const CategoryBar(),
-                    ),
-                  ),
+    return Stack(
+      children: [
+        CustomScrollView(
+          controller: _scrollController,
+          slivers: [
+            SliverPersistentHeader(
+              pinned: true,
+              delegate: _PinnedHeaderDelegate(
+                height: Responsive.dp(context, 56),
+                child: Container(
+                  color: Theme.of(context).scaffoldBackgroundColor,
+                  padding: EdgeInsets.symmetric(horizontal: hPad),
+                  alignment: Alignment.centerLeft,
+                  child: const CategoryBar(),
                 ),
-                SliverPadding(
-                  padding: EdgeInsets.fromLTRB(hPad, 0, hPad, 32),
-                  sliver: SliverList(
-                    delegate: SliverChildListDelegate([
-                      const TopPredictionsGrid(),
-                      const SizedBox(height: 48),
-                      const AccuracyReportCard(),
-                      const SizedBox(height: 48),
-                      const TopOddsList(),
-                      const SizedBox(height: 48),
-                    ]),
-                  ),
+              ),
+            ),
+            SliverPadding(
+              padding: EdgeInsets.fromLTRB(
+                  hPad, 0, hPad, Responsive.dp(context, 20)),
+              sliver: SliverList(
+                delegate: SliverChildListDelegate([
+                  const TopPredictionsGrid(),
+                  SizedBox(height: Responsive.dp(context, 24)),
+                  const AccuracyReportCard(),
+                  SizedBox(height: Responsive.dp(context, 24)),
+                  const TopOddsList(),
+                  SizedBox(height: Responsive.dp(context, 24)),
+                ]),
+              ),
+            ),
+            SliverPersistentHeader(
+              pinned: true,
+              delegate: _PinnedHeaderDelegate(
+                height: Responsive.dp(context, 36),
+                child: Container(
+                  key: _tabBarKey,
+                  color: Theme.of(context).scaffoldBackgroundColor,
+                  padding: EdgeInsets.symmetric(horizontal: hPad),
+                  alignment: Alignment.centerLeft,
+                  child: _buildTabBar(),
                 ),
-                SliverPersistentHeader(
-                  pinned: true,
-                  delegate: _PinnedHeaderDelegate(
-                    height: 50,
-                    child: Container(
-                      key: _tabBarKey,
-                      color: Theme.of(context).scaffoldBackgroundColor,
-                      padding: EdgeInsets.symmetric(horizontal: hPad),
-                      alignment: Alignment.centerLeft,
-                      child: _buildTabBar(),
-                    ),
-                  ),
+              ),
+            ),
+            SliverPadding(
+              padding: EdgeInsets.only(
+                left: hPad,
+                right: hPad,
+                top: Responsive.dp(context, 14),
+                bottom: Responsive.dp(context, 14),
+              ),
+              sliver: SliverToBoxAdapter(
+                child: Builder(
+                  builder: (context) {
+                    final index = _tabController.index;
+                    MatchTabType type;
+                    switch (index) {
+                      case 1:
+                        type = MatchTabType.live;
+                        break;
+                      case 2:
+                        type = MatchTabType.finished;
+                        break;
+                      case 3:
+                        type = MatchTabType.scheduled;
+                        break;
+                      default:
+                        type = MatchTabType.all;
+                    }
+                    return _buildMatchGroupedList(type);
+                  },
                 ),
-                SliverPadding(
-                  padding: EdgeInsets.only(
-                      left: hPad, right: hPad, top: 24, bottom: 24),
-                  sliver: SliverToBoxAdapter(
-                    child: Builder(
-                      builder: (context) {
-                        final index = _tabController.index;
-                        MatchTabType type;
-                        switch (index) {
-                          case 1:
-                            type = MatchTabType.live;
-                            break;
-                          case 2:
-                            type = MatchTabType.finished;
-                            break;
-                          case 3:
-                            type = MatchTabType.scheduled;
-                            break;
-                          default:
-                            type = MatchTabType.all;
-                        }
-
-                        return _buildMatchGroupedList(type);
-                      },
-                    ),
-                  ),
-                ),
-                // Footer
-                SliverToBoxAdapter(
-                  child: FootnoteSection(key: _footerKey),
-                ),
-              ],
+              ),
+            ),
+            SliverToBoxAdapter(
+              child: FootnoteSection(key: _footerKey),
             ),
           ],
-        );
-      },
+        ),
+      ],
     );
   }
 
@@ -183,16 +181,16 @@ class _DesktopHomeContentState extends State<DesktopHomeContent>
     return TabBar(
       controller: _tabController,
       isScrollable: true,
-      labelPadding: const EdgeInsets.only(right: 32),
+      labelPadding: EdgeInsets.only(right: Responsive.dp(context, 20)),
       indicatorColor: AppColors.primary,
-      indicatorWeight: 4,
+      indicatorWeight: 2,
       dividerColor: Colors.white10,
       labelColor: Colors.white,
       unselectedLabelColor: AppColors.textGrey,
-      labelStyle: const TextStyle(
-        fontSize: 14,
+      labelStyle: TextStyle(
+        fontSize: Responsive.dp(context, 10),
         fontWeight: FontWeight.w900,
-        letterSpacing: 1.5,
+        letterSpacing: 1.2,
       ),
       tabs: [
         Tab(text: "ALL PREDICTIONS ($_allCount)"),
@@ -203,8 +201,6 @@ class _DesktopHomeContentState extends State<DesktopHomeContent>
     );
   }
 
-  // ---------- Grouped Match List ----------
-
   Widget _buildMatchGroupedList(MatchTabType type) {
     final items = MatchSorter.getSortedMatches(
       widget.state.filteredMatches.cast(),
@@ -212,16 +208,17 @@ class _DesktopHomeContentState extends State<DesktopHomeContent>
     );
 
     if (items.isEmpty) {
-      return const Center(
+      return Center(
         child: Text(
           "No matches found for this category",
-          style: TextStyle(color: AppColors.textGrey),
+          style: TextStyle(
+            color: AppColors.textGrey,
+            fontSize: Responsive.dp(context, 10),
+          ),
         ),
       );
     }
 
-    // We clear keys only if the list changed significantly, but for simplicity
-    // let's ensure we have a key for every title we encounter.
     final List<Widget> children = [];
     List<MatchModel> currentGroupMatches = [];
 
@@ -232,7 +229,7 @@ class _DesktopHomeContentState extends State<DesktopHomeContent>
           LayoutBuilder(
             builder: (context, constraints) {
               final crossAxisCount = widget.isSidebarExpanded ? 3 : 4;
-              const spacing = 20.0;
+              final spacing = Responsive.dp(context, 12);
               final itemWidth =
                   (constraints.maxWidth - (spacing * (crossAxisCount - 1))) /
                       crossAxisCount;
@@ -255,7 +252,7 @@ class _DesktopHomeContentState extends State<DesktopHomeContent>
             },
           ),
         );
-        children.add(const SizedBox(height: 32));
+        children.add(SizedBox(height: Responsive.dp(context, 18)));
         currentGroupMatches = [];
       }
     }
@@ -280,31 +277,34 @@ class _DesktopHomeContentState extends State<DesktopHomeContent>
   Widget _buildSectionHeader(String title, Key? key) {
     return Padding(
       key: key,
-      padding: const EdgeInsets.only(bottom: 16, top: 24),
+      padding: EdgeInsets.only(
+        bottom: Responsive.dp(context, 10),
+        top: Responsive.dp(context, 14),
+      ),
       child: Row(
         children: [
           Container(
-            width: 4,
-            height: 16,
+            width: Responsive.dp(context, 2.5),
+            height: Responsive.dp(context, 10),
             decoration: BoxDecoration(
               color: AppColors.primary,
-              borderRadius: BorderRadius.circular(2),
+              borderRadius: BorderRadius.circular(1),
             ),
           ),
-          const SizedBox(width: 8),
+          SizedBox(width: Responsive.dp(context, 5)),
           Text(
             title.toUpperCase(),
-            style: const TextStyle(
+            style: TextStyle(
               color: Colors.white,
-              fontSize: 14,
+              fontSize: Responsive.dp(context, 10),
               fontWeight: FontWeight.bold,
-              letterSpacing: 1.2,
+              letterSpacing: 1.0,
             ),
           ),
-          const SizedBox(width: 16),
+          SizedBox(width: Responsive.dp(context, 10)),
           Expanded(
             child: Container(
-              height: 1,
+              height: 0.5,
               color: Colors.white10,
             ),
           ),

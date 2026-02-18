@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:leobookapp/core/constants/app_colors.dart';
+import 'package:leobookapp/core/constants/responsive_constants.dart';
 import 'package:leobookapp/data/models/match_model.dart';
 import 'package:leobookapp/data/models/recommendation_model.dart';
 import 'package:leobookapp/data/repositories/data_repository.dart';
@@ -13,7 +14,7 @@ import 'package:leobookapp/core/widgets/glass_container.dart';
 class FeaturedCarousel extends StatelessWidget {
   final List<MatchModel> matches;
   final List<RecommendationModel> recommendations;
-  final List<MatchModel> allMatches; // Added
+  final List<MatchModel> allMatches;
 
   const FeaturedCarousel({
     super.key,
@@ -30,24 +31,27 @@ class FeaturedCarousel extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+          padding: EdgeInsets.symmetric(
+            horizontal: Responsive.sp(context, 10),
+            vertical: Responsive.sp(context, 6),
+          ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Row(
                 children: [
-                  const Icon(
+                  Icon(
                     Icons.auto_awesome,
                     color: AppColors.primary,
-                    size: 20,
+                    size: Responsive.sp(context, 14),
                   ),
-                  const SizedBox(width: 8),
+                  SizedBox(width: Responsive.sp(context, 5)),
                   Text(
                     "TOP PREDICTIONS",
                     style: TextStyle(
-                      fontSize: 15,
+                      fontSize: Responsive.sp(context, 10),
                       fontWeight: FontWeight.w900,
-                      letterSpacing: 1.2,
+                      letterSpacing: 1.0,
                       color: Theme.of(context).brightness == Brightness.dark
                           ? Colors.white
                           : AppColors.textDark,
@@ -64,13 +68,13 @@ class FeaturedCarousel extends StatelessWidget {
                     ),
                   );
                 },
-                child: const Text(
+                child: Text(
                   "VIEW ALL",
                   style: TextStyle(
                     color: AppColors.primary,
-                    fontSize: 11,
+                    fontSize: Responsive.sp(context, 8),
                     fontWeight: FontWeight.w900,
-                    letterSpacing: 1.0,
+                    letterSpacing: 0.8,
                   ),
                 ),
               ),
@@ -78,10 +82,11 @@ class FeaturedCarousel extends StatelessWidget {
           ),
         ),
         SizedBox(
-          height: 220,
+          height: Responsive.sp(context, 140),
           child: ListView.builder(
             scrollDirection: Axis.horizontal,
-            padding: const EdgeInsets.symmetric(horizontal: 16),
+            padding:
+                EdgeInsets.symmetric(horizontal: Responsive.sp(context, 10)),
             itemCount: matches.length,
             itemBuilder: (context, index) {
               return _buildFeaturedCard(context, matches[index]);
@@ -94,8 +99,8 @@ class FeaturedCarousel extends StatelessWidget {
 
   Widget _buildFeaturedCard(BuildContext context, MatchModel match) {
     return GlassContainer(
-      margin: const EdgeInsets.only(right: 16),
-      borderRadius: 24,
+      margin: EdgeInsets.only(right: Responsive.sp(context, 8)),
+      borderRadius: Responsive.sp(context, 14),
       padding: EdgeInsets.zero,
       onTap: () {
         Navigator.push(
@@ -106,12 +111,11 @@ class FeaturedCarousel extends StatelessWidget {
         );
       },
       child: SizedBox(
-        width: 320,
+        width: Responsive.sp(context, 200),
         child: AspectRatio(
           aspectRatio: 16 / 10,
           child: Stack(
             children: [
-              // Background Image
               Image.network(
                 "https://images.unsplash.com/photo-1508098682722-e99c43a406b2?q=80&w=2070&auto=format&fit=crop",
                 fit: BoxFit.cover,
@@ -120,8 +124,6 @@ class FeaturedCarousel extends StatelessWidget {
                 errorBuilder: (context, error, stackTrace) =>
                     Container(color: AppColors.backgroundDark),
               ),
-
-              // Gradient Overlay
               Container(
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
@@ -135,14 +137,12 @@ class FeaturedCarousel extends StatelessWidget {
                   ),
                 ),
               ),
-
-              // Content Overlay
               Padding(
-                padding: const EdgeInsets.all(16.0),
+                padding: EdgeInsets.all(Responsive.sp(context, 10)),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    // Top Row: League & Time
+                    // Top: League & Time
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -160,79 +160,59 @@ class FeaturedCarousel extends StatelessWidget {
                               );
                             },
                             child: Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 10,
-                                vertical: 4,
+                              padding: EdgeInsets.symmetric(
+                                horizontal: Responsive.sp(context, 6),
+                                vertical: Responsive.sp(context, 2),
                               ),
                               decoration: BoxDecoration(
                                 color: AppColors.primary.withValues(alpha: 0.8),
-                                borderRadius: BorderRadius.circular(20),
+                                borderRadius: BorderRadius.circular(
+                                    Responsive.sp(context, 12)),
                                 border: Border.all(
                                   color: Colors.white.withValues(alpha: 0.15),
+                                  width: 0.5,
                                 ),
                               ),
                               child: Text(
                                 (match.league ?? "LEO LEAGUE").toUpperCase(),
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
-                                style: const TextStyle(
+                                style: TextStyle(
                                   color: Colors.white,
-                                  fontSize: 8,
+                                  fontSize: Responsive.sp(context, 6),
                                   fontWeight: FontWeight.w900,
-                                  letterSpacing: 0.8,
+                                  letterSpacing: 0.5,
                                 ),
                               ),
                             ),
                           ),
                         ),
-                        const SizedBox(width: 8),
+                        SizedBox(width: Responsive.sp(context, 4)),
                         Flexible(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.end,
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Text(
-                                "${match.date} • ${match.time}${match.displayStatus.isEmpty ? '' : ' • ${match.displayStatus}'}",
-                                maxLines: 1,
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 10,
-                                  fontWeight: FontWeight.w900,
-                                  shadows: [
-                                    Shadow(
-                                      color: Colors.black87,
-                                      blurRadius: 4,
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              if (match.displayStatus.isNotEmpty &&
-                                  !match.isLive &&
-                                  !match.status.toLowerCase().contains(
-                                    'finish',
-                                  ))
-                                Text(
-                                  "${match.date} • ${match.time}",
-                                  maxLines: 1,
-                                  style: TextStyle(
-                                    color: Colors.white.withValues(alpha: 0.8),
-                                    fontSize: 8,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                            ],
+                          child: Text(
+                            "${match.date} • ${match.time}",
+                            maxLines: 1,
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: Responsive.sp(context, 7),
+                              fontWeight: FontWeight.w900,
+                              shadows: const [
+                                Shadow(color: Colors.black87, blurRadius: 4),
+                              ],
+                            ),
                           ),
                         ),
                       ],
                     ),
 
-                    // Middle Row: Teams
+                    // Middle: Teams
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         _buildFeaturedTeam(context, match.homeTeam, true),
                         Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          padding: EdgeInsets.symmetric(
+                              horizontal: Responsive.sp(context, 8)),
                           child: Column(
                             mainAxisSize: MainAxisSize.min,
                             children: [
@@ -241,25 +221,24 @@ class FeaturedCarousel extends StatelessWidget {
                                         match.isLive
                                     ? "${match.homeScore} : ${match.awayScore}"
                                     : "VS",
-                                style: const TextStyle(
-                                  fontSize: 24,
+                                style: TextStyle(
+                                  fontSize: Responsive.sp(context, 14),
                                   fontWeight: FontWeight.w900,
                                   color: Colors.white,
                                   fontStyle: FontStyle.italic,
-                                  shadows: [
-                                    Shadow(color: Colors.black, blurRadius: 8),
+                                  shadows: const [
+                                    Shadow(color: Colors.black, blurRadius: 6),
                                   ],
                                 ),
                               ),
-                              const SizedBox(height: 4),
                               if (match.displayStatus.isNotEmpty)
                                 Text(
                                   match.displayStatus,
-                                  style: const TextStyle(
-                                    fontSize: 10,
+                                  style: TextStyle(
+                                    fontSize: Responsive.sp(context, 7),
                                     fontWeight: FontWeight.w900,
                                     color: AppColors.primary,
-                                    letterSpacing: 0.5,
+                                    letterSpacing: 0.3,
                                   ),
                                 ),
                             ],
@@ -269,77 +248,75 @@ class FeaturedCarousel extends StatelessWidget {
                       ],
                     ),
 
-                    // Bottom Section: Prediction with Glassmorphism
+                    // Bottom: Prediction
                     ClipRRect(
-                      borderRadius: BorderRadius.circular(16),
-                      child: BackdropFilter(
-                        filter: ColorFilter.mode(
-                          Colors.white.withValues(alpha: 0.1),
-                          BlendMode.overlay,
+                      borderRadius:
+                          BorderRadius.circular(Responsive.sp(context, 10)),
+                      child: Container(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: Responsive.sp(context, 10),
+                          vertical: Responsive.sp(context, 6),
                         ),
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 16,
-                            vertical: 10,
+                        decoration: BoxDecoration(
+                          color: Colors.white.withValues(alpha: 0.1),
+                          borderRadius:
+                              BorderRadius.circular(Responsive.sp(context, 10)),
+                          border: Border.all(
+                            color: Colors.white.withValues(alpha: 0.15),
+                            width: 0.5,
                           ),
-                          decoration: BoxDecoration(
-                            color: Colors.white.withValues(alpha: 0.1),
-                            borderRadius: BorderRadius.circular(16),
-                            border: Border.all(
-                              color: Colors.white.withValues(alpha: 0.2),
-                            ),
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      "LEO PREDICTION",
-                                      style: TextStyle(
-                                        fontSize: 8,
-                                        color: Colors.white.withValues(
-                                          alpha: 0.7,
-                                        ),
-                                        fontWeight: FontWeight.w900,
-                                        letterSpacing: 1.0,
-                                      ),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    "LEO PREDICTION",
+                                    style: TextStyle(
+                                      fontSize: Responsive.sp(context, 6),
+                                      color:
+                                          Colors.white.withValues(alpha: 0.7),
+                                      fontWeight: FontWeight.w900,
+                                      letterSpacing: 0.8,
                                     ),
-                                    Text(
-                                      match.prediction ?? "N/A",
-                                      style: const TextStyle(
-                                        fontSize: 14,
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.w700,
-                                      ),
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              Container(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 14,
-                                  vertical: 6,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: AppColors.primary,
-                                  borderRadius: BorderRadius.circular(10),
-                                  border: Border.all(color: Colors.white24),
-                                ),
-                                child: Text(
-                                  match.odds ?? "1.00",
-                                  style: const TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w900,
-                                    color: Colors.white,
                                   ),
+                                  Text(
+                                    match.prediction ?? "N/A",
+                                    style: TextStyle(
+                                      fontSize: Responsive.sp(context, 10),
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Container(
+                              padding: EdgeInsets.symmetric(
+                                horizontal: Responsive.sp(context, 8),
+                                vertical: Responsive.sp(context, 3),
+                              ),
+                              decoration: BoxDecoration(
+                                color: AppColors.primary,
+                                borderRadius: BorderRadius.circular(
+                                    Responsive.sp(context, 6)),
+                                border: Border.all(
+                                    color: Colors.white24, width: 0.5),
+                              ),
+                              child: Text(
+                                match.odds ?? "1.00",
+                                style: TextStyle(
+                                  fontSize: Responsive.sp(context, 10),
+                                  fontWeight: FontWeight.w900,
+                                  color: Colors.white,
                                 ),
                               ),
-                            ],
-                          ),
+                            ),
+                          ],
                         ),
                       ),
                     ),
@@ -352,22 +329,22 @@ class FeaturedCarousel extends StatelessWidget {
                   top: 0,
                   right: 0,
                   child: Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 10,
-                      vertical: 4,
+                    padding: EdgeInsets.symmetric(
+                      horizontal: Responsive.sp(context, 6),
+                      vertical: Responsive.sp(context, 2),
                     ),
-                    decoration: const BoxDecoration(
+                    decoration: BoxDecoration(
                       color: AppColors.success,
                       borderRadius: BorderRadius.only(
-                        topRight: Radius.circular(24),
-                        bottomLeft: Radius.circular(10),
+                        topRight: Radius.circular(Responsive.sp(context, 14)),
+                        bottomLeft: Radius.circular(Responsive.sp(context, 6)),
                       ),
                     ),
-                    child: const Text(
+                    child: Text(
                       "ACCURATE",
                       style: TextStyle(
                         color: Colors.white,
-                        fontSize: 8,
+                        fontSize: Responsive.sp(context, 6),
                         fontWeight: FontWeight.w900,
                       ),
                     ),
@@ -381,10 +358,8 @@ class FeaturedCarousel extends StatelessWidget {
   }
 
   Widget _buildFeaturedTeam(
-    BuildContext context,
-    String teamName,
-    bool isHome,
-  ) {
+      BuildContext context, String teamName, bool isHome) {
+    final logoSize = Responsive.sp(context, 32);
     return Expanded(
       child: GestureDetector(
         onTap: () {
@@ -400,46 +375,40 @@ class FeaturedCarousel extends StatelessWidget {
         },
         child: Column(
           children: [
-            ClipRRect(
-              borderRadius: BorderRadius.circular(30),
-              child: BackdropFilter(
-                filter: ColorFilter.mode(
-                  Colors.white.withValues(alpha: 0.1),
-                  BlendMode.overlay,
+            Container(
+              width: logoSize,
+              height: logoSize,
+              decoration: BoxDecoration(
+                color: Colors.white.withValues(alpha: 0.1),
+                shape: BoxShape.circle,
+                border: Border.all(
+                  color: Colors.white.withValues(alpha: 0.2),
+                  width: 0.5,
                 ),
-                child: Container(
-                  width: 56,
-                  height: 56,
-                  decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.1),
-                    shape: BoxShape.circle,
-                    border: Border.all(
-                      color: Colors.white.withValues(alpha: 0.2),
-                    ),
-                  ),
-                  child: Center(
-                    child: Text(
-                      teamName.substring(0, 1).toUpperCase(),
-                      style: const TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.w900,
-                        color: Colors.white,
-                      ),
-                    ),
+              ),
+              child: Center(
+                child: Text(
+                  teamName.substring(0, 1).toUpperCase(),
+                  style: TextStyle(
+                    fontSize: Responsive.sp(context, 14),
+                    fontWeight: FontWeight.w900,
+                    color: Colors.white,
                   ),
                 ),
               ),
             ),
-            const SizedBox(height: 6),
+            SizedBox(height: Responsive.sp(context, 3)),
             Text(
               teamName.toUpperCase(),
               textAlign: TextAlign.center,
-              style: const TextStyle(
-                fontSize: 9,
+              style: TextStyle(
+                fontSize: Responsive.sp(context, 7),
                 fontWeight: FontWeight.w900,
                 color: Colors.white,
-                letterSpacing: 0.5,
-                shadows: [Shadow(color: Colors.black87, blurRadius: 4)],
+                letterSpacing: 0.3,
+                shadows: const [
+                  Shadow(color: Colors.black87, blurRadius: 4),
+                ],
               ),
               overflow: TextOverflow.ellipsis,
             ),

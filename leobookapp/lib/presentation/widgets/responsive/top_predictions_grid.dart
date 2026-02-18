@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../core/constants/app_colors.dart';
+import '../../../core/constants/responsive_constants.dart';
 import '../../screens/top_predictions_screen.dart';
 
 class TopPredictionsGrid extends StatelessWidget {
@@ -13,7 +14,7 @@ class TopPredictionsGrid extends StatelessWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            const _SectionHeader(
+            _SectionHeader(
               title: "TOP PREDICTIONS",
               icon: Icons.star_rounded,
               color: AppColors.primary,
@@ -26,26 +27,26 @@ class TopPredictionsGrid extends StatelessWidget {
                   ),
                 );
               },
-              child: const Text(
+              child: Text(
                 "VIEW ALL",
                 style: TextStyle(
-                  fontSize: 10,
+                  fontSize: Responsive.sp(context, 7),
                   fontWeight: FontWeight.w900,
                   color: AppColors.textGrey,
-                  letterSpacing: 1.5,
+                  letterSpacing: 1.0,
                 ),
               ),
             ),
           ],
         ),
-        const SizedBox(height: 16),
+        SizedBox(height: Responsive.sp(context, 8)),
         GridView.count(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
-          crossAxisCount: 3,
-          crossAxisSpacing: 20,
-          mainAxisSpacing: 20,
-          childAspectRatio: 1.6,
+          crossAxisCount: Responsive.isDesktop(context) ? 3 : 2,
+          crossAxisSpacing: Responsive.sp(context, 8),
+          mainAxisSpacing: Responsive.sp(context, 8),
+          childAspectRatio: Responsive.isDesktop(context) ? 1.8 : 1.5,
           children: const [
             _PredictionCard(
               title: "Arsenal VS Liverpool",
@@ -85,14 +86,14 @@ class _SectionHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        Icon(icon, color: color, size: 20),
-        const SizedBox(width: 12),
+        Icon(icon, color: color, size: Responsive.sp(context, 14)),
+        SizedBox(width: Responsive.sp(context, 6)),
         Text(
           title,
-          style: const TextStyle(
-            fontSize: 14,
+          style: TextStyle(
+            fontSize: Responsive.sp(context, 10),
             fontWeight: FontWeight.w900,
-            letterSpacing: 2.0,
+            letterSpacing: 1.5,
             color: Colors.white,
           ),
         ),
@@ -134,18 +135,18 @@ class _PredictionCardState extends State<_PredictionCard> {
         curve: Curves.easeOutCubic,
         child: Container(
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(28),
+            borderRadius: BorderRadius.circular(Responsive.sp(context, 14)),
             boxShadow: [
               if (_isHovered)
                 BoxShadow(
-                  color: AppColors.primary.withValues(alpha: 0.1),
-                  blurRadius: 30,
-                  offset: const Offset(0, 10),
+                  color: AppColors.primary.withValues(alpha: 0.08),
+                  blurRadius: 20,
+                  offset: const Offset(0, 6),
                 ),
             ],
           ),
           child: ClipRRect(
-            borderRadius: BorderRadius.circular(28),
+            borderRadius: BorderRadius.circular(Responsive.sp(context, 14)),
             child: Stack(
               children: [
                 // Background Image
@@ -160,8 +161,8 @@ class _PredictionCardState extends State<_PredictionCard> {
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
                         colors: [
-                          Colors.black.withValues(alpha: 0.2),
-                          Colors.black.withValues(alpha: 0.5),
+                          Colors.black.withValues(alpha: 0.15),
+                          Colors.black.withValues(alpha: 0.45),
                           AppColors.desktopSidebarBg,
                         ],
                       ),
@@ -170,49 +171,50 @@ class _PredictionCardState extends State<_PredictionCard> {
                 ),
                 // Content
                 Padding(
-                  padding: const EdgeInsets.all(32.0),
+                  padding: EdgeInsets.all(Responsive.sp(context, 12)),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
                       Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 10,
-                          vertical: 6,
+                        padding: EdgeInsets.symmetric(
+                          horizontal: Responsive.sp(context, 5),
+                          vertical: Responsive.sp(context, 2),
                         ),
                         decoration: BoxDecoration(
                           color: AppColors.primary,
-                          borderRadius: BorderRadius.circular(6),
+                          borderRadius:
+                              BorderRadius.circular(Responsive.sp(context, 4)),
                         ),
                         child: Text(
                           widget.category,
-                          style: const TextStyle(
-                            fontSize: 10,
+                          style: TextStyle(
+                            fontSize: Responsive.sp(context, 6),
                             fontWeight: FontWeight.w900,
                             color: Colors.white,
-                            letterSpacing: 1,
+                            letterSpacing: 0.5,
                           ),
                         ),
                       ),
-                      const SizedBox(height: 16),
+                      SizedBox(height: Responsive.sp(context, 6)),
                       Text(
                         widget.title.toUpperCase(),
-                        style: const TextStyle(
-                          fontSize: 28,
+                        style: TextStyle(
+                          fontSize: Responsive.sp(context, 14),
                           fontWeight: FontWeight.w900,
                           color: Colors.white,
-                          height: 1,
-                          letterSpacing: -0.5,
+                          height: 1.1,
+                          letterSpacing: -0.3,
                         ),
                       ),
-                      const SizedBox(height: 8),
+                      SizedBox(height: Responsive.sp(context, 3)),
                       Text(
                         "PREDICTION: ${widget.prediction}".toUpperCase(),
                         style: TextStyle(
-                          fontSize: 12,
+                          fontSize: Responsive.sp(context, 7),
                           fontWeight: FontWeight.w700,
                           color: Colors.white.withValues(alpha: 0.5),
-                          letterSpacing: 1,
+                          letterSpacing: 0.5,
                         ),
                       ),
                     ],

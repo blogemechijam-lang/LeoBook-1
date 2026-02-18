@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import '../../../core/constants/app_colors.dart';
+import '../../../core/constants/responsive_constants.dart';
 import '../../../core/theme/liquid_glass_theme.dart';
 import '../../../logic/cubit/home_cubit.dart';
 import 'leo_date_picker.dart';
@@ -33,8 +34,8 @@ class _CategoryBarState extends State<CategoryBar> {
 
   void _scrollToIndex(int index) {
     if (!_scrollController.hasClients) return;
-    final screenWidth = MediaQuery.of(context).size.width;
-    const itemExtent = 98.0;
+    final screenWidth = MediaQuery.sizeOf(context).width;
+    final itemExtent = Responsive.sp(context, 56);
     final offset = (index * itemExtent) - (screenWidth / 2) + (itemExtent / 2);
     _scrollController.animateTo(
       offset.clamp(0.0, _scrollController.position.maxScrollExtent),
@@ -73,13 +74,14 @@ class _CategoryBarState extends State<CategoryBar> {
         final now = DateTime.now();
 
         return Container(
-          height: 44,
-          margin: const EdgeInsets.symmetric(vertical: 24),
+          height: Responsive.sp(context, 28),
+          margin: EdgeInsets.symmetric(vertical: Responsive.sp(context, 6)),
           child: ListView.separated(
             controller: _scrollController,
             scrollDirection: Axis.horizontal,
             itemCount: _totalItems,
-            separatorBuilder: (_, __) => const SizedBox(width: 8),
+            separatorBuilder: (_, __) =>
+                SizedBox(width: Responsive.sp(context, 4)),
             itemBuilder: (context, index) {
               if (index == _totalDates) {
                 return _buildMoreDates(context, selectedDate);
@@ -126,24 +128,23 @@ class _CategoryBarState extends State<CategoryBar> {
       onTap: onTap,
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
-        constraints: const BoxConstraints(minWidth: 90),
-        padding: const EdgeInsets.symmetric(horizontal: 16),
+        constraints: BoxConstraints(minWidth: Responsive.sp(context, 52)),
+        padding: EdgeInsets.symmetric(horizontal: Responsive.sp(context, 8)),
         decoration: BoxDecoration(
           color: isSelected ? AppColors.primary : AppColors.desktopSearchFill,
-          borderRadius:
-              BorderRadius.circular(LiquidGlassTheme.borderRadiusSmall),
+          borderRadius: BorderRadius.circular(Responsive.sp(context, 8)),
           border: isSelected
               ? null
-              : Border.all(color: LiquidGlassTheme.glassBorderDark),
+              : Border.all(color: LiquidGlassTheme.glassBorderDark, width: 0.5),
         ),
         child: Center(
           child: Text(
             label,
             style: TextStyle(
-              fontSize: 10,
+              fontSize: Responsive.sp(context, 7),
               fontWeight: FontWeight.w900,
               color: isSelected ? Colors.white : AppColors.textGrey,
-              letterSpacing: 1.2,
+              letterSpacing: 0.8,
             ),
           ),
         ),
@@ -154,7 +155,6 @@ class _CategoryBarState extends State<CategoryBar> {
   Widget _buildMoreDates(BuildContext context, DateTime current) {
     return GestureDetector(
       onTap: () async {
-        // Max 7 days future, unlimited past
         final maxDate = DateTime.now().add(const Duration(days: 7));
         final date = await LeoDatePicker.show(
           context,
@@ -166,28 +166,28 @@ class _CategoryBarState extends State<CategoryBar> {
         }
       },
       child: Container(
-        constraints: const BoxConstraints(minWidth: 90),
-        padding: const EdgeInsets.symmetric(horizontal: 16),
+        constraints: BoxConstraints(minWidth: Responsive.sp(context, 52)),
+        padding: EdgeInsets.symmetric(horizontal: Responsive.sp(context, 8)),
         decoration: BoxDecoration(
           color: AppColors.desktopSearchFill,
-          borderRadius:
-              BorderRadius.circular(LiquidGlassTheme.borderRadiusSmall),
-          border: Border.all(color: LiquidGlassTheme.glassBorderDark),
+          borderRadius: BorderRadius.circular(Responsive.sp(context, 8)),
+          border:
+              Border.all(color: LiquidGlassTheme.glassBorderDark, width: 0.5),
         ),
-        child: const Center(
+        child: Center(
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
               Icon(Icons.calendar_today_rounded,
-                  color: AppColors.textGrey, size: 14),
-              SizedBox(width: 8),
+                  color: AppColors.textGrey, size: Responsive.sp(context, 10)),
+              SizedBox(width: Responsive.sp(context, 4)),
               Text(
                 "MORE DATES",
                 style: TextStyle(
-                  fontSize: 10,
+                  fontSize: Responsive.sp(context, 7),
                   fontWeight: FontWeight.w900,
                   color: AppColors.textGrey,
-                  letterSpacing: 1.2,
+                  letterSpacing: 0.8,
                 ),
               ),
             ],

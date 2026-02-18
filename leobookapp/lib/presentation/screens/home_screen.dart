@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:leobookapp/logic/cubit/home_cubit.dart';
 import 'package:leobookapp/core/constants/app_colors.dart';
+import 'package:leobookapp/core/constants/responsive_constants.dart';
 import 'package:leobookapp/core/utils/match_sorter.dart';
 import 'package:leobookapp/core/animations/liquid_glass_animations.dart';
 import '../widgets/match_card.dart';
@@ -41,7 +42,8 @@ class _HomeScreenState extends State<HomeScreen>
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final isDesktop = MediaQuery.of(context).size.width > 1024;
+    final isDesktop = Responsive.isDesktop(context);
+    final hp = Responsive.horizontalPadding(context);
 
     return Scaffold(
       backgroundColor: isDesktop ? AppColors.backgroundDark : null,
@@ -66,13 +68,13 @@ class _HomeScreenState extends State<HomeScreen>
                   physics: liquidScrollPhysics,
                   slivers: [
                     SliverPadding(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 16, vertical: 16),
+                      padding: EdgeInsets.symmetric(
+                          horizontal: hp, vertical: Responsive.sp(context, 8)),
                       sliver: SliverToBoxAdapter(
                         child: Row(
                           children: [
                             const Expanded(child: CategoryBar()),
-                            const SizedBox(width: 12),
+                            SizedBox(width: Responsive.sp(context, 6)),
                             GestureDetector(
                               onTap: () {
                                 Navigator.push(
@@ -86,18 +88,20 @@ class _HomeScreenState extends State<HomeScreen>
                                 );
                               },
                               child: Container(
-                                padding: const EdgeInsets.all(12),
+                                padding:
+                                    EdgeInsets.all(Responsive.sp(context, 7)),
                                 decoration: BoxDecoration(
                                   color: isDark
                                       ? Colors.white.withValues(alpha: 0.05)
                                       : Colors.black.withValues(alpha: 0.05),
-                                  borderRadius: BorderRadius.circular(14),
+                                  borderRadius: BorderRadius.circular(
+                                      Responsive.sp(context, 8)),
                                 ),
                                 child: Icon(
                                   Icons.search_rounded,
                                   color:
                                       isDark ? Colors.white70 : Colors.black54,
-                                  size: 22,
+                                  size: Responsive.sp(context, 16),
                                 ),
                               ),
                             ),
@@ -105,13 +109,14 @@ class _HomeScreenState extends State<HomeScreen>
                         ),
                       ),
                     ),
-                    const SliverPadding(
-                      padding: EdgeInsets.symmetric(horizontal: 16),
-                      sliver: SliverToBoxAdapter(
+                    SliverPadding(
+                      padding: EdgeInsets.symmetric(horizontal: hp),
+                      sliver: const SliverToBoxAdapter(
                         child: TopPredictionsGrid(),
                       ),
                     ),
-                    const SliverToBoxAdapter(child: SizedBox(height: 24)),
+                    SliverToBoxAdapter(
+                        child: SizedBox(height: Responsive.sp(context, 10))),
                     SliverToBoxAdapter(
                       child: FeaturedCarousel(
                         matches: state.featuredMatches,
@@ -119,24 +124,32 @@ class _HomeScreenState extends State<HomeScreen>
                         allMatches: state.allMatches,
                       ),
                     ),
-                    const SliverToBoxAdapter(child: SizedBox(height: 16)),
+                    SliverToBoxAdapter(
+                        child: SizedBox(height: Responsive.sp(context, 6))),
                     SliverToBoxAdapter(child: NewsFeed(news: state.news)),
-                    const SliverToBoxAdapter(child: SizedBox(height: 16)),
+                    SliverToBoxAdapter(
+                        child: SizedBox(height: Responsive.sp(context, 6))),
                     SliverPersistentHeader(
                       pinned: true,
                       delegate: _StickyTabBarDelegate(
                         TabBar(
                           controller: _tabController,
                           indicatorColor: AppColors.primary,
-                          indicatorWeight: 3,
+                          indicatorWeight: 2,
                           labelColor: AppColors.primary,
                           unselectedLabelColor:
                               isDark ? Colors.white60 : AppColors.textGrey,
-                          labelStyle: const TextStyle(
-                            fontSize: 12,
+                          labelStyle: TextStyle(
+                            fontSize: Responsive.sp(context, 9),
                             fontWeight: FontWeight.w900,
-                            letterSpacing: 1.0,
+                            letterSpacing: 0.8,
                           ),
+                          unselectedLabelStyle: TextStyle(
+                            fontSize: Responsive.sp(context, 8),
+                            fontWeight: FontWeight.w700,
+                          ),
+                          labelPadding: EdgeInsets.symmetric(
+                              horizontal: Responsive.sp(context, 4)),
                           tabs: const [
                             Tab(text: "ALL"),
                             Tab(text: "LIVE"),
@@ -193,6 +206,7 @@ class _HomeScreenState extends State<HomeScreen>
     bool isDark,
   ) {
     final sortedItems = MatchSorter.getSortedMatches(matches.cast(), type);
+    final guideLine = Responsive.sp(context, 14);
 
     if (sortedItems.isEmpty) {
       return Center(
@@ -201,13 +215,14 @@ class _HomeScreenState extends State<HomeScreen>
           children: [
             Icon(
               Icons.sports_soccer_rounded,
-              size: 48,
+              size: Responsive.sp(context, 28),
               color: isDark ? Colors.white24 : Colors.black12,
             ),
-            const SizedBox(height: 16),
+            SizedBox(height: Responsive.sp(context, 8)),
             Text(
               "No matches found",
               style: TextStyle(
+                fontSize: Responsive.sp(context, 10),
                 color: isDark ? Colors.white38 : Colors.black38,
                 fontWeight: FontWeight.bold,
               ),
@@ -219,26 +234,24 @@ class _HomeScreenState extends State<HomeScreen>
 
     return ListView.builder(
       physics: const NeverScrollableScrollPhysics(),
-      itemCount: sortedItems.length + 1, // +1 for footnote
+      itemCount: sortedItems.length + 1,
       itemBuilder: (context, index) {
         final isFooter = index == sortedItems.length;
 
         return Stack(
           children: [
-            // Guide line segment
             if (!isFooter)
               Positioned(
-                left: 24 + 1.5,
+                left: guideLine + 1,
                 top: 0,
                 bottom: 0,
                 child: Container(
-                  width: 1,
+                  width: 0.5,
                   color: isDark
-                      ? Colors.white.withValues(alpha: 0.1)
-                      : Colors.black.withValues(alpha: 0.05),
+                      ? Colors.white.withValues(alpha: 0.08)
+                      : Colors.black.withValues(alpha: 0.04),
                 ),
               ),
-
             if (isFooter)
               const FootnoteSection()
             else
@@ -252,41 +265,47 @@ class _HomeScreenState extends State<HomeScreen>
   Widget _buildItem(dynamic item, bool isDark) {
     if (item is MatchGroupHeader) {
       return Padding(
-        padding: const EdgeInsets.fromLTRB(24, 24, 24, 8),
+        padding: EdgeInsets.fromLTRB(
+          Responsive.sp(context, 14),
+          Responsive.sp(context, 12),
+          Responsive.sp(context, 14),
+          Responsive.sp(context, 4),
+        ),
         child: Row(
           children: [
             Container(
-              width: 4,
-              height: 14,
+              width: Responsive.sp(context, 2.5),
+              height: Responsive.sp(context, 8),
               decoration: BoxDecoration(
                 color: AppColors.primary,
-                borderRadius: BorderRadius.circular(2),
+                borderRadius: BorderRadius.circular(1),
                 boxShadow: [
                   BoxShadow(
                     color: AppColors.primary.withValues(alpha: 0.4),
-                    blurRadius: 4,
+                    blurRadius: 3,
                     spreadRadius: 0,
                   ),
                 ],
               ),
             ),
-            const SizedBox(width: 8),
+            SizedBox(width: Responsive.sp(context, 4)),
             Text(
               item.title.toUpperCase(),
               style: TextStyle(
-                fontSize: 12,
+                fontSize: Responsive.sp(context, 9),
                 fontWeight: FontWeight.w900,
                 color: isDark ? Colors.white70 : AppColors.textDark,
-                letterSpacing: 1.0,
+                letterSpacing: 0.8,
               ),
             ),
             const Spacer(),
-            Container(
-              height: 1,
-              width: 100,
-              color: isDark
-                  ? Colors.white10
-                  : Colors.black.withValues(alpha: 0.05),
+            Flexible(
+              child: Container(
+                height: 0.5,
+                color: isDark
+                    ? Colors.white10
+                    : Colors.black.withValues(alpha: 0.04),
+              ),
             ),
           ],
         ),
@@ -304,8 +323,7 @@ class _StickyTabBarDelegate extends SliverPersistentHeaderDelegate {
   _StickyTabBarDelegate(this._tabBar, this.isDark);
 
   @override
-  double get minExtent =>
-      _tabBar.preferredSize.height + 1; // +1 for bottom border
+  double get minExtent => _tabBar.preferredSize.height + 1;
   @override
   double get maxExtent => _tabBar.preferredSize.height + 1;
 
@@ -315,18 +333,18 @@ class _StickyTabBarDelegate extends SliverPersistentHeaderDelegate {
     double shrinkOffset,
     bool overlapsContent,
   ) {
+    final guideLine = Responsive.sp(context, 14);
     return Stack(
       children: [
-        // Sideruler start
         Positioned(
-          left: 24 + 1.5,
+          left: guideLine + 1,
           top: 0,
           bottom: 0,
           child: Container(
-            width: 1,
+            width: 0.5,
             color: isDark
-                ? Colors.white.withValues(alpha: 0.1)
-                : Colors.black.withValues(alpha: 0.05),
+                ? Colors.white.withValues(alpha: 0.08)
+                : Colors.black.withValues(alpha: 0.04),
           ),
         ),
         Container(
@@ -337,8 +355,8 @@ class _StickyTabBarDelegate extends SliverPersistentHeaderDelegate {
               bottom: BorderSide(
                 color: isDark
                     ? Colors.white10
-                    : Colors.black.withValues(alpha: 0.05),
-                width: 1,
+                    : Colors.black.withValues(alpha: 0.04),
+                width: 0.5,
               ),
             ),
           ),

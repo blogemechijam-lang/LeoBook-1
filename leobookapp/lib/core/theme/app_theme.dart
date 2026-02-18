@@ -14,44 +14,44 @@ class AppTheme {
 
       textTheme: GoogleFonts.lexendTextTheme().copyWith(
         displayLarge: GoogleFonts.lexend(
-          fontSize: 32,
+          fontSize: 22,
           fontWeight: FontWeight.w700,
           color: Colors.white,
-          letterSpacing: -1.5,
+          letterSpacing: -1.0,
         ),
         titleLarge: GoogleFonts.lexend(
-          fontSize: 20,
+          fontSize: 15,
           fontWeight: FontWeight.w600,
           color: Colors.white,
-          letterSpacing: -0.5,
+          letterSpacing: -0.3,
         ),
         titleMedium: GoogleFonts.lexend(
-          fontSize: 16,
+          fontSize: 13,
           fontWeight: FontWeight.w600,
           color: AppColors.textLight,
         ),
         bodyLarge: GoogleFonts.lexend(
-          fontSize: 16,
+          fontSize: 13,
           fontWeight: FontWeight.w400,
           color: AppColors.textLight,
           height: 1.5,
         ),
         bodyMedium: GoogleFonts.lexend(
-          fontSize: 14,
+          fontSize: 11,
           fontWeight: FontWeight.w400,
           color: AppColors.textGrey,
-          height: 1.6,
+          height: 1.5,
         ),
         bodySmall: GoogleFonts.lexend(
-          fontSize: 12,
+          fontSize: 10,
           fontWeight: FontWeight.w400,
           color: AppColors.textGrey,
         ),
         labelLarge: GoogleFonts.lexend(
-          fontSize: 12,
+          fontSize: 9,
           fontWeight: FontWeight.w700,
           color: AppColors.textGrey,
-          letterSpacing: 1.0,
+          letterSpacing: 0.8,
         ),
       ),
 
@@ -72,9 +72,9 @@ class AppTheme {
         centerTitle: false,
         titleTextStyle: GoogleFonts.lexend(
           color: Colors.white,
-          fontSize: 20,
+          fontSize: 15,
           fontWeight: FontWeight.w700,
-          letterSpacing: -0.5,
+          letterSpacing: -0.3,
         ),
       ),
 
@@ -83,7 +83,7 @@ class AppTheme {
         color: AppColors.glassDark,
         elevation: 0,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(24),
+          borderRadius: BorderRadius.circular(14),
           side: BorderSide(color: Colors.white.withValues(alpha: 0.05)),
         ),
       ),
@@ -93,12 +93,12 @@ class AppTheme {
         filled: true,
         fillColor: AppColors.desktopSearchFill,
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(10),
           borderSide: BorderSide.none,
         ),
         hintStyle: const TextStyle(
           color: Colors.white24,
-          fontSize: 12,
+          fontSize: 11,
           fontWeight: FontWeight.w500,
         ),
       ),
@@ -113,8 +113,8 @@ class AppTheme {
       // Animated snackbar
       snackBarTheme: SnackBarThemeData(
         backgroundColor: AppColors.cardDark,
-        contentTextStyle: GoogleFonts.lexend(color: Colors.white, fontSize: 14),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        contentTextStyle: GoogleFonts.lexend(color: Colors.white, fontSize: 12),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
         behavior: SnackBarBehavior.floating,
       ),
 
@@ -123,7 +123,7 @@ class AppTheme {
         backgroundColor: AppColors.primary,
         foregroundColor: Colors.white,
         elevation: 0,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       ),
 
       // Divider

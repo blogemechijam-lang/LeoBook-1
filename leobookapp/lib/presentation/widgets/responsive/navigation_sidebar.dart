@@ -1,6 +1,7 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import '../../../core/constants/app_colors.dart';
+import '../../../core/constants/responsive_constants.dart';
 import '../../../core/theme/liquid_glass_theme.dart';
 
 class NavigationSideBar extends StatelessWidget {
@@ -32,26 +33,28 @@ class NavigationSideBar extends StatelessWidget {
             child: Container(
               height: double.infinity,
               decoration: BoxDecoration(
-                color: AppColors.surfaceDark.withValues(alpha: 0.85),
+                color: AppColors.surfaceDark.withValues(alpha: 0.7),
                 border: Border(
                   right: BorderSide(
                     color: LiquidGlassTheme.glassBorderDark,
+                    width: 0.5,
                   ),
                 ),
               ),
               child: SingleChildScrollView(
                 child: ConstrainedBox(
                   constraints: BoxConstraints(
-                    minHeight: MediaQuery.of(context).size.height,
+                    minHeight: MediaQuery.sizeOf(context).height,
                   ),
                   child: IntrinsicHeight(
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        _buildLogo(),
-                        const SizedBox(height: 32),
+                        _buildLogo(context),
+                        SizedBox(height: Responsive.dp(context, 20)),
                         Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 12),
+                          padding: EdgeInsets.symmetric(
+                              horizontal: Responsive.dp(context, 8)),
                           child: Column(
                             mainAxisSize: MainAxisSize.min,
                             children: [
@@ -87,9 +90,9 @@ class NavigationSideBar extends StatelessWidget {
                           ),
                         ),
                         const Spacer(),
-                        if (isExpanded) _buildProCard(),
+                        if (isExpanded) _buildProCard(context),
                         _buildToggleBtn(),
-                        const SizedBox(height: 16),
+                        SizedBox(height: Responsive.dp(context, 10)),
                       ],
                     ),
                   ),
@@ -111,16 +114,20 @@ class NavigationSideBar extends StatelessWidget {
         child: const Icon(
           Icons.keyboard_double_arrow_left,
           color: Colors.white54,
+          size: 18,
         ),
       ),
     );
   }
 
-  Widget _buildLogo() {
+  Widget _buildLogo(BuildContext context) {
     return Padding(
       padding: EdgeInsets.symmetric(
-        horizontal: isExpanded ? 16.0 : 4.0,
-        vertical: isExpanded ? 24.0 : 12.0,
+        horizontal:
+            isExpanded ? Responsive.dp(context, 12) : Responsive.dp(context, 4),
+        vertical: isExpanded
+            ? Responsive.dp(context, 16)
+            : Responsive.dp(context, 10),
       ),
       child: FittedBox(
         fit: BoxFit.scaleDown,
@@ -131,27 +138,31 @@ class NavigationSideBar extends StatelessWidget {
           mainAxisSize: isExpanded ? MainAxisSize.max : MainAxisSize.min,
           children: [
             Container(
-              padding: EdgeInsets.all(isExpanded ? 8 : 6),
+              padding: EdgeInsets.all(isExpanded
+                  ? Responsive.dp(context, 5)
+                  : Responsive.dp(context, 4)),
               decoration: BoxDecoration(
                 color: AppColors.primary,
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: BorderRadius.circular(Responsive.dp(context, 6)),
               ),
               child: Icon(
                 Icons.analytics_rounded,
                 color: Colors.white,
-                size: isExpanded ? 24 : 18,
+                size: isExpanded
+                    ? Responsive.dp(context, 18)
+                    : Responsive.dp(context, 14),
               ),
             ),
             if (isExpanded) ...[
-              const SizedBox(width: 8),
-              const Text(
+              SizedBox(width: Responsive.dp(context, 6)),
+              Text(
                 "LEOBOOK",
                 style: TextStyle(
-                  fontSize: 24,
+                  fontSize: Responsive.dp(context, 16),
                   fontWeight: FontWeight.w900,
                   color: Colors.white,
                   fontStyle: FontStyle.italic,
-                  letterSpacing: -1,
+                  letterSpacing: -0.5,
                 ),
                 overflow: TextOverflow.ellipsis,
                 maxLines: 1,
@@ -163,46 +174,52 @@ class NavigationSideBar extends StatelessWidget {
     );
   }
 
-  Widget _buildProCard() {
+  Widget _buildProCard(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 24.0),
+      padding: EdgeInsets.symmetric(
+        horizontal: Responsive.dp(context, 10),
+        vertical: Responsive.dp(context, 14),
+      ),
       child: Container(
-        padding: const EdgeInsets.all(12),
+        padding: EdgeInsets.all(Responsive.dp(context, 8)),
         decoration: BoxDecoration(
-          color: AppColors.backgroundDark.withValues(alpha: 0.6),
-          borderRadius: BorderRadius.circular(LiquidGlassTheme.borderRadius),
-          border: Border.all(color: LiquidGlassTheme.glassBorderDark),
+          color: AppColors.backgroundDark.withValues(alpha: 0.5),
+          borderRadius: BorderRadius.circular(Responsive.dp(context, 10)),
+          border:
+              Border.all(color: LiquidGlassTheme.glassBorderDark, width: 0.5),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Text(
+            Text(
               "PREMIUM STATUS",
               style: TextStyle(
-                fontSize: 10,
+                fontSize: Responsive.dp(context, 7),
                 fontWeight: FontWeight.w900,
                 color: AppColors.textGrey,
-                letterSpacing: 1.5,
+                letterSpacing: 1.0,
               ),
             ),
-            const SizedBox(height: 8),
+            SizedBox(height: Responsive.dp(context, 4)),
             FittedBox(
               fit: BoxFit.scaleDown,
               alignment: Alignment.centerLeft,
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text(
+                  Text(
                     "PRO MEMBER",
                     style: TextStyle(
-                      fontSize: 12,
+                      fontSize: Responsive.dp(context, 9),
                       fontWeight: FontWeight.bold,
                       color: AppColors.successGreen,
                     ),
                   ),
-                  const SizedBox(width: 8),
-                  Icon(Icons.verified, color: AppColors.warning, size: 16),
+                  SizedBox(width: Responsive.dp(context, 4)),
+                  Icon(Icons.verified,
+                      color: AppColors.warning,
+                      size: Responsive.dp(context, 12)),
                 ],
               ),
             ),
@@ -238,7 +255,7 @@ class _NavItemState extends State<_NavItem> {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 4),
+      padding: EdgeInsets.only(bottom: Responsive.dp(context, 2)),
       child: MouseRegion(
         onEnter: (_) => setState(() => _isHovered = true),
         onExit: (_) => setState(() => _isHovered = false),
@@ -248,24 +265,25 @@ class _NavItemState extends State<_NavItem> {
             duration: LiquidGlassTheme.cardPressDuration,
             curve: LiquidGlassTheme.cardPressCurve,
             padding: EdgeInsets.symmetric(
-              horizontal: widget.isExpanded ? 16 : 12,
-              vertical: 12,
+              horizontal: widget.isExpanded
+                  ? Responsive.dp(context, 10)
+                  : Responsive.dp(context, 8),
+              vertical: Responsive.dp(context, 8),
             ),
             decoration: BoxDecoration(
               color: widget.isActive
-                  ? AppColors.primary.withValues(alpha: 0.15)
+                  ? AppColors.primary.withValues(alpha: 0.12)
                   : (_isHovered
-                      ? Colors.white.withValues(alpha: 0.05)
+                      ? Colors.white.withValues(alpha: 0.04)
                       : Colors.transparent),
-              borderRadius: BorderRadius.circular(
-                LiquidGlassTheme.borderRadiusSmall,
-              ),
+              borderRadius: BorderRadius.circular(Responsive.dp(context, 8)),
               border: Border.all(
                 color: widget.isActive
-                    ? AppColors.primary.withValues(alpha: 0.5)
+                    ? AppColors.primary.withValues(alpha: 0.4)
                     : (_isHovered
                         ? LiquidGlassTheme.glassBorderDark
                         : Colors.transparent),
+                width: 0.5,
               ),
             ),
             child: FittedBox(
@@ -280,17 +298,17 @@ class _NavItemState extends State<_NavItem> {
                   Icon(
                     widget.icon,
                     color: widget.isActive ? AppColors.primary : Colors.white54,
-                    size: 20,
+                    size: Responsive.dp(context, 15),
                   ),
                   if (widget.isExpanded) ...[
-                    const SizedBox(width: 12),
+                    SizedBox(width: Responsive.dp(context, 8)),
                     Text(
                       widget.label,
                       style: TextStyle(
-                        fontSize: 12,
+                        fontSize: Responsive.dp(context, 9),
                         fontWeight: FontWeight.w700,
                         color: widget.isActive ? Colors.white : Colors.white54,
-                        letterSpacing: 1.0,
+                        letterSpacing: 0.8,
                       ),
                     ),
                   ],
