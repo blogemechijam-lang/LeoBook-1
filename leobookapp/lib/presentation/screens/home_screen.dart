@@ -12,6 +12,7 @@ import '../widgets/news_feed.dart';
 import '../widgets/responsive/desktop_home_content.dart';
 import '../widgets/responsive/category_bar.dart';
 import '../widgets/responsive/top_odds_list.dart';
+import '../widgets/responsive/leo_tab.dart';
 import '../../logic/cubit/search_cubit.dart';
 import 'search_screen.dart';
 import '../widgets/responsive/accuracy_report_card.dart';
@@ -19,7 +20,8 @@ import '../../core/theme/liquid_glass_theme.dart';
 import '../widgets/footnote_section.dart';
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+  final VoidCallback? onViewAllPredictions;
+  const HomeScreen({super.key, this.onViewAllPredictions});
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -33,10 +35,17 @@ class _HomeScreenState extends State<HomeScreen>
   void initState() {
     super.initState();
     _tabController = TabController(length: 4, vsync: this);
+    _tabController.addListener(_onTabChanged);
+  }
+
+  void _onTabChanged() {
+    if (!_tabController.indexIsChanging) return;
+    setState(() {});
   }
 
   @override
   void dispose() {
+    _tabController.removeListener(_onTabChanged);
     _tabController.dispose();
     super.dispose();
   }
@@ -162,6 +171,7 @@ class _HomeScreenState extends State<HomeScreen>
                           matches: state.featuredMatches,
                           recommendations: state.filteredRecommendations,
                           allMatches: state.allMatches,
+                          onViewAll: widget.onViewAllPredictions,
                         ),
                       ),
                     ),
@@ -185,68 +195,98 @@ class _HomeScreenState extends State<HomeScreen>
                     SliverPersistentHeader(
                       pinned: true,
                       delegate: _StickyTabBarDelegate(
-                        TabBar(
-                          controller: _tabController,
-                          indicatorColor: AppColors.primary,
-                          indicatorWeight: 2,
-                          labelColor: AppColors.primary,
-                          unselectedLabelColor:
-                              isDark ? Colors.white60 : AppColors.textGrey,
-                          labelStyle: TextStyle(
-                            fontSize: Responsive.sp(context, 10),
-                            fontWeight: FontWeight.w900,
-                            letterSpacing: 0.8,
-                          ),
-                          unselectedLabelStyle: TextStyle(
-                            fontSize: Responsive.sp(context, 8),
-                            fontWeight: FontWeight.w700,
-                          ),
-                          dividerColor: Colors.transparent,
-                          labelPadding: EdgeInsets.symmetric(
-                              horizontal: Responsive.sp(context, 4)),
-                          tabs: [
-                            Tab(text: "ALL (${state.filteredMatches.length})"),
-                            Tab(
-                                text:
-                                    "LIVE (${state.filteredMatches.where((m) => m.isLive).length})"),
-                            Tab(
-                                text:
-                                    "FINISHED (${state.filteredMatches.where((m) => m.isFinished).length})"),
-                            Tab(
-                                text:
-                                    "SCHEDULED (${state.filteredMatches.where((m) => !m.isLive && !m.isFinished).length})"),
-                          ],
+                        AnimatedBuilder(
+                          animation: _tabController,
+                          builder: (context, _) {
+                            return TabBar(
+                              controller: _tabController,
+                              indicatorColor: AppColors.primary,
+                              indicatorWeight: 2,
+                              labelColor: AppColors.primary,
+                              unselectedLabelColor:
+                                  isDark ? Colors.white60 : AppColors.textGrey,
+                              labelStyle: TextStyle(
+                                fontSize: Responsive.sp(context, 10),
+                                fontWeight: FontWeight.w900,
+                                letterSpacing: 0.8,
+                              ),
+                              unselectedLabelStyle: TextStyle(
+                                fontSize: Responsive.sp(context, 8),
+                                fontWeight: FontWeight.w700,
+                              ),
+                              dividerColor: Colors.transparent,
+                              labelPadding: EdgeInsets.symmetric(
+                                  horizontal: Responsive.sp(context, 4)),
+                              tabs: [
+                                Tab(
+                                  child: LeoTab(
+                                    text:
+                                        "ALL (${state.filteredMatches.length})",
+                                    isSelected: _tabController.index == 0,
+                                  ),
+                                ),
+                                Tab(
+                                  child: LeoTab(
+                                    text:
+                                        "LIVE (${state.filteredMatches.where((m) => m.isLive).length})",
+                                    isSelected: _tabController.index == 1,
+                                  ),
+                                ),
+                                Tab(
+                                  child: LeoTab(
+                                    text:
+                                        "FINISHED (${state.filteredMatches.where((m) => m.isFinished).length})",
+                                    isSelected: _tabController.index == 2,
+                                  ),
+                                ),
+                                Tab(
+                                  child: LeoTab(
+                                    text:
+                                        "SCHEDULED (${state.filteredMatches.where((m) => !m.isLive && !m.isFinished).length})",
+                                    isSelected: _tabController.index == 3,
+                                  ),
+                                ),
+                              ],
+                            );
+                          },
                         ),
                         isDark,
                       ),
                     ),
-                    SliverFillRemaining(
-                      hasScrollBody: true,
-                      child: TabBarView(
-                        controller: _tabController,
-                        physics: const AlwaysScrollableScrollPhysics(),
-                        children: [
-                          _buildMatchList(
-                            state.filteredMatches,
-                            MatchTabType.all,
-                            isDark,
-                          ),
-                          _buildMatchList(
-                            state.filteredMatches,
-                            MatchTabType.live,
-                            isDark,
-                          ),
-                          _buildMatchList(
-                            state.filteredMatches,
-                            MatchTabType.finished,
-                            isDark,
-                          ),
-                          _buildMatchList(
-                            state.filteredMatches,
-                            MatchTabType.scheduled,
-                            isDark,
-                          ),
-                        ],
+                    SliverPadding(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: hp,
+                        vertical: Responsive.sp(context, 8),
+                      ),
+                      sliver: SliverToBoxAdapter(
+                        child: Builder(
+                          builder: (context) {
+                            final index = _tabController.index;
+                            MatchTabType type;
+                            bool hideLeague = false;
+                            switch (index) {
+                              case 1:
+                                type = MatchTabType.live;
+                                hideLeague = true;
+                                break;
+                              case 2:
+                                type = MatchTabType.finished;
+                                break;
+                              case 3:
+                                type = MatchTabType.scheduled;
+                                break;
+                              default:
+                                type = MatchTabType.all;
+                                hideLeague = true;
+                            }
+                            return _buildMatchColumn(
+                              state.filteredMatches,
+                              type,
+                              isDark,
+                              hideLeagueInfo: hideLeague,
+                            );
+                          },
+                        ),
                       ),
                     ),
                     SliverToBoxAdapter(
@@ -268,63 +308,51 @@ class _HomeScreenState extends State<HomeScreen>
     );
   }
 
-  Widget _buildMatchList(
+  Widget _buildMatchColumn(
     List<dynamic> matches,
     MatchTabType type,
-    bool isDark,
-  ) {
+    bool isDark, {
+    bool hideLeagueInfo = false,
+  }) {
     final sortedItems = MatchSorter.getSortedMatches(matches.cast(), type);
-    final guideLine = Responsive.sp(context, 14);
 
     if (sortedItems.isEmpty) {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              Icons.sports_soccer_rounded,
-              size: Responsive.sp(context, 28),
-              color: isDark ? Colors.white24 : Colors.black12,
-            ),
-            SizedBox(height: Responsive.sp(context, 8)),
-            Text(
-              "No matches found",
-              style: TextStyle(
-                fontSize: Responsive.sp(context, 10),
-                color: isDark ? Colors.white38 : Colors.black38,
-                fontWeight: FontWeight.bold,
+      return Padding(
+        padding: EdgeInsets.symmetric(vertical: Responsive.sp(context, 40)),
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                Icons.sports_soccer_rounded,
+                size: Responsive.sp(context, 28),
+                color: isDark ? Colors.white24 : Colors.black12,
               ),
-            ),
-          ],
+              SizedBox(height: Responsive.sp(context, 8)),
+              Text(
+                "No matches found",
+                style: TextStyle(
+                  fontSize: Responsive.sp(context, 10),
+                  color: isDark ? Colors.white38 : Colors.black38,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ),
         ),
       );
     }
 
-    return ListView.builder(
-      physics: liquidScrollPhysics,
-      itemCount: sortedItems.length,
-      itemBuilder: (context, index) {
-        return Stack(
-          children: [
-            Positioned(
-              left: guideLine + 1,
-              top: 0,
-              bottom: 0,
-              child: Container(
-                width: 0.5,
-                color: isDark
-                    ? Colors.white.withValues(alpha: 0.08)
-                    : Colors.black.withValues(alpha: 0.04),
-              ),
-            ),
-            _buildItem(sortedItems[index], isDark),
-          ],
-        );
-      },
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: sortedItems
+          .map((item) =>
+              _buildItem(item, isDark, hideLeagueInfo: hideLeagueInfo))
+          .toList(),
     );
   }
 
-  Widget _buildItem(dynamic item, bool isDark) {
+  Widget _buildItem(dynamic item, bool isDark, {bool hideLeagueInfo = false}) {
     if (item is MatchGroupHeader) {
       return Padding(
         padding: EdgeInsets.fromLTRB(
@@ -373,13 +401,13 @@ class _HomeScreenState extends State<HomeScreen>
         ),
       );
     } else {
-      return MatchCard(match: item);
+      return MatchCard(match: item, hideLeagueInfo: hideLeagueInfo);
     }
   }
 }
 
 class _StickyTabBarDelegate extends SliverPersistentHeaderDelegate {
-  final TabBar _tabBar;
+  final Widget _tabBar;
   final bool isDark;
 
   _StickyTabBarDelegate(this._tabBar, this.isDark);

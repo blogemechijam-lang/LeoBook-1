@@ -95,8 +95,15 @@ async def resolve_urls(page: Page, target_date: str) -> dict:
     return mappings
 
 async def get_harvested_matches_for_date(target_date: str) -> list:
-    """Retrieves matches for the date that have valid booking codes."""
+    """Retrieves matches for the date that have valid booking codes and haven't been booked yet."""
     site_matches = load_site_matches(target_date)
-    harvested = [m for m in site_matches if m.get('booking_code') and m.get('booking_code') != 'N/A']
-    print(f"  [Registry] Found {len(harvested)} harvested codes for {target_date}.")
+    harvested = [
+        m for m in site_matches
+        if m.get('booking_code') and m.get('booking_code') != 'N/A'
+        and m.get('status') not in ('booked', 'placed')
+    ]
+    already_booked = sum(1 for m in site_matches if m.get('status') in ('booked', 'placed'))
+    if already_booked:
+        print(f"  [Registry] ⏭ {already_booked} already booked for {target_date} (skipped)")
+    print(f"  [Registry] Found {len(harvested)} unbooked harvested codes for {target_date}.")
     return harvested

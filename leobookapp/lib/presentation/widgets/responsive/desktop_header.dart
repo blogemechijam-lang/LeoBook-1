@@ -3,13 +3,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/theme/liquid_glass_theme.dart';
-import '../../../logic/cubit/home_cubit.dart';
 import '../../../logic/cubit/search_cubit.dart';
 import '../../screens/search_screen.dart';
-import 'leo_date_picker.dart';
 
 class DesktopHeader extends StatelessWidget {
-  const DesktopHeader({super.key});
+  final int currentIndex;
+  final ValueChanged<int> onTabChanged;
+
+  const DesktopHeader({
+    super.key,
+    required this.currentIndex,
+    required this.onTabChanged,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -28,6 +33,17 @@ class DesktopHeader extends StatelessWidget {
           ),
           child: Row(
             children: [
+              // Brand
+              const Text(
+                "LEOBOOK",
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w900,
+                  color: Colors.white,
+                  letterSpacing: 2.0,
+                ),
+              ),
+              const SizedBox(width: 24),
               // Search Bar
               Expanded(
                 flex: 2,
@@ -81,10 +97,17 @@ class DesktopHeader extends StatelessWidget {
                 ),
               ),
               const Spacer(),
-              // Action Buttons
+              // Navigation Items (mirrors mobile bottom nav)
               Row(
                 children: [
-                  _buildDateTrigger(context),
+                  _buildNavButton(
+                      Icons.home_rounded, Icons.home_outlined, 0, "HOME"),
+                  const SizedBox(width: 8),
+                  _buildNavButton(Icons.science_rounded, Icons.science_outlined,
+                      1, "RULES"),
+                  const SizedBox(width: 8),
+                  _buildNavButton(Icons.emoji_events_rounded,
+                      Icons.emoji_events_outlined, 2, "TOP"),
                   const SizedBox(width: 16),
                   _buildIconButton(Icons.notifications_none_rounded),
                   const SizedBox(width: 16),
@@ -102,35 +125,45 @@ class DesktopHeader extends StatelessWidget {
     );
   }
 
-  Widget _buildDateTrigger(BuildContext context) {
-    return BlocBuilder<HomeCubit, HomeState>(
-      builder: (context, state) {
-        final currentDate =
-            state is HomeLoaded ? state.selectedDate : DateTime.now();
-        return GestureDetector(
-          onTap: () async {
-            final date = await LeoDatePicker.show(context, currentDate);
-            if (date != null && context.mounted) {
-              context.read<HomeCubit>().updateDate(date);
-            }
-          },
-          child: Container(
-            width: 44,
-            height: 44,
-            decoration: BoxDecoration(
-              color: AppColors.desktopSearchFill,
-              borderRadius: BorderRadius.circular(14),
+  Widget _buildNavButton(
+    IconData activeIcon,
+    IconData inactiveIcon,
+    int index,
+    String label,
+  ) {
+    final isSelected = currentIndex == index;
+    return GestureDetector(
+      onTap: () => onTabChanged(index),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+        decoration: BoxDecoration(
+          color: isSelected
+              ? AppColors.primary.withValues(alpha: 0.15)
+              : Colors.transparent,
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              isSelected ? activeIcon : inactiveIcon,
+              size: 18,
+              color: isSelected ? AppColors.primary : Colors.white38,
             ),
-            child: const Center(
-              child: Icon(
-                Icons.calendar_today_rounded,
-                color: Colors.white54,
-                size: 20,
+            const SizedBox(width: 6),
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 11,
+                fontWeight: isSelected ? FontWeight.w900 : FontWeight.w600,
+                color: isSelected ? AppColors.primary : Colors.white38,
+                letterSpacing: 0.8,
               ),
             ),
-          ),
-        );
-      },
+          ],
+        ),
+      ),
     );
   }
 

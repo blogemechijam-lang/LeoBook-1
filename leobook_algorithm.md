@@ -1,6 +1,6 @@
-# LeoBook v3.0 Algorithm & Codebase Reference
+# LeoBook v3.1 Algorithm & Codebase Reference
 
-> **Version**: 3.0 · **Last Updated**: 2026-02-18 · **Architecture**: Clean Architecture (Orchestrator → Module → Data)
+> **Version**: 3.1 · **Last Updated**: 2026-02-19 · **Architecture**: Concurrent Clean Architecture (Sequential + Parallel Pipeline)
 
 This document maps the **execution flow** of [Leo.py](Leo.py) to specific files and functions.
 
@@ -8,15 +8,18 @@ This document maps the **execution flow** of [Leo.py](Leo.py) to specific files 
 
 ## System Architecture
 
-Leo.py is a **pure orchestrator**. It runs an infinite `while True` loop, executing 4 phases sequentially every 6h.
+Leo.py is a **pure orchestrator**. It runs an infinite `while True` loop, splitting the cycle into three phases:
 
 ```
-Leo.py (Orchestrator)
-├── Prologue: Cloud Sync → Outcome Review → Enrichment → Accuracy → Final Sync
-├── Chapter 1: Flashscore Extraction → AI Prediction → Odds Harvesting → Recommendations
-├── Chapter 2: Automated Bet Placement → Withdrawal Management
-├── Chapter 3: Chief Engineer Oversight & Health Check
-└── Live Streamer: Parallel 60s LIVE score streaming (v2.1 fix)
+Leo.py (Orchestrator) v3.1
+├── Phase 1 (Sequential Prerequisite):
+│   └── Cloud Sync → Outcome Review → Accuracy report
+├── Phase 2 (Concurrent Group):
+│   ├── Stream A: Enrichment → Accuracy Generation → Final Sync
+│   └── Stream B: Extraction → Prediction → Odds → Final Sync → Booking
+├── Phase 3 (Sequential Oversight):
+│   └── Chief Engineer Oversight → Withdrawal Management
+└── Live Streamer: Background Parallel Task (Always-On)
 ```
 
 ---
@@ -41,6 +44,7 @@ Runs in parallel with the main cycle via `asyncio.create_task()`.
 ## AI Prediction Pipeline (Chapter 1)
 
 1. **Discovery**: [fs_schedule.py](Modules/Flashscore/fs_schedule.py) extracts fixture IDs.
+   - **v3.1 Robustness**: Implements 2-tier header expansion retry (JS bulk + Locator fallback) to ensure 100% fixture visibility.
 2. **Analysis**: [fs_processor.py](Modules/Flashscore/fs_processor.py) collects H2H and Standings data.
 3. **Core Engine**: [intelligence.py](Core/Intelligence/intelligence.py) `make_prediction()`
    - **ML Model**: [ml_model.py](Core/Intelligence/ml_model.py) matches patterns against 10k+ historical matches.

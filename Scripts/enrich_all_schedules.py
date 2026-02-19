@@ -490,37 +490,137 @@ async def enrich_all_schedules(limit: Optional[int] = None, dry_run: bool = Fals
     
     print(f"[INFO] Loaded {len(sel)} selectors from knowledge.json (fs_match_page)")
 
-    # --- PHASE 0: LEAGUE PAGE HARVESTING (Proactive) ---
+    # --- PHASE 0: LEAGUE PAGE HARVESTING (Proactive & Resumable) ---
     if league_page:
         print("\n" + "=" * 80)
-        print("  PHASE 0: LEAGUE PAGE HARVESTING")
+        print("  PHASE 0: LEAGUE PAGE HARVESTING (Resumable)")
         print("  Goal: Proactively harvest all match URLs from active leagues.")
         print("=" * 80)
         
         if not os.path.exists(REGION_LEAGUE_CSV):
             print("[WARNING] region_league.csv not found. Skipping league harvesting.")
         else:
-            async with async_playwright() as p:
-                browser = await p.chromium.launch(headless=True)
-                page = await browser.new_page()
-                
-                leagues_df = pd.read_csv(REGION_LEAGUE_CSV, dtype=str).fillna('')
-                # Filter for leagues that have a URL
-                active_leagues = leagues_df[leagues_df['league_url'] != ''].to_dict('records')
-                
-                print(f"[INFO] Scanning {len(active_leagues)} leagues for new matches...")
-                
+            import time as _time
+            from Core.Browser.Extractors.league_page_extractor import extract_league_metadata
+
+            phase0_start = _time.monotonic()
+            PHASE0_TIMEOUT = 600  # 10 minutes global cap
+            PER_LEAGUE_TIMEOUT = 30  # 30 seconds per league
+            MAX_CONCURRENT_LEAGUES = 3
+            HARVEST_COOLDOWN = 86400  # 24 hours in seconds
+
+            leagues_df = pd.read_csv(REGION_LEAGUE_CSV, dtype=str).fillna('')
+            # Ensure last_harvested column exists
+            if 'last_harvested' not in leagues_df.columns:
+                leagues_df['last_harvested'] = ''
+
+            # Pre-filter: only leagues with valid URLs
+            all_league_records = leagues_df.to_dict('records')
+            active_leagues = [
+                r for r in all_league_records
+                if r.get('league_url', '').startswith('http')
+            ]
+
+            # Resume logic: separate into skip vs harvest
+            now_utc = datetime.utcnow()
+            to_harvest = []
+            skipped = 0
+            for lg in active_leagues:
+                last_h = lg.get('last_harvested', '').strip()
+                if last_h:
+                    try:
+                        last_dt = datetime.fromisoformat(last_h)
+                        age_s = (now_utc - last_dt).total_seconds()
+                        if age_s < HARVEST_COOLDOWN:
+                            skipped += 1
+                            continue
+                    except (ValueError, TypeError):
+                        pass
+                to_harvest.append(lg)
+
+            print(f"[INFO] {len(active_leagues)} leagues total | ⏭ {skipped} recently harvested (< 24h) | 🔄 {len(to_harvest)} to scan")
+            
+            if not to_harvest:
+                print("[INFO] All leagues recently harvested. Phase 0 skipped.")
+            else:
                 new_match_urls = set()
-                for league in active_leagues:
-                    l_url = league.get('league_url')
-                    l_name = f"{league.get('region', '')}: {league.get('league', '')}"
-                    print(f"   [League] Harvesting {l_name}...")
+                sem = asyncio.Semaphore(MAX_CONCURRENT_LEAGUES)
+                # Track which league indices got updated for batch saving
+                _updated_indices = []
+                _lock = asyncio.Lock()
+
+                async def _harvest_league(p_browser, league, idx, total):
+                    nonlocal new_match_urls
+                    async with sem:
+                        # Check global timeout
+                        elapsed = _time.monotonic() - phase0_start
+                        if elapsed > PHASE0_TIMEOUT:
+                            return
+                        
+                        l_url = league.get('league_url')
+                        l_name = f"{league.get('region', '')}: {league.get('league', '')}"
+                        
+                        try:
+                            page = await p_browser.new_page()
+                            try:
+                                found_urls = await asyncio.wait_for(
+                                    extract_league_match_urls(page, l_url, mode="results"),
+                                    timeout=PER_LEAGUE_TIMEOUT
+                                )
+                                for url in found_urls:
+                                    new_match_urls.add(url)
+
+                                # Capture metadata if missing
+                                if not league.get('league_crest'):
+                                    try:
+                                        meta = await extract_league_metadata(page)
+                                        for k, v in meta.items():
+                                            if v and not league.get(k):
+                                                league[k] = v
+                                    except Exception:
+                                        pass
+
+                                # Mark as harvested
+                                league['last_harvested'] = datetime.utcnow().isoformat()
+                                async with _lock:
+                                    _updated_indices.append(league)
+
+                                print(f"   [{idx}/{total}] ✓ {l_name}: {len(found_urls)} URLs")
+                            except asyncio.TimeoutError:
+                                print(f"   [{idx}/{total}] ⚠ {l_name}: TIMEOUT ({PER_LEAGUE_TIMEOUT}s)")
+                            except Exception as e:
+                                print(f"   [{idx}/{total}] ✗ {l_name}: {e}")
+                            finally:
+                                await page.close()
+                        except Exception as e:
+                            print(f"   [{idx}/{total}] ✗ {l_name}: Browser error: {e}")
+
+                async with async_playwright() as p:
+                    browser = await p.chromium.launch(headless=True)
                     
-                    found_urls = await extract_league_match_urls(page, l_url, mode="results")
-                    for url in found_urls:
-                        new_match_urls.add(url)
+                    tasks = [
+                        _harvest_league(browser, league, i + 1, len(to_harvest))
+                        for i, league in enumerate(to_harvest)
+                    ]
+                    await asyncio.gather(*tasks)
+                    await browser.close()
                 
-                await browser.close()
+                elapsed_total = _time.monotonic() - phase0_start
+                print(f"[INFO] Phase 0 completed in {elapsed_total:.1f}s ({len(_updated_indices)} leagues updated)")
+
+                # --- Crash-safe save: write back last_harvested + metadata to CSV ---
+                if _updated_indices:
+                    # Rebuild DataFrame from all records (including updated ones)
+                    # Match updated leagues back by league_url
+                    updated_map = {lg.get('league_url'): lg for lg in _updated_indices}
+                    for i, row in enumerate(all_league_records):
+                        url = row.get('league_url', '')
+                        if url in updated_map:
+                            all_league_records[i] = updated_map[url]
+                    
+                    updated_df = pd.DataFrame(all_league_records)
+                    updated_df.to_csv(REGION_LEAGUE_CSV, index=False, encoding='utf-8')
+                    print(f"[SAVE] region_league.csv updated with last_harvested timestamps + metadata")
                 
                 if new_match_urls:
                     print(f"[SUCCESS] Harvested {len(new_match_urls)} total match URLs from league pages.")
@@ -531,7 +631,6 @@ async def enrich_all_schedules(limit: Optional[int] = None, dry_run: bool = Fals
                     added_count = 0
                     for m_url in new_match_urls:
                         if m_url not in existing_links:
-                            # Add basic entry
                             new_entry = {
                                 'fixture_id': m_url.split('/')[2] if '/match/' in m_url else 'Unknown',
                                 'date': 'Pending',
@@ -539,11 +638,11 @@ async def enrich_all_schedules(limit: Optional[int] = None, dry_run: bool = Fals
                                 'match_status': 'scheduled',
                                 'match_link': m_url
                             }
-                            # Use save_schedule_entry to handle defaults/headers
                             save_schedule_entry(new_entry)
                             added_count += 1
                     
                     print(f"[INFO] Added {added_count} new unique matches to schedules.csv")
+
 
     # --- PROLOGUE PAGE 2: MISSING METADATA ANALYSIS ---
     print("\n" + "=" * 80)

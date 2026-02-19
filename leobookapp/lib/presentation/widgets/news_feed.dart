@@ -52,108 +52,160 @@ class NewsFeed extends StatelessWidget {
                 EdgeInsets.symmetric(horizontal: Responsive.sp(context, 10)),
             itemCount: news.length,
             itemBuilder: (context, index) {
-              return _buildNewsCard(context, news[index], isDark, cardW);
+              return _NewsCard(
+                item: news[index],
+                isDark: isDark,
+                cardWidth: cardW,
+              );
             },
           ),
         ),
       ],
     );
   }
+}
 
-  Widget _buildNewsCard(
-      BuildContext context, NewsModel item, bool isDark, double cardWidth) {
-    return GestureDetector(
-      onTap: () async {
-        final uri = Uri.parse(item.url);
-        if (await canLaunchUrl(uri)) {
-          await launchUrl(uri);
-        }
-      },
-      child: Container(
-        width: cardWidth,
-        margin: EdgeInsets.only(right: Responsive.sp(context, 8)),
-        decoration: BoxDecoration(
-          color: isDark
-              ? Colors.white.withValues(alpha: 0.06)
-              : Colors.white.withValues(alpha: 0.85),
-          borderRadius: BorderRadius.circular(Responsive.sp(context, 12)),
-          border: Border.all(
-            color: isDark
-                ? Colors.white.withValues(alpha: 0.08)
-                : Colors.black.withValues(alpha: 0.06),
-            width: 0.5,
-          ),
-        ),
-        clipBehavior: Clip.antiAlias,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            AspectRatio(
-              aspectRatio: 16 / 9,
-              child: Container(
-                color: isDark
-                    ? Colors.white.withValues(alpha: 0.04)
-                    : Colors.black.withValues(alpha: 0.04),
-                child: Icon(
-                  Icons.image_outlined,
-                  color: isDark ? Colors.white12 : Colors.black12,
-                  size: Responsive.sp(context, 22),
-                ),
+class _NewsCard extends StatefulWidget {
+  final NewsModel item;
+  final bool isDark;
+  final double cardWidth;
+
+  const _NewsCard({
+    required this.item,
+    required this.isDark,
+    required this.cardWidth,
+  });
+
+  @override
+  State<_NewsCard> createState() => _NewsCardState();
+}
+
+class _NewsCardState extends State<_NewsCard> {
+  bool _isHovered = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final item = widget.item;
+    final isDark = widget.isDark;
+    final cardWidth = widget.cardWidth;
+
+    return MouseRegion(
+      onEnter: (_) => setState(() => _isHovered = true),
+      onExit: (_) => setState(() => _isHovered = false),
+      child: AnimatedScale(
+        scale: _isHovered ? 1.02 : 1.0,
+        duration: const Duration(milliseconds: 200),
+        curve: Curves.easeOutCubic,
+        child: GestureDetector(
+          onTap: () async {
+            final uri = Uri.parse(item.url);
+            if (await canLaunchUrl(uri)) {
+              await launchUrl(uri);
+            }
+          },
+          child: Container(
+            width: cardWidth,
+            margin: EdgeInsets.only(right: Responsive.sp(context, 8)),
+            decoration: BoxDecoration(
+              color: isDark
+                  ? (_isHovered
+                      ? Colors.white.withValues(alpha: 0.08)
+                      : Colors.white.withValues(alpha: 0.06))
+                  : (_isHovered
+                      ? Colors.white
+                      : Colors.white.withValues(alpha: 0.85)),
+              borderRadius: BorderRadius.circular(Responsive.sp(context, 12)),
+              border: Border.all(
+                color: _isHovered
+                    ? AppColors.primary.withValues(alpha: 0.5)
+                    : (isDark
+                        ? Colors.white.withValues(alpha: 0.08)
+                        : Colors.black.withValues(alpha: 0.06)),
+                width: 0.5,
               ),
+              boxShadow: _isHovered
+                  ? [
+                      BoxShadow(
+                        color: AppColors.primary.withValues(alpha: 0.15),
+                        blurRadius: 12,
+                        spreadRadius: 2,
+                      )
+                    ]
+                  : null,
             ),
-            Expanded(
-              child: Padding(
-                padding: EdgeInsets.all(Responsive.sp(context, 8)),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Expanded(
-                      child: Text(
-                        item.title,
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
-                          fontSize: Responsive.sp(context, 9),
-                          fontWeight: FontWeight.w700,
-                          height: 1.3,
-                          color: isDark ? Colors.white : AppColors.textDark,
-                        ),
-                      ),
+            clipBehavior: Clip.antiAlias,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                AspectRatio(
+                  aspectRatio: 16 / 9,
+                  child: Container(
+                    color: isDark
+                        ? Colors.white.withValues(alpha: 0.04)
+                        : Colors.black.withValues(alpha: 0.04),
+                    child: Icon(
+                      Icons.image_outlined,
+                      color: isDark ? Colors.white12 : Colors.black12,
+                      size: Responsive.sp(context, 22),
                     ),
-                    SizedBox(height: Responsive.sp(context, 4)),
-                    Row(
+                  ),
+                ),
+                Expanded(
+                  child: Padding(
+                    padding: EdgeInsets.all(Responsive.sp(context, 8)),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          item.source.toUpperCase(),
-                          style: TextStyle(
-                            fontSize: Responsive.sp(context, 7),
-                            fontWeight: FontWeight.w700,
-                            color: AppColors.primary,
-                            letterSpacing: 0.3,
+                        Expanded(
+                          child: Text(
+                            item.title,
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              fontSize: Responsive.sp(context, 9),
+                              fontWeight: FontWeight.w700,
+                              height: 1.3,
+                              color: isDark ? Colors.white : AppColors.textDark,
+                            ),
                           ),
                         ),
-                        const Spacer(),
-                        Icon(
-                          Icons.access_time_filled,
-                          size: Responsive.sp(context, 7),
-                          color: AppColors.textGrey.withValues(alpha: 0.5),
-                        ),
-                        SizedBox(width: Responsive.sp(context, 2)),
-                        Text(
-                          item.timeAgo.toUpperCase(),
-                          style: TextStyle(
-                            fontSize: Responsive.sp(context, 7),
-                            fontWeight: FontWeight.w600,
-                            color: AppColors.textGrey.withValues(alpha: 0.5),
-                          ),
+                        SizedBox(height: Responsive.sp(context, 4)),
+                        Row(
+                          children: [
+                            Text(
+                              item.source.toUpperCase(),
+                              style: TextStyle(
+                                fontSize: Responsive.sp(context, 7),
+                                fontWeight: FontWeight.w700,
+                                color: AppColors.primary,
+                                letterSpacing: 0.3,
+                              ),
+                            ),
+                            const Spacer(),
+                            Icon(
+                              Icons.access_time_filled,
+                              size: Responsive.sp(context, 7),
+                              color: AppColors.textGrey.withValues(alpha: 0.5),
+                            ),
+                            SizedBox(width: Responsive.sp(context, 2)),
+                            Text(
+                              item.timeAgo.toUpperCase(),
+                              style: TextStyle(
+                                fontSize: Responsive.sp(context, 7),
+                                fontWeight: FontWeight.w600,
+                                color:
+                                    AppColors.textGrey.withValues(alpha: 0.5),
+                              ),
+                            ),
+                          ],
                         ),
                       ],
                     ),
-                  ],
+                  ),
                 ),
-              ),
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );

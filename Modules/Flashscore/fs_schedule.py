@@ -15,6 +15,53 @@ async def extract_matches_from_page(page: Page) -> list:
     """
     print("    [Extractor] Extracting match data from page...")
 
+    # --- TIER 1: Bulk JS expand collapsed "Show More" buttons ---
+    try:
+        expanded = await page.evaluate("""() => {
+            const containers = document.querySelectorAll('.wclIcon__leagueShowMoreCont');
+            let clicked = 0;
+            containers.forEach(cont => {
+                const trigger = cont.querySelector('.wcl-trigger_CGiIV[data-state="delayed-open"]');
+                if (trigger) {
+                    const btn = trigger.querySelector('button.wcl-accordion_7Fi80');
+                    if (btn) { btn.click(); clicked++; }
+                }
+            });
+            return clicked;
+        }""")
+        if expanded:
+            print(f"    [Extractor] Tier 1: Expanded {expanded} collapsed leagues via JS")
+            await asyncio.sleep(1)
+    except Exception:
+        pass
+
+    # --- TIER 2: Verify & retry with Playwright locator clicks on actual buttons ---
+    try:
+        still_collapsed = await page.evaluate("""() => {
+            let count = 0;
+            document.querySelectorAll('.wclIcon__leagueShowMoreCont').forEach(cont => {
+                if (cont.querySelector('.wcl-trigger_CGiIV[data-state="delayed-open"]')) count++;
+            });
+            return count;
+        }""")
+        if still_collapsed > 0:
+            print(f"    [Extractor] Tier 2: {still_collapsed} leagues still collapsed — retrying with locator clicks...")
+            expand_buttons = page.locator('.wclIcon__leagueShowMoreCont .wcl-trigger_CGiIV[data-state="delayed-open"] button.wcl-accordion_7Fi80')
+            count = await expand_buttons.count()
+            for i in range(min(count, 50)):  # Safety cap
+                try:
+                    btn = expand_buttons.nth(i)
+                    await btn.scroll_into_view_if_needed()
+                    await btn.click(force=True, timeout=3000)
+                    await asyncio.sleep(0.5)
+                except Exception:
+                    continue
+            if count > 0:
+                print(f"    [Extractor] Tier 2: Clicked {min(count, 50)} remaining expand buttons")
+                await asyncio.sleep(1)
+    except Exception:
+        pass
+
     selectors = {
         "match_rows": SelectorManager.get_selector("fs_home_page", "match_rows"),
         "match_row_home_team_name": SelectorManager.get_selector("fs_home_page", "match_row_home_team_name"),

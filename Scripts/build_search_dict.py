@@ -372,6 +372,28 @@ def main():
     print(f"Found {len(leagues_raw)} unique league keys")
     print(f"Found {len(teams_raw)} unique teams (by ID)")
 
+    # ───────────────────────────────────────────────
+    # OPTIMIZATION: Load already-enriched items to skip them
+    # ───────────────────────────────────────────────
+    enriched_team_ids = set()
+    if os.path.exists(TEAMS_CSV):
+        with open(TEAMS_CSV, mode='r', encoding='utf-8') as f:
+            for row in csv.DictReader(f):
+                st = row.get('search_terms', '').strip()
+                if st and st != '[]' and row.get('team_id'):
+                    enriched_team_ids.add(row['team_id'])
+
+    enriched_league_keys = set()
+    if os.path.exists(REGION_LEAGUE_CSV):
+        with open(REGION_LEAGUE_CSV, mode='r', encoding='utf-8') as f:
+            for row in csv.DictReader(f):
+                st = row.get('search_terms', '').strip()
+                if st and st != '[]' and row.get('league'):
+                    enriched_league_keys.add(row.get('league', '').strip())
+
+    print(f"\n[SKIP] {len(enriched_team_ids)} teams already enriched (have search_terms)")
+    print(f"[SKIP] {len(enriched_league_keys)} leagues already enriched (have search_terms)")
+
     # Prepared Update Maps for CSVs
     league_updates = {}
     team_updates = {}
@@ -386,10 +408,11 @@ def main():
                     existing_leagues[row["rl_id"]] = row
 
     # ───────────────────────────────────────────────
-    # Enrich and Upsert Leagues
+    # Enrich and Upsert Leagues (SKIP ALREADY-ENRICHED)
     # ───────────────────────────────────────────────
-    league_list = list(leagues_raw)
-    print("\nEnriching and syncing leagues...")
+    league_list_all = list(leagues_raw)
+    league_list = [l for l in league_list_all if l not in enriched_league_keys]
+    print(f"\nEnriching leagues: {len(league_list)} new (skipping {len(league_list_all) - len(league_list)} already enriched)")
     for i in range(0, len(league_list), BATCH_SIZE):
         batch = league_list[i:i + BATCH_SIZE]
         print(f" Processing league batch {i//BATCH_SIZE + 1} ({len(batch)} items)")
@@ -446,8 +469,9 @@ def main():
     # ───────────────────────────────────────────────
     # Enrich and Upsert Teams
     # ───────────────────────────────────────────────
-    team_ids = list(teams_raw.keys())
-    print("\nEnriching and syncing teams...")
+    team_ids_all = list(teams_raw.keys())
+    team_ids = [tid for tid in team_ids_all if tid not in enriched_team_ids]
+    print(f"\nEnriching teams: {len(team_ids)} new (skipping {len(team_ids_all) - len(team_ids)} already enriched)")
     for i in range(0, len(team_ids), BATCH_SIZE):
         batch_ids = team_ids[i:i + BATCH_SIZE]
         batch_names = [list(teams_raw[tid]["names"])[0] for tid in batch_ids]

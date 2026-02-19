@@ -133,6 +133,10 @@ async def harvest_booking_codes(page: Page, matched_urls: Dict[str, str], day_pr
         pred = next((p for p in day_predictions if str(p.get('fixture_id', '')) == str(match_id)), None)
         if not pred or pred.get('prediction') == 'SKIP': continue
 
+        # Resume: Skip if already harvested or booked in a previous run
+        if pred.get('status') in ('harvested', 'booked', 'added_to_slip'):
+            continue
+
         print(f"\n   [Harvest] Processing: {pred['home_team']} vs {pred['away_team']}")
         processed_urls.add(match_url)
 

@@ -1,6 +1,6 @@
 # Supabase Sync — Technical Specification
 
-> **Version**: 2.9 · **Last Updated**: 2026-02-18 · **Status**: Fully Implemented & Automated
+> **Version**: 3.1 · **Last Updated**: 2026-02-19 · **Status**: Fully Implemented & Automated
 
 ## Overview
 
@@ -8,10 +8,12 @@ LeoBook v2.8 uses **automatic bi-directional sync** between local CSV data store
 
 ### Architecture
 ```
-Leo.py (orchestrator)
-  → SyncManager.sync_on_startup()     # Pull remote → merge → push deltas
-  → [... cycle work ...]
-  → SyncManager.run_full_sync()       # Push all local changes to cloud
+Leo.py (orchestrator) v3.1
+  → Phase 1: sync_on_startup()     # Pull remote → merge → push deltas
+  → Phase 2 (Concurrent Group):
+      → Stream A: run_full_sync()  # Push enrichment data
+      → Stream B: run_full_sync()  # Push new predictions
+  → Phase 3: oversight report
   → Supabase (cloud DB)
   → Flutter App (reads Supabase)
 ```

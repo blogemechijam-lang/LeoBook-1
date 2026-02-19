@@ -79,11 +79,14 @@ def calculate_market_reliability(predictions):
 def get_recommendations(target_date=None, show_all_upcoming=False, **kwargs):
     all_predictions = load_data()
     if not all_predictions:
-        print("No predictions found.")
-        return
+        print("[ALGO] No predictions found in CSV.")
+        return {'status': 'empty', 'total': 0, 'scored': 0}
+
+    print(f"[ALGO] Loaded {len(all_predictions)} predictions. Calculating market reliability...")
 
     # 1. Build reliability index from past results
     reliability = calculate_market_reliability(all_predictions)
+    print(f"[ALGO] Built reliability index for {len(reliability)} market types.")
     
     # 2. Filter for future matches
     now = datetime.now()
@@ -147,6 +150,12 @@ def get_recommendations(target_date=None, show_all_upcoming=False, **kwargs):
 
     # 4. Sort and Print
     recommendations.sort(key=lambda x: x['score'], reverse=True)
+
+    # ALGO Summary Feedback
+    high_conf = [r for r in recommendations if r['score'] >= 0.7]
+    print(f"[ALGO] Scored {len(recommendations)} matches. High-confidence picks (≥0.7): {len(high_conf)}")
+    if recommendations:
+        print(f"[ALGO] Top score: {recommendations[0]['score']:.2f} — {recommendations[0]['match']}")
     
     title = "BETTING RECOMMENDATIONS"
     if target_date: title += f" FOR {target_date}"
@@ -221,8 +230,16 @@ def get_recommendations(target_date=None, show_all_upcoming=False, **kwargs):
     # 3. Update predictions.csv with recommendation data
     if kwargs.get('save_to_file'):
         save_recommendations_to_predictions_csv(recommendations)
-            
-    return recommendations
+
+    # Return summary for callers
+    return {
+        'status': 'ok',
+        'total': len(all_predictions),
+        'scored': len(recommendations),
+        'high_confidence': len([r for r in recommendations if r['score'] >= 0.7]),
+        'top_score': recommendations[0]['score'] if recommendations else 0,
+        'recommendations': recommendations
+    }
 
 def save_recommendations_to_predictions_csv(recommendations):
     """Updates predictions.csv with is_recommended flag and score."""
@@ -275,7 +292,7 @@ def save_recommendations_to_predictions_csv(recommendations):
             writer.writeheader()
             writer.writerows(updated_rows)
             
-        print(f"[DB] Updated predictions.csv with {updates_count} recommendations.")
+        print(f"[ALGO] Updated predictions.csv: {updates_count} marked as recommended out of {len(data)} total rows.")
 
     except Exception as e:
         print(f"[Error] Failed to update predictions.csv: {e}")

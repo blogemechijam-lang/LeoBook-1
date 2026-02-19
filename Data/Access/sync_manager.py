@@ -66,6 +66,7 @@ class SyncManager:
             return
 
         logger.info("Starting hardened bi-directional sync on startup...")
+        print("   [PROLOGUE] Bi-Directional Sync — comparing local CSV vs Supabase timestamps...")
 
         for table_key, config in TABLE_CONFIG.items():
             await self._sync_table(table_key, config)
@@ -137,6 +138,16 @@ class SyncManager:
         ][key_field].tolist()
 
         logger.info(f"    Delta: {len(to_push_ids)} to push, {len(to_pull_ids)} to pull. (Conflict resolution: Latest Wins)")
+
+        # User-visible sync direction feedback
+        if to_push_ids and to_pull_ids:
+            print(f"   [{table_name}] ↕ Bi-directional: {len(to_push_ids)} CSV→DB, {len(to_pull_ids)} DB→CSV")
+        elif to_push_ids:
+            print(f"   [{table_name}] ↑ Push: {len(to_push_ids)} rows CSV→DB (local is newer)")
+        elif to_pull_ids:
+            print(f"   [{table_name}] ↓ Pull: {len(to_pull_ids)} rows DB→CSV (remote is newer)")
+        else:
+            print(f"   [{table_name}] ✓ Already in sync")
 
         # 4. Pull Operations
         if to_pull_ids:

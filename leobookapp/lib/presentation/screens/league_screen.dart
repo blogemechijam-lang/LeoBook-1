@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:leobookapp/core/constants/app_colors.dart';
+import '../widgets/responsive/leo_tab.dart';
 import '../widgets/league_tabs/overview_tab.dart';
 import '../widgets/league_tabs/fixtures_tab.dart';
 import '../widgets/league_tabs/predictions_tab.dart';
@@ -41,9 +42,8 @@ class _LeagueScreenState extends State<LeagueScreen>
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
-      backgroundColor: isDark
-          ? AppColors.backgroundDark
-          : AppColors.backgroundLight,
+      backgroundColor:
+          isDark ? AppColors.backgroundDark : AppColors.backgroundLight,
       body: NestedScrollView(
         headerSliverBuilder: (context, innerBoxIsScrolled) {
           return [
@@ -138,32 +138,48 @@ class _LeagueScreenState extends State<LeagueScreen>
                       ),
                     ),
                   ),
-                  child: TabBar(
-                    controller: _tabController,
-                    isScrollable: true,
-                    tabAlignment: TabAlignment.start,
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    labelColor: AppColors.primary,
-                    unselectedLabelColor: AppColors.textGrey,
-                    indicatorColor: AppColors.primary,
-                    indicatorSize: TabBarIndicatorSize.label,
-                    indicatorWeight: 3,
-                    labelStyle: GoogleFonts.lexend(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w800,
-                      letterSpacing: 0.5,
-                    ),
-                    unselectedLabelStyle: GoogleFonts.lexend(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w700,
-                    ),
-                    dividerColor: Colors.transparent, // Remove default divider
-                    tabs: const [
-                      Tab(text: "OVERVIEW"),
-                      Tab(text: "FIXTURES"),
-                      Tab(text: "PREDICTIONS"),
-                      Tab(text: "STATS"),
-                    ],
+                  child: AnimatedBuilder(
+                    animation: _tabController,
+                    builder: (context, _) {
+                      return TabBar(
+                        controller: _tabController,
+                        isScrollable: true,
+                        tabAlignment: TabAlignment.start,
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        labelColor: AppColors.primary,
+                        unselectedLabelColor: AppColors.textGrey,
+                        indicatorColor: AppColors.primary,
+                        indicatorSize: TabBarIndicatorSize.label,
+                        indicatorWeight: 3,
+                        dividerColor: Colors.transparent,
+                        tabs: [
+                          Tab(
+                            child: LeoTab(
+                              text: "OVERVIEW",
+                              isSelected: _tabController.index == 0,
+                            ),
+                          ),
+                          Tab(
+                            child: LeoTab(
+                              text: "FIXTURES",
+                              isSelected: _tabController.index == 1,
+                            ),
+                          ),
+                          Tab(
+                            child: LeoTab(
+                              text: "PREDICTIONS",
+                              isSelected: _tabController.index == 2,
+                            ),
+                          ),
+                          Tab(
+                            child: LeoTab(
+                              text: "STATS",
+                              isSelected: _tabController.index == 3,
+                            ),
+                          ),
+                        ],
+                      );
+                    },
                   ),
                 ),
               ),

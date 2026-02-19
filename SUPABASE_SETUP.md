@@ -1,6 +1,6 @@
 # Supabase Setup Guide
 
-> **Version**: 2.9 · **Last Updated**: 2026-02-18
+> **Version**: 3.1 · **Last Updated**: 2026-02-19
 
 ## Quick Setup (5 minutes)
 
@@ -97,10 +97,10 @@ Leo.py runs SyncManager automatically:
 | `accuracy_reports` | `accuracy_reports.csv` | `report_id` | CSV → Supabase |
 | `live_scores` | `live_scores.csv` | `fixture_id` | CSV → Supabase (every 60s) |
 
-### Sync Frequency per Leo.py Cycle
-1. **Prologue P1**: `sync_on_startup()` — bi-directional merge
-2. **Prologue P3**: `run_full_sync("Prologue Final")` — push enrichment data
-3. **Ch1 P3**: `run_full_sync("Chapter 1 Final")` — push new predictions
+### Sync Frequency per Leo.py Cycle (v3.1)
+1. **Phase 1 (Sequential)**: `sync_on_startup()` — bi-directional merge
+2. **Phase 2 (Concurrent Stream A)**: `run_full_sync("Prologue Final")` — push enrichment data
+3. **Phase 2 (Concurrent Stream B)**: `run_full_sync("Chapter 1 Final")` — push new predictions
 4. **Ad-hoc**: Any module can call `run_full_sync()` as needed
 
 ---

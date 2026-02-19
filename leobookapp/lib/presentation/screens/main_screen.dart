@@ -39,12 +39,19 @@ class _MainScreenState extends State<MainScreen> {
             if (state is HomeLoaded) {
               final content = Column(
                 children: [
-                  if (isDesktop) const DesktopHeader(),
+                  if (isDesktop)
+                    DesktopHeader(
+                      currentIndex: _currentIndex,
+                      onTabChanged: (i) => setState(() => _currentIndex = i),
+                    ),
                   Expanded(
                     child: IndexedStack(
                       index: _currentIndex,
                       children: [
-                        const HomeScreen(),
+                        HomeScreen(
+                          onViewAllPredictions: () =>
+                              setState(() => _currentIndex = 2),
+                        ),
                         const BacktestDashboard(),
                         const TopPredictionsScreen(),
                         const AccountScreen(),
@@ -64,12 +71,19 @@ class _MainScreenState extends State<MainScreen> {
             } else {
               bodyArea = Column(
                 children: [
-                  if (isDesktop) const DesktopHeader(),
+                  if (isDesktop)
+                    DesktopHeader(
+                      currentIndex: _currentIndex,
+                      onTabChanged: (i) => setState(() => _currentIndex = i),
+                    ),
                   Expanded(
                     child: IndexedStack(
                       index: _currentIndex,
                       children: [
-                        const HomeScreen(),
+                        HomeScreen(
+                          onViewAllPredictions: () =>
+                              setState(() => _currentIndex = 2),
+                        ),
                         const BacktestDashboard(),
                         const TopPredictionsScreen(),
                         const AccountScreen(),
@@ -90,19 +104,23 @@ class _MainScreenState extends State<MainScreen> {
                       margin: Responsive.bottomNavMargin(context),
                       child: ClipRRect(
                         borderRadius:
-                            BorderRadius.circular(Responsive.sp(context, 18)),
+                            BorderRadius.circular(Responsive.sp(context, 28)),
                         child: BackdropFilter(
                           filter: ImageFilter.blur(
                             sigmaX: LiquidGlassTheme.blurRadiusMedium,
                             sigmaY: LiquidGlassTheme.blurRadiusMedium,
                           ),
                           child: Container(
+                            padding: EdgeInsets.symmetric(
+                              horizontal: Responsive.sp(context, 12),
+                              vertical: Responsive.sp(context, 4),
+                            ),
                             decoration: BoxDecoration(
                               color: isDark
                                   ? AppColors.cardDark.withValues(alpha: 0.35)
                                   : Colors.white.withValues(alpha: 0.35),
                               borderRadius: BorderRadius.circular(
-                                  Responsive.sp(context, 18)),
+                                  Responsive.sp(context, 28)),
                               border: Border.all(
                                 color: LiquidGlassTheme.glassBorder(
                                   Theme.of(context).brightness,
@@ -119,6 +137,8 @@ class _MainScreenState extends State<MainScreen> {
                               backgroundColor: Colors.transparent,
                               elevation: 0,
                               type: BottomNavigationBarType.fixed,
+                              selectedItemColor: AppColors.primary,
+                              unselectedItemColor: Colors.white38,
                               showSelectedLabels: true,
                               showUnselectedLabels: true,
                               selectedFontSize: Responsive.sp(context, 7),

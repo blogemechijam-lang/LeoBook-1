@@ -8,362 +8,391 @@ import '../screens/league_screen.dart';
 
 import 'package:leobookapp/core/widgets/glass_container.dart';
 
-class RecommendationCard extends StatelessWidget {
+class RecommendationCard extends StatefulWidget {
   final RecommendationModel recommendation;
 
   const RecommendationCard({super.key, required this.recommendation});
 
   @override
+  State<RecommendationCard> createState() => _RecommendationCardState();
+}
+
+class _RecommendationCardState extends State<RecommendationCard> {
+  bool _isHovered = false;
+
+  RecommendationModel get recommendation => widget.recommendation;
+
+  @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final isLive =
-        recommendation.confidence.toLowerCase().contains('live') ||
+    final isLive = recommendation.confidence.toLowerCase().contains('live') ||
         recommendation.league.toLowerCase().contains('live');
     final accentColor = isLive ? AppColors.liveRed : AppColors.primary;
 
-    return GlassContainer(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-      borderRadius: 20,
-      onTap: () {
-        // We could link to match details if we had the ID here,
-        // for now just hover/click effect.
-      },
-      child: Stack(
-        children: [
-          // Vertical Accent Line
-          Positioned(
-            left: 0,
-            top: 0,
-            bottom: 0,
-            width: 3,
-            child: Container(
-              decoration: BoxDecoration(
-                color: accentColor.withValues(alpha: 0.6),
-                borderRadius: const BorderRadius.only(
-                  topRight: Radius.circular(2),
-                  bottomRight: Radius.circular(2),
+    return MouseRegion(
+      onEnter: (_) => setState(() => _isHovered = true),
+      onExit: (_) => setState(() => _isHovered = false),
+      child: AnimatedScale(
+        scale: _isHovered ? 1.012 : 1.0,
+        duration: const Duration(milliseconds: 200),
+        curve: Curves.easeOutCubic,
+        child: GlassContainer(
+          margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+          borderRadius: 20,
+          borderColor: _isHovered
+              ? accentColor.withValues(alpha: 0.5)
+              : Colors.transparent,
+          onTap: () {
+            // We could link to match details if we had the ID here,
+            // for now just hover/click effect.
+          },
+          child: Stack(
+            children: [
+              // Vertical Accent Line
+              Positioned(
+                left: 0,
+                top: 0,
+                bottom: 0,
+                width: 3,
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: accentColor.withValues(alpha: 0.6),
+                    borderRadius: const BorderRadius.only(
+                      topRight: Radius.circular(2),
+                      bottomRight: Radius.circular(2),
+                    ),
+                  ),
                 ),
               ),
-            ),
-          ),
 
-          Padding(
-            padding: const EdgeInsets.fromLTRB(20, 16, 16, 16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Top Row: League & Stars
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              Padding(
+                padding: const EdgeInsets.fromLTRB(20, 16, 16, 16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                    // Top Row: League & Stars
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        GestureDetector(
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => LeagueScreen(
-                                  leagueId: recommendation.league,
-                                  leagueName: recommendation.league,
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            GestureDetector(
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => LeagueScreen(
+                                      leagueId: recommendation.league,
+                                      leagueName: recommendation.league,
+                                    ),
+                                  ),
+                                );
+                              },
+                              child: Text(
+                                recommendation.league.toUpperCase(),
+                                style: TextStyle(
+                                  color:
+                                      AppColors.textGrey.withValues(alpha: 0.6),
+                                  fontSize: 9,
+                                  fontWeight: FontWeight.w900,
+                                  letterSpacing: 0.8,
                                 ),
                               ),
-                            );
-                          },
-                          child: Text(
-                            recommendation.league.toUpperCase(),
-                            style: TextStyle(
-                              color: AppColors.textGrey.withValues(alpha: 0.6),
-                              fontSize: 9,
-                              fontWeight: FontWeight.w900,
-                              letterSpacing: 0.8,
                             ),
-                          ),
-                        ),
-                        if (isLive)
-                          Padding(
-                            padding: const EdgeInsets.only(top: 4),
-                            child: _LivePulseTag(),
-                          )
-                        else
-                          Padding(
-                            padding: const EdgeInsets.only(top: 4),
-                            child: Text(
-                              "${recommendation.date}, ${recommendation.time}"
-                                  .toUpperCase(),
-                              style: const TextStyle(
-                                color: AppColors.primary,
-                                fontSize: 9,
-                                fontWeight: FontWeight.w900,
+                            if (isLive)
+                              Padding(
+                                padding: const EdgeInsets.only(top: 4),
+                                child: _LivePulseTag(),
+                              )
+                            else
+                              Padding(
+                                padding: const EdgeInsets.only(top: 4),
+                                child: Text(
+                                  "${recommendation.date}, ${recommendation.time}"
+                                      .toUpperCase(),
+                                  style: const TextStyle(
+                                    color: AppColors.primary,
+                                    fontSize: 9,
+                                    fontWeight: FontWeight.w900,
+                                  ),
+                                ),
                               ),
-                            ),
-                          ),
+                          ],
+                        ),
+                        Icon(
+                          Icons.stars_rounded,
+                          size: 20,
+                          color: isDark
+                              ? Colors.white.withValues(alpha: 0.1)
+                              : Colors.grey[200],
+                        ),
                       ],
                     ),
-                    Icon(
-                      Icons.stars_rounded,
-                      size: 20,
-                      color: isDark
-                          ? Colors.white.withValues(alpha: 0.1)
-                          : Colors.grey[200],
-                    ),
-                  ],
-                ),
 
-                const SizedBox(height: 24),
+                    const SizedBox(height: 24),
 
-                // Team Layout (3 Columns)
-                Row(
-                  children: [
-                    // Home Team
-                    Expanded(
-                      child: GestureDetector(
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => TeamScreen(
-                                teamName: recommendation.homeTeam,
-                                repository: context.read<DataRepository>(),
-                              ),
-                            ),
-                          );
-                        },
-                        child: Column(
-                          children: [
-                            Container(
-                              width: 52,
-                              height: 52,
-                              decoration: BoxDecoration(
-                                color: isDark
-                                    ? Colors.white.withValues(alpha: 0.05)
-                                    : Colors.black.withValues(alpha: 0.04),
-                                shape: BoxShape.circle,
-                                border: Border.all(
-                                  color: isDark
-                                      ? Colors.white.withValues(alpha: 0.08)
-                                      : Colors.black.withValues(alpha: 0.06),
-                                ),
-                              ),
-                              child: Center(
-                                child: Text(
-                                  recommendation.homeShort,
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.w900,
-                                    fontSize: 13,
+                    // Team Layout (3 Columns)
+                    Row(
+                      children: [
+                        // Home Team
+                        Expanded(
+                          child: GestureDetector(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => TeamScreen(
+                                    teamName: recommendation.homeTeam,
+                                    repository: context.read<DataRepository>(),
                                   ),
                                 ),
-                              ),
-                            ),
-                            const SizedBox(height: 8),
-                            Text(
-                              recommendation.homeTeam,
-                              textAlign: TextAlign.center,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.w800,
-                                color: isDark
-                                    ? Colors.white
-                                    : AppColors.textDark,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-
-                    // VS or Score
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      child: Text(
-                        "VS",
-                        style: TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w900,
-                          fontStyle: FontStyle.italic,
-                          color: isDark ? Colors.white24 : Colors.grey[300],
-                        ),
-                      ),
-                    ),
-
-                    // Away Team
-                    Expanded(
-                      child: GestureDetector(
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => TeamScreen(
-                                teamName: recommendation.awayTeam,
-                                repository: context.read<DataRepository>(),
-                              ),
-                            ),
-                          );
-                        },
-                        child: Column(
-                          children: [
-                            Container(
-                              width: 52,
-                              height: 52,
-                              decoration: BoxDecoration(
-                                color: isDark
-                                    ? Colors.white.withValues(alpha: 0.05)
-                                    : Colors.black.withValues(alpha: 0.04),
-                                shape: BoxShape.circle,
-                                border: Border.all(
-                                  color: isDark
-                                      ? Colors.white.withValues(alpha: 0.08)
-                                      : Colors.black.withValues(alpha: 0.06),
-                                ),
-                              ),
-                              child: Center(
-                                child: Text(
-                                  recommendation.awayShort,
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.w900,
-                                    fontSize: 13,
+                              );
+                            },
+                            child: Column(
+                              children: [
+                                Container(
+                                  width: 52,
+                                  height: 52,
+                                  decoration: BoxDecoration(
+                                    color: isDark
+                                        ? Colors.white.withValues(alpha: 0.05)
+                                        : Colors.black.withValues(alpha: 0.04),
+                                    shape: BoxShape.circle,
+                                    border: Border.all(
+                                      color: isDark
+                                          ? Colors.white.withValues(alpha: 0.08)
+                                          : Colors.black
+                                              .withValues(alpha: 0.06),
+                                    ),
+                                  ),
+                                  child: Center(
+                                    child: Text(
+                                      recommendation.homeShort,
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.w900,
+                                        fontSize: 13,
+                                      ),
+                                    ),
                                   ),
                                 ),
-                              ),
+                                const SizedBox(height: 8),
+                                Text(
+                                  recommendation.homeTeam,
+                                  textAlign: TextAlign.center,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w800,
+                                    color: isDark
+                                        ? Colors.white
+                                        : AppColors.textDark,
+                                  ),
+                                ),
+                              ],
                             ),
-                            const SizedBox(height: 8),
-                            Text(
-                              recommendation.awayTeam,
-                              textAlign: TextAlign.center,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.w800,
-                                color: isDark
-                                    ? Colors.white
-                                    : AppColors.textDark,
-                              ),
-                            ),
-                          ],
+                          ),
                         ),
-                      ),
-                    ),
-                  ],
-                ),
 
-                const SizedBox(height: 24),
-                Divider(
-                  color: isDark
-                      ? Colors.white.withValues(alpha: 0.05)
-                      : Colors.black.withValues(alpha: 0.05),
-                ),
-                const SizedBox(height: 16),
-
-                // Footer Row
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            "RELIABILITY",
+                        // VS or Score
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          child: Text(
+                            "VS",
                             style: TextStyle(
-                              color: AppColors.textGrey.withValues(alpha: 0.6),
-                              fontSize: 9,
-                              fontWeight: FontWeight.w900,
-                              letterSpacing: 0.5,
-                            ),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            "${(recommendation.reliabilityScore * 10).toStringAsFixed(0)}%",
-                            style: TextStyle(
-                              color: isDark ? Colors.white : AppColors.textDark,
-                              fontWeight: FontWeight.w900,
-                              fontSize: 14,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 10,
-                      ),
-                      decoration: BoxDecoration(
-                        color: isDark ? Colors.white10 : Colors.grey[100],
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(
-                          color: isDark ? Colors.white10 : Colors.black12,
-                        ),
-                      ),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          const Text(
-                            "ACCURACY",
-                            style: TextStyle(
-                              color: AppColors.textGrey,
-                              fontSize: 8,
-                              fontWeight: FontWeight.w900,
-                            ),
-                          ),
-                          Text(
-                            recommendation.overallAcc,
-                            style: TextStyle(
-                              color: isDark ? Colors.white : AppColors.textDark,
                               fontSize: 12,
                               fontWeight: FontWeight.w900,
+                              fontStyle: FontStyle.italic,
+                              color: isDark ? Colors.white24 : Colors.grey[300],
                             ),
                           ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 12,
-                      ),
-                      decoration: BoxDecoration(
-                        color: AppColors.primary.withValues(alpha: 0.15),
-                        borderRadius: BorderRadius.circular(16),
-                        border: Border.all(
-                          color: AppColors.primary.withValues(alpha: 0.3),
                         ),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(
-                            "ODDS",
-                            style: TextStyle(
-                              color: AppColors.primary.withValues(alpha: 0.7),
-                              fontSize: 9,
-                              fontWeight: FontWeight.w900,
+
+                        // Away Team
+                        Expanded(
+                          child: GestureDetector(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => TeamScreen(
+                                    teamName: recommendation.awayTeam,
+                                    repository: context.read<DataRepository>(),
+                                  ),
+                                ),
+                              );
+                            },
+                            child: Column(
+                              children: [
+                                Container(
+                                  width: 52,
+                                  height: 52,
+                                  decoration: BoxDecoration(
+                                    color: isDark
+                                        ? Colors.white.withValues(alpha: 0.05)
+                                        : Colors.black.withValues(alpha: 0.04),
+                                    shape: BoxShape.circle,
+                                    border: Border.all(
+                                      color: isDark
+                                          ? Colors.white.withValues(alpha: 0.08)
+                                          : Colors.black
+                                              .withValues(alpha: 0.06),
+                                    ),
+                                  ),
+                                  child: Center(
+                                    child: Text(
+                                      recommendation.awayShort,
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.w900,
+                                        fontSize: 13,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(height: 8),
+                                Text(
+                                  recommendation.awayTeam,
+                                  textAlign: TextAlign.center,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w800,
+                                    color: isDark
+                                        ? Colors.white
+                                        : AppColors.textDark,
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
-                          const SizedBox(width: 8),
-                          Text(
-                            recommendation.marketOdds.toStringAsFixed(2),
-                            style: const TextStyle(
-                              color: AppColors.primary,
-                              fontSize: 16,
-                              fontWeight: FontWeight.w900,
+                        ),
+                      ],
+                    ),
+
+                    const SizedBox(height: 24),
+                    Divider(
+                      color: isDark
+                          ? Colors.white.withValues(alpha: 0.05)
+                          : Colors.black.withValues(alpha: 0.05),
+                    ),
+                    const SizedBox(height: 16),
+
+                    // Footer Row
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                "RELIABILITY",
+                                style: TextStyle(
+                                  color:
+                                      AppColors.textGrey.withValues(alpha: 0.6),
+                                  fontSize: 9,
+                                  fontWeight: FontWeight.w900,
+                                  letterSpacing: 0.5,
+                                ),
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                "${(recommendation.reliabilityScore * 10).toStringAsFixed(0)}%",
+                                style: TextStyle(
+                                  color: isDark
+                                      ? Colors.white
+                                      : AppColors.textDark,
+                                  fontWeight: FontWeight.w900,
+                                  fontSize: 14,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 10,
+                          ),
+                          decoration: BoxDecoration(
+                            color: isDark ? Colors.white10 : Colors.grey[100],
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(
+                              color: isDark ? Colors.white10 : Colors.black12,
                             ),
                           ),
-                        ],
-                      ),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const Text(
+                                "ACCURACY",
+                                style: TextStyle(
+                                  color: AppColors.textGrey,
+                                  fontSize: 8,
+                                  fontWeight: FontWeight.w900,
+                                ),
+                              ),
+                              Text(
+                                recommendation.overallAcc,
+                                style: TextStyle(
+                                  color: isDark
+                                      ? Colors.white
+                                      : AppColors.textDark,
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w900,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 12,
+                          ),
+                          decoration: BoxDecoration(
+                            color: AppColors.primary.withValues(alpha: 0.15),
+                            borderRadius: BorderRadius.circular(16),
+                            border: Border.all(
+                              color: AppColors.primary.withValues(alpha: 0.3),
+                            ),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                "ODDS",
+                                style: TextStyle(
+                                  color:
+                                      AppColors.primary.withValues(alpha: 0.7),
+                                  fontSize: 9,
+                                  fontWeight: FontWeight.w900,
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                              Text(
+                                recommendation.marketOdds.toStringAsFixed(2),
+                                style: const TextStyle(
+                                  color: AppColors.primary,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w900,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }

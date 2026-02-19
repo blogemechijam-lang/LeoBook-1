@@ -10,16 +10,30 @@ import '../screens/league_screen.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:leobookapp/core/widgets/glass_container.dart';
 
-class MatchCard extends StatelessWidget {
+class MatchCard extends StatefulWidget {
   final MatchModel match;
   final bool showLiveBadge;
   final bool showLeagueHeader;
+  final bool hideLeagueInfo;
   const MatchCard({
     super.key,
     required this.match,
     this.showLiveBadge = true,
     this.showLeagueHeader = true,
+    this.hideLeagueInfo = false,
   });
+
+  @override
+  State<MatchCard> createState() => _MatchCardState();
+}
+
+class _MatchCardState extends State<MatchCard> {
+  bool _isHovered = false;
+
+  MatchModel get match => widget.match;
+  bool get showLiveBadge => widget.showLiveBadge;
+  bool get showLeagueHeader => widget.showLeagueHeader;
+  bool get hideLeagueInfo => widget.hideLeagueInfo;
 
   @override
   Widget build(BuildContext context) {
@@ -39,283 +53,301 @@ class MatchCard extends StatelessWidget {
       }
     }
 
-    return GlassContainer(
-      margin: EdgeInsets.symmetric(
-        horizontal: w * 0.03,
-        vertical: w * 0.01,
-      ),
-      padding: EdgeInsets.all(Responsive.sp(context, 10)),
-      borderRadius: Responsive.sp(context, 10),
-      borderColor: (match.isLive || match.isStartingSoon)
-          ? AppColors.liveRed.withValues(alpha: 0.3)
-          : AppColors.primary.withValues(alpha: 0.2),
-      onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => MatchDetailsScreen(match: match),
+    return MouseRegion(
+      onEnter: (_) => setState(() => _isHovered = true),
+      onExit: (_) => setState(() => _isHovered = false),
+      child: AnimatedScale(
+        scale: _isHovered ? 1.012 : 1.0,
+        duration: const Duration(milliseconds: 200),
+        curve: Curves.easeOutCubic,
+        child: GlassContainer(
+          margin: EdgeInsets.symmetric(
+            horizontal: w * 0.03,
+            vertical: w * 0.01,
           ),
-        );
-      },
-      child: Stack(
-        clipBehavior: Clip.none,
-        children: [
-          Column(
-            mainAxisSize: MainAxisSize.min,
+          padding: EdgeInsets.all(Responsive.sp(context, 10)),
+          borderRadius: Responsive.sp(context, 10),
+          borderColor: _isHovered
+              ? AppColors.primary.withValues(alpha: 0.5)
+              : ((match.isLive || match.isStartingSoon)
+                  ? AppColors.liveRed.withValues(alpha: 0.3)
+                  : AppColors.primary.withValues(alpha: 0.2)),
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => MatchDetailsScreen(match: match),
+              ),
+            );
+          },
+          child: Stack(
+            clipBehavior: Clip.none,
             children: [
-              if (showLeagueHeader)
-                GestureDetector(
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => LeagueScreen(
-                          leagueId: match.league ?? "SOCCER",
-                          leagueName: match.league ?? "SOCCER",
-                        ),
-                      ),
-                    );
-                  },
-                  child: Column(
-                    children: [
-                      // Region + Flag Row
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          if (match.regionFlagUrl != null &&
-                              match.regionFlagUrl!.isNotEmpty)
-                            CachedNetworkImage(
-                              imageUrl: match.regionFlagUrl!,
-                              width: Responsive.sp(context, 10),
-                              height: Responsive.sp(context, 7),
-                              fit: BoxFit.cover,
-                              placeholder: (_, __) => Icon(
-                                Icons.public,
-                                size: Responsive.sp(context, 8),
-                                color:
-                                    AppColors.textGrey.withValues(alpha: 0.8),
-                              ),
-                              errorWidget: (_, __, ___) => Icon(
-                                Icons.public,
-                                size: Responsive.sp(context, 8),
-                                color:
-                                    AppColors.textGrey.withValues(alpha: 0.8),
-                              ),
-                            )
-                          else
-                            Icon(
-                              Icons.public,
-                              size: Responsive.sp(context, 8),
-                              color: AppColors.textGrey.withValues(alpha: 0.8),
-                            ),
-                          SizedBox(width: Responsive.sp(context, 3)),
-                          Flexible(
-                            child: Text(
-                              region.toUpperCase(),
-                              style: TextStyle(
-                                fontSize: Responsive.sp(context, 7),
-                                fontWeight: FontWeight.w900,
-                                color:
-                                    AppColors.textGrey.withValues(alpha: 0.8),
-                                letterSpacing: 1.0,
-                              ),
-                              overflow: TextOverflow.ellipsis,
+              Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  if (showLeagueHeader && !hideLeagueInfo)
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => LeagueScreen(
+                              leagueId: match.league ?? "SOCCER",
+                              leagueName: match.league ?? "SOCCER",
                             ),
                           ),
-                        ],
-                      ),
-                      SizedBox(height: Responsive.sp(context, 2)),
-                      // League Name
-                      Text(
-                        leagueName.toUpperCase(),
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          fontSize: Responsive.sp(context, 8),
-                          fontWeight: FontWeight.w900,
-                          color: Colors.white,
-                          letterSpacing: 0.3,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      SizedBox(height: Responsive.sp(context, 2)),
-                      // Date & Time
-                      Text(
-                        "${match.date} • ${match.isLive && (match.liveMinute != null && match.liveMinute!.isNotEmpty) ? "${match.liveMinute}'" : match.time}${match.displayStatus.isEmpty ? '' : ' • ${match.displayStatus}'}",
-                        style: TextStyle(
-                          fontSize: Responsive.sp(context, 7),
-                          fontWeight: FontWeight.bold,
-                          color: match.isLive
-                              ? AppColors.liveRed
-                              : AppColors.textGrey,
-                        ),
-                      ),
-                    ],
-                  ),
-                )
-              else ...[
-                Text(
-                  "${match.date} • ${match.isLive && (match.liveMinute != null && match.liveMinute!.isNotEmpty) ? "${match.liveMinute}'" : match.time}${match.displayStatus.isEmpty ? '' : ' • ${match.displayStatus}'}",
-                  style: TextStyle(
-                    fontSize: Responsive.sp(context, 7),
-                    fontWeight: FontWeight.bold,
-                    color:
-                        match.isLive ? AppColors.liveRed : AppColors.textGrey,
-                  ),
-                ),
-              ],
-              SizedBox(height: Responsive.sp(context, 6)),
-
-              // Teams Comparison / Result
-              if (isFinished)
-                _buildFinishedLayout(context, isDark)
-              else
-                _buildActiveLayout(context, isDark),
-
-              SizedBox(height: Responsive.sp(context, 6)),
-
-              // Prediction Section
-              Container(
-                padding: EdgeInsets.all(Responsive.sp(context, 7)),
-                decoration: BoxDecoration(
-                  color: match.isLive
-                      ? AppColors.liveRed.withValues(alpha: 0.08)
-                      : (isDark
-                          ? Colors.white.withValues(alpha: 0.05)
-                          : Colors.black.withValues(alpha: 0.03)),
-                  borderRadius:
-                      BorderRadius.circular(Responsive.sp(context, 8)),
-                  border: Border.all(
-                    color: match.isLive
-                        ? AppColors.liveRed.withValues(alpha: 0.15)
-                        : (isDark
-                            ? Colors.white.withValues(alpha: 0.06)
-                            : Colors.black.withValues(alpha: 0.04)),
-                    width: 0.5,
-                  ),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Flexible(
+                        );
+                      },
                       child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
+                          // Region + Flag Row
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              if (match.regionFlagUrl != null &&
+                                  match.regionFlagUrl!.isNotEmpty)
+                                CachedNetworkImage(
+                                  imageUrl: match.regionFlagUrl!,
+                                  width: Responsive.sp(context, 10),
+                                  height: Responsive.sp(context, 7),
+                                  fit: BoxFit.cover,
+                                  placeholder: (_, __) => Icon(
+                                    Icons.public,
+                                    size: Responsive.sp(context, 8),
+                                    color: AppColors.textGrey
+                                        .withValues(alpha: 0.8),
+                                  ),
+                                  errorWidget: (_, __, ___) => Icon(
+                                    Icons.public,
+                                    size: Responsive.sp(context, 8),
+                                    color: AppColors.textGrey
+                                        .withValues(alpha: 0.8),
+                                  ),
+                                )
+                              else
+                                Icon(
+                                  Icons.public,
+                                  size: Responsive.sp(context, 8),
+                                  color:
+                                      AppColors.textGrey.withValues(alpha: 0.8),
+                                ),
+                              SizedBox(width: Responsive.sp(context, 3)),
+                              Flexible(
+                                child: Text(
+                                  region.toUpperCase(),
+                                  style: TextStyle(
+                                    fontSize: Responsive.sp(context, 7),
+                                    fontWeight: FontWeight.w900,
+                                    color: AppColors.textGrey
+                                        .withValues(alpha: 0.8),
+                                    letterSpacing: 1.0,
+                                  ),
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                            ],
+                          ),
+                          SizedBox(height: Responsive.sp(context, 2)),
+                          // League Name
+                          Text(
+                            leagueName.toUpperCase(),
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontSize: Responsive.sp(context, 8),
+                              fontWeight: FontWeight.w900,
+                              color: Colors.white,
+                              letterSpacing: 0.3,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          SizedBox(height: Responsive.sp(context, 2)),
+                          // Date & Time — hide date when live
                           Text(
                             match.isLive
-                                ? "IN-PLAY PREDICTION"
-                                : "LEO PREDICTION",
+                                ? "${(match.liveMinute != null && match.liveMinute!.isNotEmpty) ? "${match.liveMinute}'" : 'LIVE'}${match.displayStatus.isEmpty ? '' : ' • ${match.displayStatus}'}"
+                                : "${match.date} • ${match.time}${match.displayStatus.isEmpty ? '' : ' • ${match.displayStatus}'}",
                             style: TextStyle(
-                              fontSize: Responsive.sp(context, 6),
-                              fontWeight: FontWeight.w900,
+                              fontSize: Responsive.sp(context, 7),
+                              fontWeight: FontWeight.bold,
                               color: match.isLive
                                   ? AppColors.liveRed
                                   : AppColors.textGrey,
-                              letterSpacing: 0.3,
                             ),
                           ),
-                          SizedBox(height: Responsive.sp(context, 1)),
-                          Text(
-                            match.prediction ?? "N/A",
-                            style: TextStyle(
-                              fontSize: Responsive.sp(context, 9),
-                              fontWeight: FontWeight.w900,
-                              color: isFinished
-                                  ? AppColors.success
-                                  : AppColors.primary,
-                              decoration: isFinished &&
-                                      !(match.prediction
-                                              ?.contains('Accurate') ??
-                                          true)
-                                  ? TextDecoration.lineThrough
-                                  : null,
-                            ),
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                          if (match.marketReliability != null)
-                            Text(
-                              "RELIABILITY: ${match.marketReliability}%",
-                              style: TextStyle(
-                                fontSize: Responsive.sp(context, 6),
-                                fontWeight: FontWeight.bold,
-                                color: AppColors.success.withValues(alpha: 0.7),
-                              ),
-                            ),
                         ],
                       ),
-                    ),
-                    SizedBox(width: Responsive.sp(context, 4)),
-                    if (match.odds != null)
-                      Container(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: Responsive.sp(context, 8),
-                          vertical: Responsive.sp(context, 3),
-                        ),
-                        decoration: BoxDecoration(
-                          color: isFinished
-                              ? Colors.white.withValues(alpha: 0.06)
-                              : AppColors.primary.withValues(alpha: 0.12),
-                          borderRadius:
-                              BorderRadius.circular(Responsive.sp(context, 6)),
-                          border: Border.all(
-                            color: isFinished
-                                ? Colors.white.withValues(alpha: 0.08)
-                                : AppColors.primary.withValues(alpha: 0.25),
-                            width: 0.5,
-                          ),
-                        ),
-                        child: Text(
-                          match.odds!,
-                          style: TextStyle(
-                            fontSize: Responsive.sp(context, 10),
-                            fontWeight: FontWeight.w900,
-                            color: isFinished
-                                ? AppColors.textGrey
-                                : AppColors.primary,
-                          ),
-                        ),
+                    )
+                  else ...[
+                    Text(
+                      match.isLive
+                          ? "${(match.liveMinute != null && match.liveMinute!.isNotEmpty) ? "${match.liveMinute}'" : 'LIVE'}${match.displayStatus.isEmpty ? '' : ' • ${match.displayStatus}'}"
+                          : "${match.date} • ${match.time}${match.displayStatus.isEmpty ? '' : ' • ${match.displayStatus}'}",
+                      style: TextStyle(
+                        fontSize: Responsive.sp(context, 7),
+                        fontWeight: FontWeight.bold,
+                        color: match.isLive
+                            ? AppColors.liveRed
+                            : AppColors.textGrey,
                       ),
+                    ),
                   ],
-                ),
+                  SizedBox(height: Responsive.sp(context, 6)),
+
+                  // Teams Comparison / Result
+                  if (isFinished)
+                    _buildFinishedLayout(context, isDark)
+                  else
+                    _buildActiveLayout(context, isDark),
+
+                  SizedBox(height: Responsive.sp(context, 6)),
+
+                  // Prediction Section
+                  Container(
+                    padding: EdgeInsets.all(Responsive.sp(context, 7)),
+                    decoration: BoxDecoration(
+                      color: match.isLive
+                          ? AppColors.liveRed.withValues(alpha: 0.08)
+                          : (isDark
+                              ? Colors.white.withValues(alpha: 0.05)
+                              : Colors.black.withValues(alpha: 0.03)),
+                      borderRadius:
+                          BorderRadius.circular(Responsive.sp(context, 8)),
+                      border: Border.all(
+                        color: match.isLive
+                            ? AppColors.liveRed.withValues(alpha: 0.15)
+                            : (isDark
+                                ? Colors.white.withValues(alpha: 0.06)
+                                : Colors.black.withValues(alpha: 0.04)),
+                        width: 0.5,
+                      ),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Flexible(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                match.isLive
+                                    ? "IN-PLAY PREDICTION"
+                                    : "LEO PREDICTION",
+                                style: TextStyle(
+                                  fontSize: Responsive.sp(context, 6),
+                                  fontWeight: FontWeight.w900,
+                                  color: match.isLive
+                                      ? AppColors.liveRed
+                                      : AppColors.textGrey,
+                                  letterSpacing: 0.3,
+                                ),
+                              ),
+                              SizedBox(height: Responsive.sp(context, 1)),
+                              Text(
+                                match.prediction ?? "N/A",
+                                style: TextStyle(
+                                  fontSize: Responsive.sp(context, 9),
+                                  fontWeight: FontWeight.w900,
+                                  color: isFinished
+                                      ? AppColors.success
+                                      : AppColors.primary,
+                                  decoration: isFinished &&
+                                          !(match.prediction
+                                                  ?.contains('Accurate') ??
+                                              true)
+                                      ? TextDecoration.lineThrough
+                                      : null,
+                                ),
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                              if (match.marketReliability != null)
+                                Text(
+                                  "RELIABILITY: ${match.marketReliability}%",
+                                  style: TextStyle(
+                                    fontSize: Responsive.sp(context, 6),
+                                    fontWeight: FontWeight.bold,
+                                    color: AppColors.success
+                                        .withValues(alpha: 0.7),
+                                  ),
+                                ),
+                            ],
+                          ),
+                        ),
+                        SizedBox(width: Responsive.sp(context, 4)),
+                        if (match.odds != null)
+                          Container(
+                            padding: EdgeInsets.symmetric(
+                              horizontal: Responsive.sp(context, 8),
+                              vertical: Responsive.sp(context, 3),
+                            ),
+                            decoration: BoxDecoration(
+                              color: isFinished
+                                  ? Colors.white.withValues(alpha: 0.06)
+                                  : AppColors.primary.withValues(alpha: 0.12),
+                              borderRadius: BorderRadius.circular(
+                                  Responsive.sp(context, 6)),
+                              border: Border.all(
+                                color: isFinished
+                                    ? Colors.white.withValues(alpha: 0.08)
+                                    : AppColors.primary.withValues(alpha: 0.25),
+                                width: 0.5,
+                              ),
+                            ),
+                            child: Text(
+                              match.odds!,
+                              style: TextStyle(
+                                fontSize: Responsive.sp(context, 10),
+                                fontWeight: FontWeight.w900,
+                                color: isFinished
+                                    ? AppColors.textGrey
+                                    : AppColors.primary,
+                              ),
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
+                ],
               ),
+              if (showLiveBadge && (match.isLive || match.isStartingSoon))
+                Positioned(
+                  top: 0,
+                  right: 0,
+                  child: _LiveBadge(
+                    minute: match.isLive ? match.liveMinute : null,
+                    isSoon: match.isStartingSoon && !match.isLive,
+                  ),
+                ),
+              if (isFinished && match.isPredictionAccurate)
+                Positioned(
+                  top: 0,
+                  right: 0,
+                  child: Container(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: Responsive.sp(context, 6),
+                      vertical: Responsive.sp(context, 2),
+                    ),
+                    decoration: BoxDecoration(
+                      color: AppColors.success,
+                      borderRadius: BorderRadius.only(
+                        topRight: Radius.circular(Responsive.sp(context, 10)),
+                        bottomLeft: Radius.circular(Responsive.sp(context, 6)),
+                      ),
+                    ),
+                    child: Text(
+                      "ACCURATE",
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: Responsive.sp(context, 6),
+                        fontWeight: FontWeight.w900,
+                      ),
+                    ),
+                  ),
+                ),
             ],
           ),
-          if (showLiveBadge && (match.isLive || match.isStartingSoon))
-            Positioned(
-              top: 0,
-              right: 0,
-              child: _LiveBadge(
-                minute: match.isLive ? match.liveMinute : null,
-                isSoon: match.isStartingSoon && !match.isLive,
-              ),
-            ),
-          if (isFinished && match.isPredictionAccurate)
-            Positioned(
-              top: 0,
-              right: 0,
-              child: Container(
-                padding: EdgeInsets.symmetric(
-                  horizontal: Responsive.sp(context, 6),
-                  vertical: Responsive.sp(context, 2),
-                ),
-                decoration: BoxDecoration(
-                  color: AppColors.success,
-                  borderRadius: BorderRadius.only(
-                    topRight: Radius.circular(Responsive.sp(context, 10)),
-                    bottomLeft: Radius.circular(Responsive.sp(context, 6)),
-                  ),
-                ),
-                child: Text(
-                  "ACCURATE",
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: Responsive.sp(context, 6),
-                    fontWeight: FontWeight.w900,
-                  ),
-                ),
-              ),
-            ),
-        ],
+        ),
       ),
     );
   }

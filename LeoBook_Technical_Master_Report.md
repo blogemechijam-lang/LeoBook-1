@@ -1,6 +1,6 @@
 # LeoBook — Technical Master Report
 
-> **Version**: 3.0 · **Last Updated**: 2026-02-18 · **Architecture**: Clean Architecture (Orchestrator → Module → Data)
+> **Version**: 3.1 · **Last Updated**: 2026-02-19 · **Architecture**: Concurrent Clean Architecture (Sequential + Parallel Pipeline)
 
 ## Table of Contents
 
@@ -21,7 +21,7 @@ LeoBook is a **fully autonomous sports prediction and betting system** comprised
 | **Backend (Leo.py)** | Python 3.12 + Playwright | Autonomous data extraction, AI prediction, odds harvesting, bet placement, withdrawal management, and system health monitoring |
 | **Frontend (leobookapp)** | Flutter/Dart | Elite dashboard with "Telegram-grade" density, liquid glass aesthetics, and proportional scaling |
 
-**Leo.py** is a **pure orchestrator** — it contains zero business logic. All logic lives in the modules it imports. It runs in an infinite loop, executing a cycle every 6h.
+**Leo.py** is a **pure orchestrator** — it contains zero business logic. All logic lives in the modules it imports. It runs in an infinite loop, executing a cycle every 6h. Starting v3.1, the engine uses **Concurrent Task Execution** to run non-blocking prologue tasks alongside the main chapter pipeline.
 
 ---
 
@@ -68,18 +68,30 @@ Leo.py orchestrates 3 main chapters sequentially:
 2. **CSV Init**: Create local databases if missing.
 3. **Browser Engine**: Launch Playwright context.
 
-### Per-Cycle Logic (6h Cycle)
+### Per-Cycle Logic (6h Cycle) — Concurrent Engine (v3.1)
 
+Leo.py splits the cycle into three phases: Sequential Prep, Concurrent Execution, and Sequential Oversight.
+
+#### Phase 1: Sequential Preparation (Prerequisite)
 | # | Phase | Module Called | Action |
 |---|-------|-------------|--------|
-| 1 | **Prologue** | `SyncManager` | Bi-directional Supabase handshake. |
-| 2 | **Prologue** | `outcome_reviewer` | Parallel Flashscore score matching for results. |
-| 3 | **Prologue** | `enrich_all_schedules` | Visit URLs to extract team crests, IDs, and standings. |
-| 4 | **Chapter 1** | `manager.py` | Scrape today's fixtures and run AI predictions. |
-| 5 | **Chapter 1** | `fb_manager.py` | Fuzzy-match to Football.com and extract booking codes. |
-| 6 | **Chapter 1** | `recommend_bets` | Score predictions and save `recommended.json`. |
-| 7 | **Chapter 2** | `placement.py` | Inject codes and place bets with Kelly staking. |
-| 8 | **Chapter 3** | `monitoring.py` | Health check and oversight reporting. |
+| 1 | **Prologue P1** | `SyncManager` | Bi-directional Supabase handshake (Sync on Startup). |
+| 2 | **Prologue P1** | `outcome_reviewer` | Match score matching for results + Accuracy Report. |
+
+#### Phase 2: Concurrent Pipeline (Parallel Execution)
+| Execution Stream | Phase | Module Called | Action | Resume Logic |
+|:--- | :--- | :--- | :--- | :--- |
+| **Stream A** | **Prologue P2** | `enrich_all_schedules` | Extract team crests, IDs, and standings. | Skip if already enriched/needs not found. |
+| **Stream A** | **Prologue P3** | `Data Access Layer` | Final Prologue sync & Accuracy generation. | Delta-based sync. |
+| **Stream B** | **Chapter 1** | `manager.py` | Scrape today's fixtures and run AI predictions. | Skip if `fixture_id` already predicted. |
+| **Stream B** | **Chapter 1** | `fb_manager.py` | Match to Football.com and extract booking codes. | Skip if already `harvested` or `booked`. |
+| **Stream B** | **Chapter 1** | `recommend_bets` | Score predictions and save `recommended.json`. | Stateless recalculation. |
+| **Stream B** | **Chapter 2** | `placement.py` | Inject codes and place bets with Kelly staking. | Skip if already `booked` or `placed`. |
+
+#### Phase 3: Sequential Oversight (Finality)
+| # | Phase | Module Called | Action |
+|---|-------|-------------|--------|
+| 1 | **Chapter 3** | `monitoring.py` | Health check, oversight reporting, and withdrawal management. |
 
 ---
 

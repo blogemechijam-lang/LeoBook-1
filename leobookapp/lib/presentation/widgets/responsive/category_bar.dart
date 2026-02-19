@@ -5,7 +5,6 @@ import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/responsive_constants.dart';
 import '../../../core/theme/liquid_glass_theme.dart';
 import '../../../logic/cubit/home_cubit.dart';
-import 'leo_date_picker.dart';
 
 class CategoryBar extends StatefulWidget {
   const CategoryBar({super.key});
@@ -106,11 +105,10 @@ class _CategoryBarState extends State<CategoryBar> {
                     "${DateFormat('EEE').format(date).toUpperCase()} ${date.day}";
               }
 
-              return _buildChip(
-                context,
-                label,
-                _isSameDay(selectedDate, date),
-                () => context.read<HomeCubit>().updateDate(date),
+              return _CategoryChip(
+                label: label,
+                isSelected: _isSameDay(selectedDate, date),
+                onTap: () => context.read<HomeCubit>().updateDate(date),
               );
             },
           ),
@@ -119,78 +117,107 @@ class _CategoryBarState extends State<CategoryBar> {
     );
   }
 
-  bool _isSameDay(DateTime a, DateTime b) =>
-      a.year == b.year && a.month == b.month && a.day == b.day;
-
-  Widget _buildChip(
-      BuildContext context, String label, bool isSelected, VoidCallback onTap) {
-    return GestureDetector(
-      onTap: onTap,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        constraints: BoxConstraints(minWidth: Responsive.sp(context, 52)),
-        padding: EdgeInsets.symmetric(horizontal: Responsive.sp(context, 8)),
-        decoration: BoxDecoration(
-          color: isSelected ? AppColors.primary : AppColors.desktopSearchFill,
-          borderRadius: BorderRadius.circular(Responsive.sp(context, 8)),
-          border: isSelected
-              ? null
-              : Border.all(color: LiquidGlassTheme.glassBorderDark, width: 0.5),
-        ),
-        child: Center(
-          child: Text(
-            label,
-            style: TextStyle(
-              fontSize: Responsive.sp(context, 7),
-              fontWeight: FontWeight.w900,
-              color: isSelected ? Colors.white : AppColors.textGrey,
-              letterSpacing: 0.8,
-            ),
-          ),
-        ),
-      ),
+  Widget _buildMoreDates(BuildContext context, DateTime selectedDate) {
+    final isInRange = !_isSameDay(selectedDate, DateTime.now()) &&
+        selectedDate.difference(DateTime.now()).inDays.abs() > _futureDays;
+    return _CategoryChip(
+      label: 'MORE',
+      isSelected: isInRange,
+      isMoreDates: true,
+      onTap: () async {
+        final picked = await showDatePicker(
+          context: context,
+          initialDate: selectedDate,
+          firstDate: DateTime.now().subtract(const Duration(days: 365)),
+          lastDate: DateTime.now().add(const Duration(days: 365)),
+        );
+        if (picked != null && context.mounted) {
+          context.read<HomeCubit>().updateDate(picked);
+        }
+      },
     );
   }
 
-  Widget _buildMoreDates(BuildContext context, DateTime current) {
-    return GestureDetector(
-      onTap: () async {
-        final maxDate = DateTime.now().add(const Duration(days: 7));
-        final date = await LeoDatePicker.show(
-          context,
-          current,
-          lastDate: maxDate,
-        );
-        if (date != null && context.mounted) {
-          context.read<HomeCubit>().updateDate(date);
-        }
-      },
-      child: Container(
-        constraints: BoxConstraints(minWidth: Responsive.sp(context, 52)),
-        padding: EdgeInsets.symmetric(horizontal: Responsive.sp(context, 8)),
-        decoration: BoxDecoration(
-          color: AppColors.desktopSearchFill,
-          borderRadius: BorderRadius.circular(Responsive.sp(context, 8)),
-          border:
-              Border.all(color: LiquidGlassTheme.glassBorderDark, width: 0.5),
-        ),
-        child: Center(
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(Icons.calendar_today_rounded,
-                  color: AppColors.textGrey, size: Responsive.sp(context, 10)),
-              SizedBox(width: Responsive.sp(context, 4)),
-              Text(
-                "MORE DATES",
-                style: TextStyle(
-                  fontSize: Responsive.sp(context, 7),
-                  fontWeight: FontWeight.w900,
-                  color: AppColors.textGrey,
-                  letterSpacing: 0.8,
-                ),
+  bool _isSameDay(DateTime a, DateTime b) =>
+      a.year == b.year && a.month == b.month && a.day == b.day;
+}
+
+class _CategoryChip extends StatefulWidget {
+  final String label;
+  final bool isSelected;
+  final VoidCallback onTap;
+  final bool isMoreDates;
+
+  const _CategoryChip({
+    required this.label,
+    required this.isSelected,
+    required this.onTap,
+    this.isMoreDates = false,
+  });
+
+  @override
+  State<_CategoryChip> createState() => _CategoryChipState();
+}
+
+class _CategoryChipState extends State<_CategoryChip> {
+  bool _isHovered = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return MouseRegion(
+      onEnter: (_) => setState(() => _isHovered = true),
+      onExit: (_) => setState(() => _isHovered = false),
+      child: GestureDetector(
+        onTap: widget.onTap,
+        child: AnimatedScale(
+          scale: _isHovered ? 1.05 : 1.0,
+          duration: const Duration(milliseconds: 200),
+          curve: Curves.easeOutCubic,
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 200),
+            constraints: BoxConstraints(minWidth: Responsive.sp(context, 52)),
+            padding:
+                EdgeInsets.symmetric(horizontal: Responsive.sp(context, 8)),
+            decoration: BoxDecoration(
+              color: widget.isSelected
+                  ? AppColors.primary
+                  : (_isHovered
+                      ? AppColors.desktopSearchFill.withValues(alpha: 0.8)
+                      : AppColors.desktopSearchFill),
+              borderRadius: BorderRadius.circular(Responsive.sp(context, 8)),
+              border: widget.isSelected
+                  ? null
+                  : Border.all(
+                      color: _isHovered
+                          ? AppColors.primary.withValues(alpha: 0.5)
+                          : LiquidGlassTheme.glassBorderDark,
+                      width: 0.5),
+            ),
+            child: Center(
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  if (widget.isMoreDates) ...[
+                    Icon(Icons.calendar_today_rounded,
+                        color: widget.isSelected
+                            ? Colors.white
+                            : AppColors.textGrey,
+                        size: Responsive.sp(context, 10)),
+                    SizedBox(width: Responsive.sp(context, 4)),
+                  ],
+                  Text(
+                    widget.label,
+                    style: TextStyle(
+                      fontSize: Responsive.sp(context, 7),
+                      fontWeight: FontWeight.w900,
+                      color:
+                          widget.isSelected ? Colors.white : AppColors.textGrey,
+                      letterSpacing: 0.8,
+                    ),
+                  ),
+                ],
               ),
-            ],
+            ),
           ),
         ),
       ),
