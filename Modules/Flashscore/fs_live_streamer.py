@@ -167,7 +167,7 @@ def _propagate_status_updates(live_matches: list, resolved_matches: list = None)
     sched_updates = []
     if sched_changed:
         _write_csv(SCHEDULES_CSV, sched_rows, sched_headers)
-        sched_updates = [r for r in sched_rows if r.get('fixture_id') in (live_ids | finished_ids)]
+        sched_updates = [r for r in sched_rows if r.get('fixture_id') in (live_ids | resolved_ids)]
 
     # --- Update predictions.csv ---
     pred_headers = files_and_headers.get(PREDICTIONS_CSV, [])

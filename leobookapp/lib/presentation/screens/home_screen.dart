@@ -11,7 +11,6 @@ import '../widgets/featured_carousel.dart';
 import '../widgets/news_feed.dart';
 import '../widgets/responsive/desktop_home_content.dart';
 import '../widgets/responsive/category_bar.dart';
-import '../widgets/responsive/top_odds_list.dart';
 import '../widgets/responsive/leo_tab.dart';
 import '../../logic/cubit/search_cubit.dart';
 import 'search_screen.dart';
@@ -181,8 +180,6 @@ class _HomeScreenState extends State<HomeScreen>
                         child: Column(
                           children: [
                             SizedBox(height: Responsive.sp(context, 10)),
-                            const TopOddsList(),
-                            SizedBox(height: Responsive.sp(context, 12)),
                             const AccuracyReportCard(),
                             SizedBox(height: Responsive.sp(context, 10)),
                           ],

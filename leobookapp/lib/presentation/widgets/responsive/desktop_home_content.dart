@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'category_bar.dart';
 import '../featured_carousel.dart';
 import 'accuracy_report_card.dart';
-import 'top_odds_list.dart';
 import '../../../logic/cubit/home_cubit.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/responsive_constants.dart';
@@ -120,8 +119,6 @@ class _DesktopHomeContentState extends State<DesktopHomeContent>
                     recommendations: widget.state.filteredRecommendations,
                     allMatches: widget.state.allMatches,
                   ),
-                  SizedBox(height: Responsive.dp(context, 24)),
-                  const TopOddsList(),
                   SizedBox(height: Responsive.dp(context, 24)),
                   const AccuracyReportCard(),
                   SizedBox(height: Responsive.dp(context, 24)),

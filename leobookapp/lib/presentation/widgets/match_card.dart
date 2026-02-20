@@ -40,7 +40,6 @@ class _MatchCardState extends State<MatchCard> {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final isFinished = match.status.toLowerCase().contains('finished') ||
         match.status.toUpperCase() == 'FT';
-    final w = MediaQuery.sizeOf(context).width;
 
     // Parse League String "REGION: League"
     String region = "WORLD";
@@ -62,8 +61,8 @@ class _MatchCardState extends State<MatchCard> {
         curve: Curves.easeOutCubic,
         child: GlassContainer(
           margin: EdgeInsets.symmetric(
-            horizontal: w * 0.03,
-            vertical: w * 0.01,
+            horizontal: Responsive.sp(context, 4),
+            vertical: Responsive.sp(context, 4),
           ),
           padding: EdgeInsets.all(Responsive.sp(context, 10)),
           borderRadius: Responsive.sp(context, 10),

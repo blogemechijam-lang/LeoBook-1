@@ -101,10 +101,13 @@ class _MainScreenState extends State<MainScreen> {
                   ? null
                   : Container(
                       color: Colors.transparent,
-                      margin: Responsive.bottomNavMargin(context),
+                      margin: EdgeInsets.symmetric(
+                        horizontal: Responsive.sp(context, 20),
+                        vertical: Responsive.sp(context, 14),
+                      ),
                       child: ClipRRect(
                         borderRadius:
-                            BorderRadius.circular(Responsive.sp(context, 28)),
+                            BorderRadius.circular(Responsive.sp(context, 40)),
                         child: BackdropFilter(
                           filter: ImageFilter.blur(
                             sigmaX: LiquidGlassTheme.blurRadiusMedium,
@@ -120,7 +123,7 @@ class _MainScreenState extends State<MainScreen> {
                                   ? AppColors.cardDark.withValues(alpha: 0.35)
                                   : Colors.white.withValues(alpha: 0.35),
                               borderRadius: BorderRadius.circular(
-                                  Responsive.sp(context, 28)),
+                                  Responsive.sp(context, 40)),
                               border: Border.all(
                                 color: LiquidGlassTheme.glassBorder(
                                   Theme.of(context).brightness,

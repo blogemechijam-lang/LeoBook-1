@@ -100,7 +100,7 @@ class FeaturedCarousel extends StatelessWidget {
           ),
         ),
         SizedBox(
-          height: Responsive.sp(context, 140),
+          height: Responsive.sp(context, 150),
           child: ListView.builder(
             scrollDirection: Axis.horizontal,
             padding:
@@ -130,9 +130,7 @@ class _FeaturedCardState extends State<_FeaturedCard> {
   @override
   Widget build(BuildContext context) {
     final match = widget.match;
-    final cardWidth = Responsive.isDesktop(context)
-        ? Responsive.dp(context, 240)
-        : Responsive.sp(context, 200);
+    final cardWidth = Responsive.sp(context, 200);
 
     return MouseRegion(
       onEnter: (_) => setState(() => _isHovered = true),
