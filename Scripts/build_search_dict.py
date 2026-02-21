@@ -62,6 +62,15 @@ def generate_deterministic_id(name: str, context: str = "") -> str:
     unique_string = f"leobook-{context}-{normalize_for_search(name)}"
     return str(uuid.uuid5(namespace, unique_string))
 
+def is_field_empty(value: str) -> bool:
+    """True if a CSV field is effectively empty (None-string, null, unknown, etc)."""
+    v = (value or '').strip().lower()
+    return v in ('', 'none', 'null', 'unknown', '[]')
+
+def clean_none_values(data: dict) -> dict:
+    """Replace Python None values with empty string to avoid 'None' in CSV."""
+    return {k: ('' if v is None else v) for k, v in data.items()}
+
 def extract_json_with_salvage(text: str) -> list:
     """
     Attempts to extract JSON from text even if malformed or truncated.
@@ -115,33 +124,6 @@ def query_grok_for_metadata_with_retry(items, item_type="team", retries=3):
             time.sleep(5 * (attempt + 1)) # Exponential backoff
     print(f"  [Error] Grok API failed after {retries} attempts.")
     return []
-    """
-    Tries to find an existing league ID using exact match or slug matching.
-    Returns (rl_id, is_new)
-    """
-    # 1. Exact Name Match
-    for rl_id, data in existing_leagues_map.items():
-        if data.get('league') == league_name:
-            return rl_id, False
-            
-    # 2. Slug Match (Name + Country for uniqueness)
-    slug_base = normalize_for_search(league_name).replace(" ", "-")
-    country_slug = normalize_for_search(country).replace(" ", "-") if country else "intl"
-    full_slug = f"{country_slug}-{slug_base}"
-    
-    if full_slug in existing_leagues_map:
-        return full_slug, False
-        
-    if slug_base in existing_leagues_map:
-         return slug_base, False
-
-    # 3. UUID Fallback if names are extremely common or context is missing
-    det_id = generate_deterministic_id(league_name, context=country or "intl")
-    if det_id in existing_leagues_map:
-        return det_id, False
-
-    # 4. Create New ID (prefer full slug if possible, else UUID)
-    return full_slug if len(full_slug) < 100 else det_id, True
 
 def query_grok_for_metadata(items, item_type="team"):
     """
@@ -384,7 +366,7 @@ def main():
     # ───────────────────────────────────────────────
     fully_enriched_team_ids = set()   # have search_terms AND all critical fields
     incomplete_team_ids = set()       # have search_terms but missing critical fields
-    TEAM_CRITICAL_FIELDS = ['country', 'city', 'stadium', 'team_crest']
+    TEAM_CRITICAL_FIELDS = ['country', 'city']  # stadium/crest are nice-to-have, not worth re-enriching
     if os.path.exists(TEAMS_CSV):
         with open(TEAMS_CSV, mode='r', encoding='utf-8') as f:
             for row in csv.DictReader(f):
@@ -395,7 +377,7 @@ def main():
                 if st and st != '[]':
                     # Has search_terms — check if critical fields are filled
                     missing = [fld for fld in TEAM_CRITICAL_FIELDS
-                               if not row.get(fld, '').strip()]
+                               if is_field_empty(row.get(fld, ''))]
                     if missing:
                         incomplete_team_ids.add(tid)
                     else:
@@ -403,7 +385,7 @@ def main():
 
     fully_enriched_league_keys = set()  # rl_ids with search_terms AND all critical fields
     incomplete_league_keys = set()      # rl_ids with search_terms but missing critical fields
-    LEAGUE_CRITICAL_FIELDS = ['country', 'logo_url']
+    LEAGUE_CRITICAL_FIELDS = ['country']  # logo_url is nice-to-have; Grok can't supply most logos
 
     # Load existing region_league data FIRST (needed for ID matching)
     existing_leagues = {}
@@ -417,7 +399,7 @@ def main():
                 st = row.get('search_terms', '').strip()
                 if st and st != '[]':
                     missing = [fld for fld in LEAGUE_CRITICAL_FIELDS
-                               if not row.get(fld, '').strip()]
+                               if is_field_empty(row.get(fld, ''))]
                     if missing:
                         incomplete_league_keys.add(rl_id)
                     else:
@@ -481,14 +463,14 @@ def main():
                 search_terms.add(term.replace("league", "lge"))
                 search_terms.add(term.replace("cup", "cp"))
 
-            upsert_data = {
+            upsert_data = clean_none_values({
                 "league": official_name, # map to league
                 "other_names": item.get("other_names", []),
                 "abbreviations": item.get("abbreviations", []),
                 "search_terms": list(filter(None, search_terms)),
                 "country": item.get("country"),
                 "logo_url": item.get("logo_url")
-            }
+            })
             
             # Prepare CSV update data using the matched ID
             league_updates[rl_id_key] = upsert_data
@@ -548,7 +530,7 @@ def main():
                   search_terms.add(term.replace("united", "utd"))
                   search_terms.add(term.replace("city", "fc"))
 
-              upsert_data = {
+              upsert_data = clean_none_values({
                   "team_id": tid, # use team_id as per schema
                   "team_name": official_name, # map to team_name
                   "other_names": item.get("other_names", []),
@@ -558,7 +540,7 @@ def main():
                   "city": item.get("city"),
                   "stadium": item.get("stadium"),
                   "team_crest": item.get("crest_url") # column is team_crest in schema
-              }
+              })
             
               # Prepare CSV update data
               team_updates[tid] = upsert_data
