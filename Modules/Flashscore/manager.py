@@ -209,3 +209,106 @@ async def run_flashscore_analysis(playwright: Playwright):
              
     print(f"\n--- Data Extraction & Analysis Complete: {total_cycle_predictions} new predictions found. ---")
 
+
+async def run_flashscore_schedule_only(playwright: Playwright, refresh: bool = False):
+    """
+    Schedule-only mode: extract match schedules for 7 days, save to DB + sync.
+    No predictions, no match-page analysis.
+    If refresh=True, ignore resume date and start from today.
+    """
+    print("\n--- Running Schedule Extraction (No Predictions) ---")
+
+    browser = await playwright.chromium.launch(
+        headless=True,
+        args=["--disable-dev-shm-usage", "--no-sandbox", "--disable-gpu"]
+    )
+
+    context = None
+    total_saved = 0
+    try:
+        context = await browser.new_context(
+            user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
+            timezone_id="Africa/Lagos"
+        )
+        page = await context.new_page()
+        PageMonitor.attach_listeners(page)
+
+        # Navigation
+        print("  [Navigation] Going to Flashscore...")
+        for attempt in range(5):
+            try:
+                await page.goto("https://www.flashscore.com/football/", wait_until="domcontentloaded", timeout=NAVIGATION_TIMEOUT)
+                print("  [Navigation] Flashscore loaded successfully.")
+                break
+            except Exception as e:
+                print(f"  [Navigation Error] Attempt {attempt + 1}/5 failed: {e}")
+                if attempt < 4:
+                    await asyncio.sleep(5)
+                else:
+                    print("  [Critical] All navigation attempts failed.")
+                    return
+
+        await fs_universal_popup_dismissal(page, "fs_home_page")
+
+        # Resume logic (skipped if refresh=True)
+        resume_date = None
+        if not refresh:
+            last_processed_info = get_last_processed_info()
+            resume_date = last_processed_info.get('date_obj')
+            if resume_date and resume_date > (dt.now(NIGERIA_TZ) + timedelta(days=7)).date():
+                print(f"  [Schedule] Resume date {resume_date} is beyond 7-day window. All caught up.")
+                return
+        else:
+            print("  [Schedule] Refresh mode — starting from today.")
+
+        for day_offset in range(7):
+            target_date = dt.now(NIGERIA_TZ) + timedelta(days=day_offset)
+            target_full = target_date.strftime("%d.%m.%Y")
+
+            if day_offset > 0:
+                match_row_sel = await SelectorManager.get_selector_auto(page, "fs_home_page", "match_rows")
+                if not match_row_sel or not await click_next_day(page, match_row_sel):
+                    break
+                await asyncio.sleep(2)
+
+            if resume_date and target_date.date() < resume_date:
+                continue
+
+            print(f"\n--- EXTRACTING SCHEDULE: {target_full} ---")
+            await fs_universal_popup_dismissal(page, "fs_home_page")
+            # ALL tab is the default view — extract_matches_from_page uses it directly
+            matches_data = await extract_matches_from_page(page)
+
+            # Save schedules + teams (no predictions)
+            for m in matches_data:
+                fixture_id = m.get('fixture_id')
+                m['date'] = target_full
+                save_schedule_entry({
+                    'fixture_id': fixture_id, 'date': m.get('date'),
+                    'match_time': m.get('match_time', m.get('time')),
+                    'region_league': m.get('region_league'),
+                    'home_team': m.get('home_team'), 'away_team': m.get('away_team'),
+                    'home_team_id': m.get('home_team_id'), 'away_team_id': m.get('away_team_id'),
+                    'match_status': m.get('status', 'scheduled'),
+                    'match_link': m.get('match_link')
+                })
+                save_team_entry({'team_id': m.get('home_team_id') or f"t_{hash(m['home_team']) & 0xfffffff}",
+                                 'team_name': m['home_team'],
+                                 'region': m['region_league'].split(' - ')[0] if ' - ' in m['region_league'] else 'Unknown'})
+                save_team_entry({'team_id': m.get('away_team_id') or f"t_{hash(m['away_team']) & 0xfffffff}",
+                                 'team_name': m['away_team'],
+                                 'region': m['region_league'].split(' - ')[0] if ' - ' in m['region_league'] else 'Unknown'})
+
+            total_saved += len(matches_data)
+            print(f"  [Schedule] Saved {len(matches_data)} matches for {target_full}.")
+
+    finally:
+        if context is not None:
+            await context.close()
+        if 'browser' in locals():
+            await browser.close()
+
+    # Cloud sync
+    from Data.Access.sync_manager import run_full_sync
+    await run_full_sync(session_name="Schedule Extraction")
+    print(f"\n--- Schedule Extraction Complete: {total_saved} total matches saved. ---")

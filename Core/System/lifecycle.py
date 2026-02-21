@@ -124,14 +124,16 @@ Examples:
   python Leo.py --chapter 2                Full Chapter 2 (Booking & Withdrawal)
   python Leo.py --chapter 3                Chapter 3: Monitoring & Oversight
   python Leo.py --sync                     Force full cloud sync
-  python Leo.py --recommend                Generate recommendations only
-  python Leo.py --accuracy                 Print accuracy report
-  python Leo.py --search-dict              Rebuild search dictionary
-  python Leo.py --review                   Run outcome review only
-  python Leo.py --backtest                 Run single-pass backtest
+  python Leo.py --recommend                Generate and display recommendations only
+  python Leo.py --accuracy                 Print accuracy report only
+  python Leo.py --search-dict              Rebuild the search dictionary from CSVs
+  python Leo.py --review                   Run outcome review process only
+  python Leo.py --backtest                 Run a single-pass backtest check
   python Leo.py --offline-repredict        Offline reprediction mode
-  python Leo.py --streamer                 Run live score streamer
-  python Leo.py --rule-engine              Show default rule engine + accuracy
+  python Leo.py --streamer                 Run the live score streamer independently
+  python Leo.py --schedule                 Extract schedules only (no predictions)
+  python Leo.py --schedule --refresh       Re-extract schedules starting from today
+  python Leo.py --rule-engine              Show default rule engine info (combine with --list, --set-default, --backtest)
   python Leo.py --rule-engine --list       List all saved rule engines
   python Leo.py --rule-engine --backtest   Progressive backtest default engine
   python Leo.py --rule-engine --backtest --id ENGINE_ID   Backtest a specific engine
@@ -165,9 +167,9 @@ Examples:
     parser.add_argument('--streamer', action='store_true',
                        help='Run the live score streamer independently')
     parser.add_argument('--schedule', action='store_true',
-                       help='Run the daily schedule scraper independently')
+                       help='Extract match schedules only (no predictions)')
     parser.add_argument('--refresh', action='store_true',
-                       help='Run multi-day schedule scraping (requires --schedule)')
+                       help='Force re-extract from today (use with --schedule)')
 
     # --- Rule Engine Management ---
     parser.add_argument('--rule-engine', action='store_true',
@@ -189,5 +191,7 @@ Examples:
         parser.error("--list requires --rule-engine")
     if args.set_default and not args.rule_engine:
         parser.error("--set-default requires --rule-engine")
+    if args.refresh and not args.schedule:
+        parser.error("--refresh requires --schedule")
     return args
 
