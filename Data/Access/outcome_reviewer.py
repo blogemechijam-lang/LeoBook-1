@@ -191,13 +191,19 @@ def save_single_outcome(match_data: Dict, new_status: str):
                         actual_score = row.get('actual_score', '')
                         
                         try:
-                            h_core, a_core = actual_score.split('-')
-                            is_correct = final_eval(prediction, h_core, a_core)
-                            row['outcome_correct'] = str(is_correct)
-                            
-                            # Immediate Sync (Real-time update)
-                            print(f"      [Cloud] Immediate sync for {target_id}...")
-                            asyncio.create_task(SyncManager().batch_upsert('predictions', [row]))
+                            # Robust score parsing: handle "3-1", "3 - 1", "3-1-AET", etc.
+                            import re
+                            score_match = re.match(r'(\d+)\s*-\s*(\d+)', actual_score or '')
+                            if score_match:
+                                h_core, a_core = score_match.group(1), score_match.group(2)
+                                is_correct = final_eval(prediction, h_core, a_core)
+                                row['outcome_correct'] = str(is_correct)
+                                
+                                # Immediate Sync (Real-time update)
+                                print(f"      [Cloud] Immediate sync for {target_id}...")
+                                asyncio.create_task(SyncManager().batch_upsert('predictions', [row]))
+                            else:
+                                print(f"      [Eval Skip] Cannot parse score '{actual_score}' for {target_id}")
                         except Exception as eval_err:
                             print(f"      [Eval Error] {eval_err}")
 
