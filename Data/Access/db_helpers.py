@@ -15,7 +15,7 @@ from datetime import datetime as dt
 from typing import Dict, Any, List, Optional
 import uuid
 
-from .csv_operations import _read_csv, _append_to_csv, _write_csv, upsert_entry
+from .csv_operations import _read_csv, _append_to_csv, _write_csv, upsert_entry, batch_upsert
 append_to_csv = _append_to_csv # Alias for external use
 
 # --- Data Store Paths ---

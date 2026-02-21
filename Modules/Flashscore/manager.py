@@ -276,31 +276,15 @@ async def run_flashscore_schedule_only(playwright: Playwright, refresh: bool = F
 
             print(f"\n--- EXTRACTING SCHEDULE: {target_full} ---")
             await fs_universal_popup_dismissal(page, "fs_home_page")
-            # ALL tab is the default view — extract_matches_from_page uses it directly
+            # extract_matches_from_page handles expansion + extraction + batch save + sync
             matches_data = await extract_matches_from_page(page)
 
-            # Save schedules + teams (no predictions)
+            # Stamp date on all matches for this day
             for m in matches_data:
-                fixture_id = m.get('fixture_id')
                 m['date'] = target_full
-                save_schedule_entry({
-                    'fixture_id': fixture_id, 'date': m.get('date'),
-                    'match_time': m.get('match_time', m.get('time')),
-                    'region_league': m.get('region_league'),
-                    'home_team': m.get('home_team'), 'away_team': m.get('away_team'),
-                    'home_team_id': m.get('home_team_id'), 'away_team_id': m.get('away_team_id'),
-                    'match_status': m.get('status', 'scheduled'),
-                    'match_link': m.get('match_link')
-                })
-                save_team_entry({'team_id': m.get('home_team_id') or f"t_{hash(m['home_team']) & 0xfffffff}",
-                                 'team_name': m['home_team'],
-                                 'region': m['region_league'].split(' - ')[0] if ' - ' in m['region_league'] else 'Unknown'})
-                save_team_entry({'team_id': m.get('away_team_id') or f"t_{hash(m['away_team']) & 0xfffffff}",
-                                 'team_name': m['away_team'],
-                                 'region': m['region_league'].split(' - ')[0] if ' - ' in m['region_league'] else 'Unknown'})
 
             total_saved += len(matches_data)
-            print(f"  [Schedule] Saved {len(matches_data)} matches for {target_full}.")
+            print(f"  [Schedule] {len(matches_data)} matches for {target_full}.")
 
     finally:
         if context is not None:

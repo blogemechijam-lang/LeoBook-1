@@ -77,3 +77,34 @@ def upsert_entry(filepath: str, data_row: Dict, fieldnames: List[str], unique_ke
         all_rows.append(data_row)
 
     _write_csv(filepath, all_rows, fieldnames)
+
+
+def batch_upsert(filepath: str, data_rows: List[Dict], fieldnames: List[str], unique_key: str):
+    """
+    Batch UPSERT: reads the file ONCE, updates/inserts ALL rows in memory, writes ONCE.
+    ~1000x faster than calling upsert_entry() in a loop for large datasets.
+    """
+    if not data_rows:
+        return
+
+    all_rows = _read_csv(filepath)
+
+    # Build index for O(1) lookup
+    index = {}
+    for i, row in enumerate(all_rows):
+        key = row.get(unique_key)
+        if key:
+            index[key] = i
+
+    new_rows = []
+    for data_row in data_rows:
+        uid = data_row.get(unique_key)
+        if not uid:
+            continue
+        if uid in index:
+            all_rows[index[uid]].update(data_row)
+        else:
+            new_rows.append(data_row)
+
+    all_rows.extend(new_rows)
+    _write_csv(filepath, all_rows, fieldnames)
