@@ -40,7 +40,10 @@
     "expand_show_more_button": ".wclIcon__leagueShowMoreCont .wcl-trigger_CGiIV[data-state=\"delayed-open\"] button.wcl-accordion_7Fi80",
     "all_tab": ".filters__tab[data-analytics-alias=\"summary\"]",
     "all_tab_fallback": ".filters__tab",
-    "cookie_accept_onetrust": "#onetrust-accept-btn-handler"
+    "cookie_accept_onetrust": "#onetrust-accept-btn-handler",
+    "league_header_collapsed": ".event__header--collapsed",
+    "league_expand_arrow": ".event__arrow",
+    "score_final_state": "final"
   },
   "fs_match_page": {
     "region_flag_img": "ol.wcl-breadcrumbList_lC9sI img[data-testid^='wcl-flag-']",

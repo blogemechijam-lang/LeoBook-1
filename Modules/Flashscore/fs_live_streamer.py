@@ -34,10 +34,8 @@ _STREAMER_HEARTBEAT_FILE = os.path.join(os.path.dirname(LIVE_SCORES_CSV), '.stre
 
 # JS to expand the "Show More" dropdown found in mobile/collapsed views
 EXPAND_DROPDOWN_JS = """
-() => {
-    // Selector from knowledge.json: expand_show_more_button
-    const btn = document.querySelector('.wclIcon__leagueShowMoreCont .wcl-trigger_CGiIV[data-state="delayed-open"] button.wcl-accordion_7Fi80') 
-             || document.querySelector('.wcl-accordion_7Fi80');
+(selector) => {
+    const btn = document.querySelector(selector);
     if (btn) {
         btn.click();
         return true;
@@ -48,11 +46,11 @@ EXPAND_DROPDOWN_JS = """
 
 # JS to expand all collapsed league headers
 EXPAND_LEAGUES_JS = """
-() => {
+(headerSelector, arrowSelector) => {
     let clicked = 0;
-    const items = document.querySelectorAll('.event__header--collapsed');
+    const items = document.querySelectorAll(headerSelector);
     items.forEach(el => {
-        const arrow = el.querySelector('.event__arrow');
+        const arrow = el.querySelector(arrowSelector);
         if (arrow) {
             arrow.click();
             clicked++;
@@ -327,42 +325,44 @@ async def _extract_all_matches(page) -> list:
       - 'scheduled': upcoming (has time, no score)
     """
 
-    matches = await page.evaluate(r"""() => {
+    selectors = SelectorManager.get_all_selectors_for_context("fs_home_page")
+
+    matches = await page.evaluate(r"""(sel) => {
         const matches = [];
-        const container = document.querySelector('.sportName.soccer') || document.body;
+        const container = document.querySelector(sel.sport_container_soccer) || document.body;
         if (!container) return [];
 
         const allElements = container.querySelectorAll(
-            '.headerLeague__wrapper, .event__match'
+            sel.league_header + ', ' + sel.match_rows
         );
 
         let currentRegion = '';
         let currentLeague = '';
 
         allElements.forEach((el) => {
-            if (el.classList.contains('headerLeague__wrapper')) {
-                const catEl = el.querySelector('.headerLeague__category-text');
-                const titleEl = el.querySelector('.headerLeague__title-text');
+            if (el.classList.contains(sel.league_header.replace('.', ''))) {
+                const catEl = el.querySelector(sel.live_league_category_text);
+                const titleEl = el.querySelector(sel.live_league_title_text);
                 currentRegion = catEl ? catEl.innerText.trim() : '';
                 currentLeague = titleEl ? titleEl.innerText.trim() : '';
                 return;
             }
 
             const rowId = el.getAttribute('id');
-            const cleanId = rowId ? rowId.replace('g_1_', '') : null;
+            const cleanId = rowId ? rowId.replace(sel.live_match_row_id_prefix, '') : null;
             if (!cleanId) return;
 
-            const homeNameEl = el.querySelector('.event__homeParticipant .wcl-name_jjfMf');
-            const awayNameEl = el.querySelector('.event__awayParticipant .wcl-name_jjfMf');
+            const homeNameEl = el.querySelector(sel.match_row_home_team_name);
+            const awayNameEl = el.querySelector(sel.match_row_away_team_name);
             if (!homeNameEl || !awayNameEl) return;
 
-            const homeScoreEl = el.querySelector('span.event__score--home');
-            const awayScoreEl = el.querySelector('span.event__score--away');
-            const stageEl = el.querySelector('.event__stage--block');
-            const timeEl = el.querySelector('.event__time');
-            const linkEl = el.querySelector('a.eventRowLink');
+            const homeScoreEl = el.querySelector(sel.live_match_home_score);
+            const awayScoreEl = el.querySelector(sel.live_match_away_score);
+            const stageEl = el.querySelector(sel.live_match_stage_block);
+            const timeEl = el.querySelector(sel.match_row_time);
+            const linkEl = el.querySelector(sel.event_row_link);
 
-            const isLive = el.classList.contains('event__match--live');
+            const isLive = el.classList.contains(sel.live_match_row.replace('.', ''));
             const stageText = stageEl ? stageEl.innerText.trim() : '';
             const stageLower = stageText.toLowerCase();
             const rawTime = timeEl ? timeEl.innerText.trim() : '';
@@ -395,7 +395,7 @@ async def _extract_all_matches(page) -> list:
                 homeScore = ''; awayScore = '';
             } else if (homeScoreEl && awayScoreEl) {
                 const scoreState = homeScoreEl.getAttribute('data-state');
-                if (scoreState === 'final' || stageLower.includes('fin') || stageLower === '') {
+                if (scoreState === sel.score_final_state || stageLower.includes('fin') || stageLower === '') {
                     status = 'finished';
                     if (stageLower.includes('pen')) stageDetail = 'Pen';
                     else if (stageLower.includes('aet') || stageLower.includes('et')) stageDetail = 'AET';
@@ -423,7 +423,7 @@ async def _extract_all_matches(page) -> list:
             });
         });
         return matches;
-    }""")
+    }""", selectors)
     return matches or []
 
 
@@ -433,13 +433,12 @@ async def _extract_all_matches(page) -> list:
 async def _click_all_tab(page) -> bool:
     """Clicks the ALL tab on the Flashscore football page (default/first tab)."""
     try:
-        tab_sel = SelectorManager.get_selector("fs_home_page", "all_tab")
-        if tab_sel:
-            tab = page.locator(tab_sel)
-            if await tab.count() > 0:
-                await tab.first.click()
-                await asyncio.sleep(2)
-                return True
+        tab_sel = SelectorManager.get_selector_strict("fs_home_page", "all_tab")
+        tab = page.locator(tab_sel)
+        if await tab.count() > 0:
+            await tab.first.click()
+            await asyncio.sleep(2)
+            return True
     except Exception:
         pass
     return False
@@ -449,15 +448,19 @@ async def ensure_content_expanded(page):
     """Robustly expand dropdowns and leagues to ensure all matches are visible."""
     # 1. Expand the "Show More" dropdown if present (Mobile/Collapsed view)
     try:
-        if await page.evaluate(EXPAND_DROPDOWN_JS):
+        expand_btn = SelectorManager.get_selector("fs_home_page", "expand_show_more_button")
+        if await page.evaluate(EXPAND_DROPDOWN_JS, expand_btn):
             print("   [Streamer] Expanded 'Show More' dropdown")
             await asyncio.sleep(2)
     except Exception:
         pass
 
     # 2. Expand league headers
+    header_sel = SelectorManager.get_selector("fs_home_page", "league_header_collapsed")
+    arrow_sel = SelectorManager.get_selector("fs_home_page", "league_expand_arrow")
+
     for attempt in range(1, 4):
-        expanded = await page.evaluate(EXPAND_LEAGUES_JS)
+        expanded = await page.evaluate(EXPAND_LEAGUES_JS, header_sel, arrow_sel)
         if expanded > 0:
             print(f"   [Streamer] Expanded {expanded} league headers (attempt {attempt})")
             await asyncio.sleep(2)
@@ -507,7 +510,8 @@ async def live_score_streamer(playwright: Playwright):
         
         # Target a visible element to ensure page has actual content before proceeding
         try:
-            await page.wait_for_selector(".sportName", timeout=60000)
+            sport_sel = SelectorManager.get_selector_strict("fs_home_page", "sport_container")
+            await page.wait_for_selector(sport_sel, timeout=60000)
         except:
             print("   [Streamer] Warning: sportName container not found, proceeding anyway...")
         
