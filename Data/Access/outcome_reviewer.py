@@ -302,10 +302,13 @@ def process_review_task_offline(match: Dict) -> Optional[Dict]:
     schedule = schedule_db.get(fixture_id, {})
 
     match_status = schedule.get('match_status', '').upper()
-    home_score = schedule.get('home_score', '')
-    away_score = schedule.get('away_score', '')
+    home_score = schedule.get('home_score', '').strip()
+    away_score = schedule.get('away_score', '').strip()
 
-    if match_status in ('FINISHED', 'AET', 'PEN') and home_score and away_score:
+    # Scores must be numeric — dashes/empty/'None' are NOT real scores
+    has_valid_scores = home_score.isdigit() and away_score.isdigit()
+
+    if match_status in ('FINISHED', 'AET', 'PEN') and has_valid_scores:
         match['home_score'] = home_score
         match['away_score'] = away_score
         match['actual_score'] = f"{home_score}-{away_score}"
