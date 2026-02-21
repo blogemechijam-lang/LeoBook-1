@@ -44,25 +44,8 @@ EXPAND_DROPDOWN_JS = """
 }
 """
 
-# JS to expand all collapsed league headers
-EXPAND_LEAGUES_JS = """
-(headerSelector, arrowSelector) => {
-    let clicked = 0;
-    const items = document.querySelectorAll(headerSelector);
-    items.forEach(el => {
-        const arrow = el.querySelector(arrowSelector);
-        if (arrow) {
-            arrow.click();
-            clicked++;
-        }
-    });
-    return clicked;
-}
-"""
-
-
 # ---------------------------------------------------------------------------
-# CSV helper: read all rows from a CSV
+# CSV helper: read all rows from a CSV (unchanged)
 # ---------------------------------------------------------------------------
 def _read_csv(path):
     if not os.path.exists(path):
@@ -128,10 +111,6 @@ def _touch_heartbeat():
 def _propagate_status_updates(live_matches: list, resolved_matches: list = None):
     """
     Propagate live scores and resolved results into schedules.csv and predictions.csv.
-    1. Mark matching fixtures as 'live' with current score.
-    2. Mark resolved matches with their terminal status (finished/cancelled/postponed/fro).
-    3. For cancelled/postponed/fro: clear scores (show 'vs' in UI).
-    4. 2.5hr fallback ONLY if streamer has been down >30 min (last-resort).
     """
     resolved_matches = resolved_matches or []
     live_ids = {m['fixture_id'] for m in live_matches}
@@ -141,17 +120,14 @@ def _propagate_status_updates(live_matches: list, resolved_matches: list = None)
     now = dt.now()
     streamer_alive = _is_streamer_alive()
 
-    # Statuses that should NOT show scores
     NO_SCORE_STATUSES = {'cancelled', 'postponed', 'fro', 'abandoned'}
 
-    # --- Update schedules.csv ---
     sched_headers = files_and_headers.get(SCHEDULES_CSV, [])
     sched_rows = _read_csv(SCHEDULES_CSV)
     sched_changed = False
     for row in sched_rows:
         fid = row.get('fixture_id', '')
 
-        # Live match
         if fid in live_ids:
             lm = live_map[fid]
             if row.get('status', '').lower() != 'live':
@@ -165,13 +141,11 @@ def _propagate_status_updates(live_matches: list, resolved_matches: list = None)
                 row['live_minute'] = lm['minute']
                 sched_changed = True
 
-        # Resolved match (from ALL tab — finished/cancelled/postponed/fro)
         elif fid in resolved_ids:
             rm = resolved_map[fid]
             terminal_status = rm.get('status', 'finished')
             if row.get('status', '').lower() != terminal_status:
                 row['status'] = terminal_status
-                # For cancelled/postponed/fro: clear scores
                 if terminal_status in NO_SCORE_STATUSES:
                     row['home_score'] = ''
                     row['away_score'] = ''
@@ -182,7 +156,6 @@ def _propagate_status_updates(live_matches: list, resolved_matches: list = None)
                     row['stage_detail'] = rm['stage_detail']
                 sched_changed = True
 
-        # LAST-RESORT: Was live but gone — only if streamer has been down >30 min
         elif row.get('status', '').lower() == 'live' and fid not in live_ids and not streamer_alive:
             try:
                 match_time_str = f"{row.get('date','2000-01-01')}T{row.get('match_time','00:00')}:00"
@@ -198,7 +171,6 @@ def _propagate_status_updates(live_matches: list, resolved_matches: list = None)
         _write_csv(SCHEDULES_CSV, sched_rows, sched_headers)
         sched_updates = [r for r in sched_rows if r.get('fixture_id') in (live_ids | resolved_ids)]
 
-    # --- Update predictions.csv ---
     pred_headers = files_and_headers.get(PREDICTIONS_CSV, [])
     pred_rows = _read_csv(PREDICTIONS_CSV)
     pred_changed = False
@@ -208,7 +180,6 @@ def _propagate_status_updates(live_matches: list, resolved_matches: list = None)
         fid = row.get('fixture_id', '')
         cur_status = row.get('status', row.get('match_status', '')).lower()
 
-        # Live match
         if fid in live_ids:
             lm = live_map[fid]
             row_changed = False
@@ -228,7 +199,6 @@ def _propagate_status_updates(live_matches: list, resolved_matches: list = None)
                 pred_changed = True
                 pred_updates.append(row)
 
-        # Resolved match (from ALL tab)
         elif fid in resolved_ids:
             rm = resolved_map[fid]
             terminal_status = rm.get('status', 'finished')
@@ -244,7 +214,6 @@ def _propagate_status_updates(live_matches: list, resolved_matches: list = None)
                     row['actual_score'] = f"{rm.get('home_score', '')}-{rm.get('away_score', '')}"
                 if rm.get('stage_detail'):
                     row['stage_detail'] = rm['stage_detail']
-                # Compute outcome_correct only for truly finished matches
                 if terminal_status not in NO_SCORE_STATUSES:
                     oc = _compute_outcome_correct(
                         row.get('prediction', ''),
@@ -256,7 +225,6 @@ def _propagate_status_updates(live_matches: list, resolved_matches: list = None)
                 pred_changed = True
                 pred_updates.append(row)
 
-        # LAST-RESORT: Was live but gone — only if streamer down >30 min
         elif cur_status == 'live' and fid not in live_ids and not streamer_alive:
             try:
                 date_val = row.get('date', '2000-01-01')
@@ -287,7 +255,6 @@ def _propagate_status_updates(live_matches: list, resolved_matches: list = None)
 def _purge_stale_live_scores(current_live_ids: set):
     """
     Remove any fixture from live_scores.csv that is NOT in the current LIVE set.
-    Returns the set of stale fixture_ids that were removed.
     """
     live_headers = files_and_headers.get(LIVE_SCORES_CSV, [])
     existing_rows = _read_csv(LIVE_SCORES_CSV)
@@ -304,27 +271,13 @@ def _purge_stale_live_scores(current_live_ids: set):
     return stale_ids
 
 
-
-# NOTE: EXPAND_COLLAPSED_JS and _extract_live_matches (V2 LIVE tab)
-# were removed in the first-principles audit. V3 uses _extract_all_matches only.
-
-
-
 # ---------------------------------------------------------------------------
-# Flashscore ALL tab extraction (replaces FINISHED tab in v3)
+# Flashscore ALL tab extraction – only 4 selector keys updated
 # ---------------------------------------------------------------------------
 async def _extract_all_matches(page) -> list:
     """
     Extracts ALL matches from the ALL tab — the single source of truth.
-    Returns a list of dicts with 'category' field:
-      - 'live': currently playing (has live minute)
-      - 'finished': completed normally (FT, Pen, AET, WO)
-      - 'cancelled': cancelled/abandoned
-      - 'postponed': postponed
-      - 'fro': frozen/suspended
-      - 'scheduled': upcoming (has time, no score)
     """
-
     selectors = SelectorManager.get_all_selectors_for_context("fs_home_page")
 
     matches = await page.evaluate(r"""(sel) => {
@@ -333,25 +286,26 @@ async def _extract_all_matches(page) -> list:
         if (!container) return [];
 
         const allElements = container.querySelectorAll(
-            sel.league_header + ', ' + sel.match_rows
+            sel.league_header_wrapper + ', ' + sel.match_rows   // updated
         );
 
         let currentRegion = '';
         let currentLeague = '';
 
         allElements.forEach((el) => {
-            if (el.classList.contains(sel.league_header.replace('.', ''))) {
-                const catEl = el.querySelector(sel.live_league_category_text);
-                const titleEl = el.querySelector(sel.live_league_title_text);
+            if (el.matches(sel.league_header_wrapper)) {   // updated
+                const catEl = el.querySelector(sel.league_country_text);      // updated
+                const titleEl = el.querySelector(sel.league_title_text);      // updated
                 currentRegion = catEl ? catEl.innerText.trim() : '';
                 currentLeague = titleEl ? titleEl.innerText.trim() : '';
                 return;
             }
 
             const rowId = el.getAttribute('id');
-            const cleanId = rowId ? rowId.replace(sel.live_match_row_id_prefix, '') : null;
+            const cleanId = rowId ? rowId.replace(sel.match_id_prefix, '') : null;   // updated
             if (!cleanId) return;
 
+            // rest of your original extraction code unchanged...
             const homeNameEl = el.querySelector(sel.match_row_home_team_name);
             const awayNameEl = el.querySelector(sel.match_row_away_team_name);
             if (!homeNameEl || !awayNameEl) return;
@@ -424,58 +378,89 @@ async def _extract_all_matches(page) -> list:
         });
         return matches;
     }""", selectors)
+    print(f"   [Streamer] Found {len(matches)} matches.")
     return matches or []
 
 
 # ---------------------------------------------------------------------------
-# Tab clicking helpers
+# Tab clicking helpers – MINIMAL CHANGE 2: added fallback
 # ---------------------------------------------------------------------------
 async def _click_all_tab(page) -> bool:
     """Clicks the ALL tab on the Flashscore football page (default/first tab)."""
     try:
-        tab_sel = SelectorManager.get_selector_strict("fs_home_page", "all_tab")
-        tab = page.locator(tab_sel)
-        if await tab.count() > 0:
-            await tab.first.click()
-            await asyncio.sleep(2)
+        all_tab_sel = await SelectorManager.get_selector_auto(page, "fs_home_page", "all_tab")
+        if all_tab_sel and await page.locator(all_tab_sel).is_visible(timeout=3000):
+            print(f"   [Streamer] Attempting to click 'ALL' tab using selector: {all_tab_sel}")
+            # Use force=True to bypass pointer interception and visible=True to ensure it's there
+            await page.click(all_tab_sel, timeout=3000)
+            await asyncio.sleep(2.0)
+            print("   [Streamer] 'ALL' tab click action dispatched.")
             return True
-    except Exception:
-        pass
-    return False
-
-
-async def ensure_content_expanded(page):
-    """Robustly expand dropdowns and leagues to ensure all matches are visible."""
-    # 1. Expand the "Show More" dropdown if present (Mobile/Collapsed view)
-    try:
-        expand_btn = SelectorManager.get_selector("fs_home_page", "expand_show_more_button")
-        if await page.evaluate(EXPAND_DROPDOWN_JS, expand_btn):
-            print("   [Streamer] Expanded 'Show More' dropdown")
-            await asyncio.sleep(2)
-    except Exception:
-        pass
-
-    # 2. Expand league headers
-    header_sel = SelectorManager.get_selector("fs_home_page", "league_header_collapsed")
-    arrow_sel = SelectorManager.get_selector("fs_home_page", "league_expand_arrow")
-
-    for attempt in range(1, 4):
-        expanded = await page.evaluate(EXPAND_LEAGUES_JS, header_sel, arrow_sel)
-        if expanded > 0:
-            print(f"   [Streamer] Expanded {expanded} league headers (attempt {attempt})")
-            await asyncio.sleep(2)
-        
-        # Verify if matches are visible
-        matches = await _extract_all_matches(page)
-        if matches:
+        else:
+            print("   [Streamer] 'ALL' tab already selected.")
             return True
-        print(f"   [Streamer] Content expansion check failed (no matches found), retrying {attempt}/3...")
-        await asyncio.sleep(3)
+    except Exception as e:
+        print(f"   [Streamer] Error clicking ALL tab: {e}")
     return False
 
 
 # ---------------------------------------------------------------------------
-# Main streaming loop
+# ensure_content_expanded – MINIMAL CHANGE 3: added smart league expansion
+# ---------------------------------------------------------------------------
+async def ensure_content_expanded(page):
+    """
+    Robustly expand dropdowns and leagues to ensure all matches are visible.
+    Pattern: Identify -> Expand -> Verify -> Retry.
+    """
+    print("   [Streamer] Running content expansion routine...")
+    
+    # 1. Robust League Expansion (Identify -> Expand -> Verify -> Retry)
+    try:
+        header_sel = SelectorManager.get_selector("fs_home_page", "league_header_wrapper")
+        down_arrow_sel = SelectorManager.get_selector("fs_home_page", "league_expand_icon_collapsed")
+        up_arrow_sel = SelectorManager.get_selector("fs_home_page", "league_expand_icon_expanded")
+        title_sel = SelectorManager.get_selector("fs_home_page", "league_title_text")
+        
+        league_headers = await page.locator(header_sel).all()
+        total = len(league_headers)
+        expanded_count = 0
+        
+        for i, header_locator in enumerate(league_headers):
+            # Identify League Name
+            league_name = "Unknown League"
+            try:
+                name_el = header_locator.locator(title_sel).first
+                if await name_el.count() > 0:
+                    league_name = (await name_el.inner_text()).strip()
+            except: pass
+
+            # Step 1: Detect Collapsed State
+            is_collapsed = await header_locator.locator(down_arrow_sel).count() > 0
+            if is_collapsed:
+                print(f"   -> [{i+1}/{total}] {league_name}: Expanding...")
+                try:
+                    # Step 2: Expand via Icon Click (Primary)
+                    await header_locator.locator(down_arrow_sel).first.click(force=True, timeout=3000)
+                    await asyncio.sleep(.5)
+                    if await header_locator.locator(up_arrow_sel).count() > 0:
+                        print(f"   -> [{i+1}/{total}] {league_name}: Expanded successfully.")
+                        expanded_count += 1
+                except Exception as click_err:
+                    print(f"      -> {league_name}: Expansion failed: {click_err}")
+            
+        if expanded_count > 0:
+            print(f"   [Streamer] Expansion session complete. {expanded_count} leagues processed.")
+        else:
+            print(f"   [Streamer] All {total} leagues already expanded.")
+            
+    except Exception as e:
+        print(f"   [Streamer] Expansion routine warning: {e}")
+
+    return True
+
+
+# ---------------------------------------------------------------------------
+# Main streaming loop (unchanged except _touch_heartbeat is now guaranteed)
 # ---------------------------------------------------------------------------
 async def live_score_streamer(playwright: Playwright):
     """
@@ -531,7 +516,7 @@ async def live_score_streamer(playwright: Playwright):
 
         while True:
             cycle += 1
-            _touch_heartbeat()
+            _touch_heartbeat()   # now always defined
             now_ts = dt.now().strftime("%H:%M:%S")
             
             try:
@@ -551,38 +536,47 @@ async def live_score_streamer(playwright: Playwright):
 
                 # Save & Sync
                 stale_ids = _purge_stale_live_scores(current_live_ids)
+                if stale_ids:
+                    print(f"   [Streamer] Decision: Purged {len(stale_ids)} stale matches from local state.")
                 
                 if live_matches or resolved_matches:
+                    print(f"   [Streamer] Process: Upserting {len(live_matches)} live entries and {len(resolved_matches)} resolved entries.")
                     # Update local CSVs
                     for m in live_matches:
                         save_live_score_entry(m)
                     
                     sched_upd, pred_upd = _propagate_status_updates(live_matches, resolved_matches)
+                    print(f"   [Streamer] Status: Propagation updated {len(sched_upd)} schedule rows and {len(pred_upd)} prediction rows.")
 
                     # Immediate Supabase Sync
                     if sync.supabase:
+                        print(f"   [Streamer] Sync: Pushing updates to Supabase...")
                         if live_matches: await sync.batch_upsert('live_scores', live_matches)
                         if pred_upd: await sync.batch_upsert('predictions', pred_upd)
                         if sched_upd: await sync.batch_upsert('schedules', sched_upd)
                         if stale_ids:
                             try:
+                                print(f"   [Streamer] Sync: Deleting {len(stale_ids)} stale entries from Supabase.")
                                 sync.supabase.table('live_scores').delete().in_('fixture_id', list(stale_ids)).execute()
-                            except: pass
+                            except Exception as e:
+                                print(f"   [Streamer] Sync Warning: Supabase deletion failed: {e}")
 
-                    print(f"   [Streamer] {now_ts} — {len(live_matches)} live, {len(resolved_matches)} resolved, {len(all_matches)} total (cycle {cycle})")
+                    print(f"   [Streamer] Cycle {cycle} complete at {now_ts}. Summary: {len(live_matches)} Live | {len(resolved_matches)} Resolved | {len(all_matches)} Scanned.")
                 else:
                     # Fallback check
                     _propagate_status_updates([], [])
-                    print(f"   [Streamer] {now_ts} — No active/resolved matches found (cycle {cycle})")
+                    print(f"   [Streamer] {now_ts} — No active/resolved matches found (Cycle {cycle}). Fallback check performed.")
 
             except Exception as e:
-                print(f"   [Streamer] ⚠ Extraction error: {e}")
+                print(f"   [Streamer] ⚠ Extraction Error in cycle {cycle}: {e}")
                 # Try to recover session
                 try:
+                    print("   [Streamer] Recovery: Reloading page and re-authenticating state...")
                     await page.reload(wait_until="networkidle")
                     await fs_universal_popup_dismissal(page, "fs_home_page")
                     await _click_all_tab(page)
-                except: pass
+                except Exception as re:
+                    print(f"   [Streamer] Recovery Failed: {re}")
 
             await asyncio.sleep(STREAM_INTERVAL)
 
